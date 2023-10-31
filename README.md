@@ -26,7 +26,10 @@ To send to a test endpoint (using SMK) use this URL:
 /sendtest/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}
 ```
 
-In both cases, the payload to send must be the XML business document (like the UBL Invoice). 
+In both cases, the payload to send must be the XML business document (like the UBL Invoice).
+The outcome is a simple JSON document that contains most of the relevant details on sending.
+
+**Note:** Documents are NOT validated internally. They need to be validated externally.
 
 ## Building
 

@@ -31,6 +31,14 @@ The outcome is a simple JSON document that contains most of the relevant details
 
 **Note:** Documents are NOT validated internally. They need to be validated externally.
 
+## What is not included
+
+The following list contains the elements not considered for this demo application:
+
+* You need your own Peppol certificate to make it work - the contained keystore is a dummy only
+* Document validation is not included
+* Peppol Reporting is not included, as no backend connection is available
+
 ## Building
 
 This application is based on Spring Boot 3.x and uses Apache 3.x and Java 17 to build.
@@ -46,7 +54,7 @@ An example Docker file is also present - see `docker-build.cmd` and `docker-run.
 ## Configuration
 
 The main configuration is done via the file `src/main/resources/application.properties`.
-You may need to rebuild the application to have an effect. 
+You may need to rebuild the application to have an effect.
 
 ## Running
 
@@ -54,6 +62,8 @@ If you run it with `java -jar target/phase4-peppol-standalone-x.y.z.jar` it will
 It should show a small introduction page. The `/as4` servlet itself has no user interface.
 
 In case you run the application behind an HTTP proxy, modify the settings in the configuration file (`http.proxy.*`).
+
+In case you don't like port 8080, also check the configuration file.
 
 ---
 

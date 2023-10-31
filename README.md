@@ -41,6 +41,8 @@ mvn clean install
 
 The resulting Spring Boot application is afterwards available as `target/phase4-peppol-standalone-x.y.z.jar` (`x.y.z` is the version number).
 
+An example Docker file is also present - see `docker-build.cmd` and `docker-run.cmd` for details.
+
 ## Configuration
 
 The main configuration is done via the file `src/main/resources/application.properties`.

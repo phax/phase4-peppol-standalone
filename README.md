@@ -38,11 +38,17 @@ mvn clean install
 
 The resulting Spring Boot application is afterwards available as `target/phase4-peppol-standalone-x.y.z.jar` (`x.y.z` is the version number).
 
+## Configuration
+
+The main configuration is done via the file `src/main/resources/application.properties`.
+You may need to rebuild the application to have an effect. 
+
 ## Running
 
 If you run it with `java -jar target/phase4-peppol-standalone-x.y.z.jar` it will spawn a local Tomcat at port `8080` and you can access it via `http://localhost:8080`.
 It should show a small introduction page. The `/as4` servlet itself has no user interface.
 
+In case you run the application behind an HTTP proxy, modify the settings in the configuration file (`http.proxy.*`).
 
 ---
 

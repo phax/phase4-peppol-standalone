@@ -1,23 +1,45 @@
 package com.helger.phase4.peppolstandalone.controller;
 
+import java.time.OffsetDateTime;
+
 import javax.annotation.Nonnull;
+import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.w3c.dom.Element;
+import org.w3c.dom.Document;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.datetime.PDTFactory;
+import com.helger.commons.datetime.PDTWebDateHelper;
+import com.helger.commons.lang.StackTraceHelper;
+import com.helger.commons.system.EJavaVersion;
+import com.helger.commons.timing.StopWatch;
+import com.helger.jaxb.GenericJAXBMarshaller;
+import com.helger.json.IJsonObject;
+import com.helger.json.JsonObject;
+import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.peppol.sml.ESML;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.phase4.client.IAS4ClientBuildMessageCallback;
 import com.helger.phase4.dump.AS4RawResponseConsumerWriteToFile;
+import com.helger.phase4.ebms3header.Ebms3SignalMessage;
+import com.helger.phase4.marshaller.Ebms3NamespaceHandler;
+import com.helger.phase4.messaging.domain.AS4UserMessage;
+import com.helger.phase4.messaging.domain.AbstractAS4Message;
 import com.helger.phase4.peppol.Phase4PeppolSender;
 import com.helger.phase4.sender.AbstractAS4UserMessageBuilder.ESimpleUserMessageSendResult;
+import com.helger.security.certificate.CertificateHelper;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
+import com.helger.xml.serialize.read.DOMReader;
+
+import jakarta.xml.bind.JAXBElement;
 
 @RestController
 public class PeppolSenderController
@@ -27,19 +49,45 @@ public class PeppolSenderController
   // TODO
   private static final String C2_PEPPOL_SEAT_ID = "POP000000";
 
-  private void _sendPeppolMessage (@Nonnull final Element aPayloadElement,
-                                   @Nonnull final ISMLInfo aSmlInfo,
-                                   @Nonnull @Nonempty final String senderId,
-                                   @Nonnull @Nonempty final String receiverId,
-                                   @Nonnull @Nonempty final String docTypeId,
-                                   @Nonnull @Nonempty final String processId,
-                                   @Nonnull @Nonempty final String countryC1)
+  @Nonnull
+  private String _sendPeppolMessage (@Nonnull final byte [] aPayloadBytes,
+                                     @Nonnull final ISMLInfo aSmlInfo,
+                                     @Nonnull @Nonempty final String senderId,
+                                     @Nonnull @Nonempty final String receiverId,
+                                     @Nonnull @Nonempty final String docTypeId,
+                                     @Nonnull @Nonempty final String processId,
+                                     @Nonnull @Nonempty final String countryC1)
   {
+    final OffsetDateTime aNowUTC = PDTFactory.getCurrentOffsetDateTimeUTC ();
+    final IJsonObject aJson = new JsonObject ();
+    aJson.add ("currentDateTimeUTC", PDTWebDateHelper.getAsStringXSD (aNowUTC));
+    aJson.add ("senderId", senderId);
+    aJson.add ("receiverId", receiverId);
+    aJson.add ("docTypeId", docTypeId);
+    aJson.add ("processId", processId);
+    aJson.add ("countryC1", countryC1);
+    aJson.add ("senderPartyId", C2_PEPPOL_SEAT_ID);
+
+    ESimpleUserMessageSendResult eResult = null;
+    final StopWatch aSW = StopWatch.createdStarted ();
     try
     {
+      final Document aDoc = DOMReader.readXMLDOM (aPayloadBytes);
+      if (aDoc == null)
+        throw new IllegalStateException ("Failed to read provided payload as XML");
+
       // Start configuring here
       final IParticipantIdentifier aReceiverID = Phase4PeppolSender.IF.createParticipantIdentifierWithDefaultScheme (receiverId);
-      final ESimpleUserMessageSendResult eResult;
+
+      final SMPClientReadOnly aSMPClient = new SMPClientReadOnly (Phase4PeppolSender.URL_PROVIDER,
+                                                                  aReceiverID,
+                                                                  aSmlInfo);
+      if (EJavaVersion.JDK_17.isNewerOrEqualsThan (EJavaVersion.getCurrentVersion ()))
+      {
+        // Work around the disabled SHA-1 in XMLDsig issue
+        aSMPClient.setSecureValidation (false);
+      }
+
       eResult = Phase4PeppolSender.builder ()
                                   .documentTypeID (Phase4PeppolSender.IF.createDocumentTypeIdentifierWithDefaultScheme (docTypeId))
                                   .processID (Phase4PeppolSender.IF.createProcessIdentifierWithDefaultScheme (processId))
@@ -47,48 +95,82 @@ public class PeppolSenderController
                                   .receiverParticipantID (aReceiverID)
                                   .senderPartyID (C2_PEPPOL_SEAT_ID)
                                   .countryC1 (countryC1)
-                                  .payload (aPayloadElement)
-                                  .smpClient (new SMPClientReadOnly (Phase4PeppolSender.URL_PROVIDER,
-                                                                     aReceiverID,
-                                                                     aSmlInfo))
+                                  .payload (aDoc.getDocumentElement ())
+                                  .smpClient (aSMPClient)
                                   .rawResponseConsumer (new AS4RawResponseConsumerWriteToFile ())
+                                  .endpointURLConsumer (endpointUrl -> {
+                                    // Determined by SMP lookup
+                                    aJson.add ("c3EndpointUrl", endpointUrl);
+                                  })
+                                  .certificateConsumer ( (aAPCertificate, aCheckDT, eCertCheckResult) -> {
+                                    // Determined by SMP lookup
+                                    aJson.add ("c3Cert", CertificateHelper.getPEMEncodedCertificate (aAPCertificate));
+                                    aJson.add ("c3CertCheckDT", PDTWebDateHelper.getAsStringXSD (aCheckDT));
+                                    aJson.add ("c3CertCheckResult", eCertCheckResult);
+                                  })
+                                  .buildMessageCallback (new IAS4ClientBuildMessageCallback ()
+                                  {
+                                    public void onAS4Message (@Nonnull final AbstractAS4Message <?> aMsg)
+                                    {
+                                      // Created AS4 data
+                                      final AS4UserMessage aUserMsg = (AS4UserMessage) aMsg;
+                                      aJson.add ("as4MessageId",
+                                                 aUserMsg.getEbms3UserMessage ().getMessageInfo ().getMessageId ());
+                                      aJson.add ("as4ConversationId",
+                                                 aUserMsg.getEbms3UserMessage ()
+                                                         .getCollaborationInfo ()
+                                                         .getConversationId ());
+                                    }
+                                  })
+                                  .signalMsgConsumer ( (aSignalMsg, aMessageMetadata, aState) -> {
+                                    // Add the full signal message to the JSON -
+                                    // a bit hacky ;-)
+                                    final GenericJAXBMarshaller <Ebms3SignalMessage> aMarshaller;
+                                    aMarshaller = new GenericJAXBMarshaller <> (Ebms3SignalMessage.class,
+                                                                                null,
+                                                                                x -> new JAXBElement <> (new QName ("http://docs.oasis-open.org/ebxml-msg/ebms/v3.0/ns/core/200704/",
+                                                                                                                    "SignalMessage"),
+                                                                                                         Ebms3SignalMessage.class,
+                                                                                                         null,
+                                                                                                         x));
+                                    aMarshaller.setNamespaceContext (Ebms3NamespaceHandler.getInstance ());
+                                    aJson.add ("as4ReceivedSignalMsg", aMarshaller.getAsString (aSignalMsg));
+                                  })
                                   .disableValidation ()
                                   .sendMessageAndCheckForReceipt ();
       LOGGER.info ("Peppol client send result: " + eResult);
+      aJson.add ("sendingResult", eResult);
     }
     catch (final Exception ex)
     {
+      // Mostly errors on HTTP level
       LOGGER.error ("Error sending Peppol message via AS4", ex);
+      aJson.add ("sendingException",
+                 new JsonObject ().add ("class", ex.getClass ().getName ())
+                                  .add ("message", ex.getMessage ())
+                                  .add ("stackTrace", StackTraceHelper.getStackAsString (ex)));
     }
+    finally
+    {
+      aSW.stop ();
+      aJson.add ("overallDurationMillis", aSW.getMillis ());
+    }
+
+    // Result may be null
+    aJson.add ("success", eResult == ESimpleUserMessageSendResult.SUCCESS);
+
+    // Return result JSON
+    return aJson.getAsJsonString (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);
   }
 
-  @PostMapping ("/sendprod/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}")
-  public void sendPeppolProdMessage (@RequestBody final Element aPayloadElement,
-                                     @PathVariable final String senderId,
-                                     @PathVariable final String receiverId,
-                                     @PathVariable final String docTypeId,
-                                     @PathVariable final String processId,
-                                     @PathVariable final String countryC1)
-  {
-    LOGGER.info ("Trying to send Peppol Prod message from '" +
-                 senderId +
-                 "' to '" +
-                 receiverId +
-                 "' using '" +
-                 docTypeId +
-                 "' and '" +
-                 processId +
-                 "'");
-    _sendPeppolMessage (aPayloadElement, ESML.DIGIT_PRODUCTION, senderId, receiverId, docTypeId, processId, countryC1);
-  }
-
-  @PostMapping ("/sendtest/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}")
-  public void sendPeppolTestMessage (@RequestBody final Element aPayloadElement,
-                                     @PathVariable final String senderId,
-                                     @PathVariable final String receiverId,
-                                     @PathVariable final String docTypeId,
-                                     @PathVariable final String processId,
-                                     @PathVariable final String countryC1)
+  @PostMapping (path = "/sendtest/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}",
+                produces = MediaType.APPLICATION_JSON_VALUE)
+  public String sendPeppolTestMessage (@RequestBody final byte [] aPayloadBytes,
+                                       @PathVariable final String senderId,
+                                       @PathVariable final String receiverId,
+                                       @PathVariable final String docTypeId,
+                                       @PathVariable final String processId,
+                                       @PathVariable final String countryC1)
   {
     LOGGER.info ("Trying to send Peppol Test message from '" +
                  senderId +
@@ -99,6 +181,33 @@ public class PeppolSenderController
                  "' and '" +
                  processId +
                  "'");
-    _sendPeppolMessage (aPayloadElement, ESML.DIGIT_TEST, senderId, receiverId, docTypeId, processId, countryC1);
+    return _sendPeppolMessage (aPayloadBytes, ESML.DIGIT_TEST, senderId, receiverId, docTypeId, processId, countryC1);
+  }
+
+  @PostMapping (path = "/sendprod/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}",
+                produces = MediaType.APPLICATION_JSON_VALUE)
+  public String sendPeppolProdMessage (@RequestBody final byte [] aPayloadBytes,
+                                       @PathVariable final String senderId,
+                                       @PathVariable final String receiverId,
+                                       @PathVariable final String docTypeId,
+                                       @PathVariable final String processId,
+                                       @PathVariable final String countryC1)
+  {
+    LOGGER.info ("Trying to send Peppol Prod message from '" +
+                 senderId +
+                 "' to '" +
+                 receiverId +
+                 "' using '" +
+                 docTypeId +
+                 "' and '" +
+                 processId +
+                 "'");
+    return _sendPeppolMessage (aPayloadBytes,
+                               ESML.DIGIT_PRODUCTION,
+                               senderId,
+                               receiverId,
+                               docTypeId,
+                               processId,
+                               countryC1);
   }
 }

@@ -1,4 +1,4 @@
-# phase4-peppol-standalone
+# Standalone Peppol phase4
 
 This an example standalone implementation of [phase4](https://github.com/phax/phase4) for the Peppol Network.
 
@@ -7,7 +7,7 @@ Use it as a template to add your own code.
 
 ## Building
 
-This application is based on Spring Boot 3.x and uses Java 17 to build.
+This application is based on Spring Boot 3.x and uses Apache 3.x and Java 17 to build.
 
 ```
 mvn clean install

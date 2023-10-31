@@ -17,7 +17,6 @@
 package com.helger.phase4.peppolstandalone.spi;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,31 +45,6 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (CustomPeppolIncomingSBDHandlerSPI.class);
 
-  private static IPeppolIncomingHandler s_aHandler = null;
-
-  /**
-   * @return The statically defined incoming handler. May be <code>null</code>.
-   *         Is <code>null</code> by default.
-   */
-  @Nullable
-  public static IPeppolIncomingHandler getIncomingHandler ()
-  {
-    return s_aHandler;
-  }
-
-  /**
-   * Call this method once on application startup. Should only be called once.
-   *
-   * @param aHandler
-   *        The handler to be used. May be <code>null</code> but makes no sense.
-   */
-  public static void setIncomingHandler (@Nullable final IPeppolIncomingHandler aHandler)
-  {
-    if (s_aHandler != null && aHandler != null)
-      LOGGER.warn ("Overwriting static handler for incoming Peppol messages");
-    s_aHandler = aHandler;
-  }
-
   public void handleIncomingSBD (@Nonnull final IAS4IncomingMessageMetadata aMessageMetadata,
                                  @Nonnull final HttpHeaderMap aHeaders,
                                  @Nonnull final Ebms3UserMessage aUserMessage,
@@ -79,21 +53,16 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
                                  @Nonnull final PeppolSBDHDocument aPeppolSBD,
                                  @Nonnull final IAS4MessageState aState) throws Exception
   {
-    if (s_aHandler != null)
-    {
-      LOGGER.info ("Invoking the registered IPeppolIncomingHandler");
-      try
-      {
-        s_aHandler.handleIncomingSBD (aMessageMetadata, aHeaders, aUserMessage, aSBDBytes, aSBD, aPeppolSBD, aState);
-      }
-      finally
-      {
-        // Also called in case of Exceptions
-        LOGGER.info ("Finished invoking the registered IPeppolIncomingHandler");
-      }
-    }
-    else
-      LOGGER.error ("No IPeppolIncomingHandler is registered. Make sure to call 'setIncomingHandler' of this class on application startup");
+    // TODO add your code here
+    // E.g. write to disk, write to S3, write to database, write to queue...
+    LOGGER.error ("You need to implement handleIncomingSBD to deal with incoming messages");
+
+    // Last action in this method
+    new Thread ( () -> {
+      // TODO If you have a way to determine the real end user of the message
+      // here, this might be a good opportunity to store the data for Peppol
+      // Reporting (do this asynchronously as the last activity)
+    }).start ();
   }
 
   @Override

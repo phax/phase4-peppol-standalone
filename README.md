@@ -5,6 +5,8 @@ This an example standalone implementation of [phase4](https://github.com/phax/ph
 This is a demo application and NOT ready for production use.
 Use it as a template to add your own code.
 
+# Functionality
+
 ## Functionality Receiving
 
 Based on the Servlet technology, the application takes AS4 messages via HTTP POST to `/as4`.
@@ -38,6 +40,8 @@ The following list contains the elements not considered for this demo applicatio
 * You need your own Peppol certificate to make it work - the contained keystore is a dummy only
 * Document validation is not included
 * Peppol Reporting is not included, as no backend connection is available
+
+# Get it up and running
 
 ## Building
 

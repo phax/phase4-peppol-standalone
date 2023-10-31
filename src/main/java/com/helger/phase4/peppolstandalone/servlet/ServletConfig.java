@@ -42,6 +42,9 @@ import com.helger.peppol.utils.PeppolCertificateChecker;
 import com.helger.phase4.config.AS4Configuration;
 import com.helger.phase4.crypto.AS4CryptoFactoryProperties;
 import com.helger.phase4.crypto.IAS4CryptoFactory;
+import com.helger.phase4.dump.AS4DumpManager;
+import com.helger.phase4.dump.AS4IncomingDumperFileBased;
+import com.helger.phase4.dump.AS4OutgoingDumperFileBased;
 import com.helger.phase4.mgr.MetaAS4Manager;
 import com.helger.phase4.peppol.servlet.Phase4PeppolServletConfiguration;
 import com.helger.phase4.profile.peppol.AS4PeppolProfileRegistarSPI;
@@ -157,6 +160,10 @@ public class ServletConfig
   private static void _initAS4 ()
   {
     AS4ServerInitializer.initAS4Server ();
+
+    // TODO dump all messages to a file
+    AS4DumpManager.setIncomingDumper (new AS4IncomingDumperFileBased ());
+    AS4DumpManager.setOutgoingDumper (new AS4OutgoingDumperFileBased ());
   }
 
   private static void _initPeppolAS4 ()

@@ -14,7 +14,19 @@ This class contains a `TODO` where you need to implement the stuff you want to d
 
 ## Functionality Sending
 
-Will follow soon
+Sending is triggered via an HTTP POST request.
+
+To send to a production endpoint (using SML) use this URL:
+```
+/sendprod/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}
+```
+
+To send to a test endpoint (using SMK) use this URL:
+```
+/sendtest/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}
+```
+
+In both cases, the payload to send must be the XML business document (like the UBL Invoice). 
 
 ## Building
 

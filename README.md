@@ -5,6 +5,17 @@ This an example standalone implementation of [phase4](https://github.com/phax/ph
 This is a demo application and NOT ready for production use.
 Use it as a template to add your own code.
 
+## Functionality Receiving
+
+Based on the Servlet technology, the application takes AS4 messages via HTTP POST to `/as4`.
+
+By default, all valid incoming messages are handled by class `CustomPeppolIncomingSBDHandlerSPI`.
+This class contains a `TODO` where you need to implement the stuff you want to do with incoming messages.
+
+## Functionality Sending
+
+Will follow soon
+
 ## Building
 
 This application is based on Spring Boot 3.x and uses Apache 3.x and Java 17 to build.

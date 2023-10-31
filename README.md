@@ -37,11 +37,20 @@ The outcome is a simple JSON document that contains most of the relevant details
 
 The following list contains the elements not considered for this demo application:
 
-* You need your own Peppol certificate to make it work - the contained keystore is a dummy only
+* You need your own Peppol certificate to make it work - the contained keystore is a dummy one only
 * Document validation is not included
 * Peppol Reporting is not included, as no backend connection is available
 
 # Get it up and running
+
+## Tasks
+
+1. Prepare your Peppol Access Point Key Store according to the rules described at https://github.com/phax/phoss-smp/wiki/Certificate-setup
+1. Configure your Key Store in the `application.properties` file - don't touch the Trust Store - it is part of the deployment.
+1. Set the correct value of `peppol.seatid` in the `application.properties` file
+1. Once the Peppol Certificate is configured, change the code snippet with `TODO` in file `ServletConfig` according to the comment (approx. line 192)
+1. Note that incoming Peppol messages are only logged and discarded. Edit the code in class `CustomPeppolIncomingSBDHandlerSPI` to fix it.
+1. Build and start the application (see below)  
 
 ## Building
 

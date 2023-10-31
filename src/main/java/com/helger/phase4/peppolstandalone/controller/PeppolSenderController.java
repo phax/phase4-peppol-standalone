@@ -28,6 +28,7 @@ import com.helger.peppol.sml.ESML;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phase4.client.IAS4ClientBuildMessageCallback;
+import com.helger.phase4.config.AS4Configuration;
 import com.helger.phase4.dump.AS4RawResponseConsumerWriteToFile;
 import com.helger.phase4.ebms3header.Ebms3SignalMessage;
 import com.helger.phase4.marshaller.Ebms3NamespaceHandler;
@@ -46,9 +47,6 @@ public class PeppolSenderController
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (PeppolSenderController.class);
 
-  // TODO
-  private static final String C2_PEPPOL_SEAT_ID = "POP000000";
-
   @Nonnull
   private String _sendPeppolMessage (@Nonnull final byte [] aPayloadBytes,
                                      @Nonnull final ISMLInfo aSmlInfo,
@@ -58,6 +56,8 @@ public class PeppolSenderController
                                      @Nonnull @Nonempty final String processId,
                                      @Nonnull @Nonempty final String countryC1)
   {
+    final String sMyPeppolSeatID = AS4Configuration.getConfig ().getAsString ("peppol.seatid");
+
     final OffsetDateTime aNowUTC = PDTFactory.getCurrentOffsetDateTimeUTC ();
     final IJsonObject aJson = new JsonObject ();
     aJson.add ("currentDateTimeUTC", PDTWebDateHelper.getAsStringXSD (aNowUTC));
@@ -66,7 +66,7 @@ public class PeppolSenderController
     aJson.add ("docTypeId", docTypeId);
     aJson.add ("processId", processId);
     aJson.add ("countryC1", countryC1);
-    aJson.add ("senderPartyId", C2_PEPPOL_SEAT_ID);
+    aJson.add ("senderPartyId", sMyPeppolSeatID);
 
     ESimpleUserMessageSendResult eResult = null;
     final StopWatch aSW = StopWatch.createdStarted ();
@@ -93,7 +93,7 @@ public class PeppolSenderController
                                   .processID (Phase4PeppolSender.IF.createProcessIdentifierWithDefaultScheme (processId))
                                   .senderParticipantID (Phase4PeppolSender.IF.createParticipantIdentifierWithDefaultScheme (senderId))
                                   .receiverParticipantID (aReceiverID)
-                                  .senderPartyID (C2_PEPPOL_SEAT_ID)
+                                  .senderPartyID (sMyPeppolSeatID)
                                   .countryC1 (countryC1)
                                   .payload (aDoc.getDocumentElement ())
                                   .smpClient (aSMPClient)

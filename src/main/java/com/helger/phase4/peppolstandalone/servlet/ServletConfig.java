@@ -189,15 +189,16 @@ public class ServletConfig
                                                                                                           null);
     if (eCheckResult.isInvalid ())
     {
-      // TODO This block SHOULD be uncommented once you have a Peppol
+      // TODO Change from "true" to "false" once you have a Peppol
       // certificate so that an exception is thrown
-      if (false)
+      if (true)
+        LOGGER.error ("The provided certificate is not a Peppol certificate. Check result: " + eCheckResult);
+      else
       {
         throw new InitializationException ("The provided certificate is not a Peppol certificate. Check result: " +
                                            eCheckResult);
       }
 
-      LOGGER.error ("The provided certificate is not a Peppol certificate. Check result: " + eCheckResult);
     }
     else
       LOGGER.info ("Sucessfully checked that the provided Peppol AP certificate is valid.");

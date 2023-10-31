@@ -5,6 +5,8 @@ This an example standalone implementation of [phase4](https://github.com/phax/ph
 This is a demo application and NOT ready for production use.
 Use it as a template to add your own code.
 
+**Note:** because it is demo code, no releases are created - you have to modify it anyway.
+
 # Functionality
 
 ## Functionality Receiving

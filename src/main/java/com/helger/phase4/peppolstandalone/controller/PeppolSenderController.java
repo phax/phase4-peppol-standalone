@@ -42,6 +42,7 @@ import com.helger.json.JsonObject;
 import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.peppol.sml.ESML;
 import com.helger.peppol.sml.ISMLInfo;
+import com.helger.peppol.utils.PeppolCertificateHelper;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phase4.client.IAS4ClientBuildMessageCallback;
 import com.helger.phase4.config.AS4Configuration;
@@ -121,6 +122,8 @@ public class PeppolSenderController
                                   .certificateConsumer ( (aAPCertificate, aCheckDT, eCertCheckResult) -> {
                                     // Determined by SMP lookup
                                     aJson.add ("c3Cert", CertificateHelper.getPEMEncodedCertificate (aAPCertificate));
+                                    aJson.add ("c3CertSubjectCN",
+                                               PeppolCertificateHelper.getSubjectCN (aAPCertificate));
                                     aJson.add ("c3CertCheckDT", PDTWebDateHelper.getAsStringXSD (aCheckDT));
                                     aJson.add ("c3CertCheckResult", eCertCheckResult);
                                   })
@@ -128,7 +131,7 @@ public class PeppolSenderController
                                   {
                                     public void onAS4Message (@Nonnull final AbstractAS4Message <?> aMsg)
                                     {
-                                      // Created AS4 data
+                                      // Created AS4 fields
                                       final AS4UserMessage aUserMsg = (AS4UserMessage) aMsg;
                                       aJson.add ("as4MessageId",
                                                  aUserMsg.getEbms3UserMessage ().getMessageInfo ().getMessageId ());
@@ -151,6 +154,14 @@ public class PeppolSenderController
                                                                                                          x));
                                     aMarshaller.setNamespaceContext (Ebms3NamespaceHandler.getInstance ());
                                     aJson.add ("as4ReceivedSignalMsg", aMarshaller.getAsString (aSignalMsg));
+
+                                    if (aSignalMsg.hasErrorEntries ())
+                                    {
+                                      // TODO extract the errors
+                                      aJson.add ("as4ResponseError", true);
+                                    }
+                                    else
+                                      aJson.add ("as4ResponseError", false);
                                   })
                                   .disableValidation ()
                                   .sendMessageAndCheckForReceipt ();
@@ -179,8 +190,7 @@ public class PeppolSenderController
     return aJson.getAsJsonString (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);
   }
 
-  @PostMapping (path = "/sendtest/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}",
-                produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping (path = "/sendtest/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}", produces = MediaType.APPLICATION_JSON_VALUE)
   public String sendPeppolTestMessage (@RequestBody final byte [] aPayloadBytes,
                                        @PathVariable final String senderId,
                                        @PathVariable final String receiverId,
@@ -200,8 +210,7 @@ public class PeppolSenderController
     return _sendPeppolMessage (aPayloadBytes, ESML.DIGIT_TEST, senderId, receiverId, docTypeId, processId, countryC1);
   }
 
-  @PostMapping (path = "/sendprod/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}",
-                produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping (path = "/sendprod/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}", produces = MediaType.APPLICATION_JSON_VALUE)
   public String sendPeppolProdMessage (@RequestBody final byte [] aPayloadBytes,
                                        @PathVariable final String senderId,
                                        @PathVariable final String receiverId,

@@ -23,9 +23,11 @@ import org.slf4j.LoggerFactory;
 import org.unece.cefact.namespaces.sbdh.StandardBusinessDocument;
 
 import com.helger.commons.annotation.IsSPIImplementation;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.http.HttpHeaderMap;
 import com.helger.peppol.sbdh.PeppolSBDHDocument;
 import com.helger.peppol.utils.PeppolCertificateHelper;
+import com.helger.phase4.ebms3header.Ebms3Error;
 import com.helger.phase4.ebms3header.Ebms3UserMessage;
 import com.helger.phase4.messaging.IAS4IncomingMessageMetadata;
 import com.helger.phase4.peppol.servlet.IPhase4PeppolIncomingSBDHandlerSPI;
@@ -47,7 +49,8 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
                                  @Nonnull final byte [] aSBDBytes,
                                  @Nonnull final StandardBusinessDocument aSBD,
                                  @Nonnull final PeppolSBDHDocument aPeppolSBD,
-                                 @Nonnull final IAS4MessageState aState) throws Exception
+                                 @Nonnull final IAS4MessageState aState,
+                                 @Nonnull final ICommonsList <Ebms3Error> aProcessingErrorMessages) throws Exception
   {
     // Example code snippets how to get data
     LOGGER.info ("Received a new Peppol Message");

@@ -99,7 +99,7 @@ public class PeppolSenderController
       final SMPClientReadOnly aSMPClient = new SMPClientReadOnly (Phase4PeppolSender.URL_PROVIDER,
                                                                   aReceiverID,
                                                                   aSmlInfo);
-      if (EJavaVersion.JDK_17.isNewerOrEqualsThan (EJavaVersion.getCurrentVersion ()))
+      if (EJavaVersion.getCurrentVersion ().isNewerOrEqualsThan (EJavaVersion.JDK_17))
       {
         // Work around the disabled SHA-1 in XMLDsig issue
         aSMPClient.setSecureValidation (false);

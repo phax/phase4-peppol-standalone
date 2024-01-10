@@ -136,12 +136,11 @@ public class ServletConfig
     // Sanity check
     if (CommandMap.getDefaultCommandMap ().createDataContentHandler (CMimeType.MULTIPART_RELATED.getAsString ()) ==
         null)
+    {
       throw new IllegalStateException ("No DataContentHandler for MIME Type '" +
                                        CMimeType.MULTIPART_RELATED.getAsString () +
                                        "' is available. There seems to be a problem with the dependencies/packaging");
-
-    // Enforce Peppol profile usage
-    AS4ProfileSelector.setCustomAS4ProfileID (AS4PeppolProfileRegistarSPI.AS4_PROFILE_ID);
+    }
 
     // Init the data path
     {
@@ -159,6 +158,9 @@ public class ServletConfig
 
   private static void _initAS4 ()
   {
+    // Enforce Peppol profile usage
+    AS4ProfileSelector.setCustomAS4ProfileID (AS4PeppolProfileRegistarSPI.AS4_PROFILE_ID);
+
     AS4ServerInitializer.initAS4Server ();
 
     // TODO dump all messages to a file
@@ -180,7 +182,8 @@ public class ServletConfig
     LOGGER.info ("Successfully loaded configured AS4 private key from the crypto factory");
 
     // Check the configured Peppol AP certificate
-    // No OCSP check for performance
+    // * No caching
+    // * Use global certificate check mode
     final X509Certificate aAPCert = (X509Certificate) aPKE.getCertificate ();
     final EPeppolCertificateCheckResult eCheckResult = PeppolCertificateChecker.checkPeppolAPCertificate (aAPCert,
                                                                                                           MetaAS4Manager.getTimestampMgr ()

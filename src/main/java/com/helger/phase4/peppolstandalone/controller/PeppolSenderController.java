@@ -52,6 +52,7 @@ import com.helger.phase4.marshaller.Ebms3NamespaceHandler;
 import com.helger.phase4.messaging.domain.AS4UserMessage;
 import com.helger.phase4.messaging.domain.AbstractAS4Message;
 import com.helger.phase4.peppol.Phase4PeppolSender;
+import com.helger.phase4.peppol.Phase4PeppolSender.Builder;
 import com.helger.phase4.sender.AbstractAS4UserMessageBuilder.ESimpleUserMessageSendResult;
 import com.helger.security.certificate.CertificateHelper;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
@@ -105,67 +106,79 @@ public class PeppolSenderController
         aSMPClient.setSecureValidation (false);
       }
 
-      eResult = Phase4PeppolSender.builder ()
-                                  .documentTypeID (Phase4PeppolSender.IF.createDocumentTypeIdentifierWithDefaultScheme (docTypeId))
-                                  .processID (Phase4PeppolSender.IF.createProcessIdentifierWithDefaultScheme (processId))
-                                  .senderParticipantID (Phase4PeppolSender.IF.createParticipantIdentifierWithDefaultScheme (senderId))
-                                  .receiverParticipantID (aReceiverID)
-                                  .senderPartyID (sMyPeppolSeatID)
-                                  .countryC1 (countryC1)
-                                  .payload (aDoc.getDocumentElement ())
-                                  .smpClient (aSMPClient)
-                                  .rawResponseConsumer (new AS4RawResponseConsumerWriteToFile ())
-                                  .endpointURLConsumer (endpointUrl -> {
-                                    // Determined by SMP lookup
-                                    aJson.add ("c3EndpointUrl", endpointUrl);
-                                  })
-                                  .certificateConsumer ( (aAPCertificate, aCheckDT, eCertCheckResult) -> {
-                                    // Determined by SMP lookup
-                                    aJson.add ("c3Cert", CertificateHelper.getPEMEncodedCertificate (aAPCertificate));
-                                    aJson.add ("c3CertSubjectCN",
-                                               PeppolCertificateHelper.getSubjectCN (aAPCertificate));
-                                    aJson.add ("c3CertCheckDT", PDTWebDateHelper.getAsStringXSD (aCheckDT));
-                                    aJson.add ("c3CertCheckResult", eCertCheckResult);
-                                  })
-                                  .buildMessageCallback (new IAS4ClientBuildMessageCallback ()
-                                  {
-                                    public void onAS4Message (@Nonnull final AbstractAS4Message <?> aMsg)
-                                    {
-                                      // Created AS4 fields
-                                      final AS4UserMessage aUserMsg = (AS4UserMessage) aMsg;
-                                      aJson.add ("as4MessageId",
-                                                 aUserMsg.getEbms3UserMessage ().getMessageInfo ().getMessageId ());
-                                      aJson.add ("as4ConversationId",
-                                                 aUserMsg.getEbms3UserMessage ()
-                                                         .getCollaborationInfo ()
-                                                         .getConversationId ());
-                                    }
-                                  })
-                                  .signalMsgConsumer ( (aSignalMsg, aMessageMetadata, aState) -> {
-                                    // Add the full signal message to the JSON -
-                                    // a bit hacky ;-)
-                                    final GenericJAXBMarshaller <Ebms3SignalMessage> aMarshaller;
-                                    aMarshaller = new GenericJAXBMarshaller <> (Ebms3SignalMessage.class,
-                                                                                null,
-                                                                                x -> new JAXBElement <> (new QName ("http://docs.oasis-open.org/ebxml-msg/ebms/v3.0/ns/core/200704/",
-                                                                                                                    "SignalMessage"),
-                                                                                                         Ebms3SignalMessage.class,
-                                                                                                         null,
-                                                                                                         x));
-                                    aMarshaller.setNamespaceContext (Ebms3NamespaceHandler.getInstance ());
-                                    aJson.add ("as4ReceivedSignalMsg", aMarshaller.getAsString (aSignalMsg));
+      final Builder aBuilder;
+      aBuilder = Phase4PeppolSender.builder ()
+                                   .documentTypeID (Phase4PeppolSender.IF.createDocumentTypeIdentifierWithDefaultScheme (docTypeId))
+                                   .processID (Phase4PeppolSender.IF.createProcessIdentifierWithDefaultScheme (processId))
+                                   .senderParticipantID (Phase4PeppolSender.IF.createParticipantIdentifierWithDefaultScheme (senderId))
+                                   .receiverParticipantID (aReceiverID)
+                                   .senderPartyID (sMyPeppolSeatID)
+                                   .countryC1 (countryC1)
+                                   .payload (aDoc.getDocumentElement ())
+                                   .smpClient (aSMPClient)
+                                   .rawResponseConsumer (new AS4RawResponseConsumerWriteToFile ())
+                                   .endpointURLConsumer (endpointUrl -> {
+                                     // Determined by SMP lookup
+                                     aJson.add ("c3EndpointUrl", endpointUrl);
+                                   })
+                                   .certificateConsumer ( (aAPCertificate, aCheckDT, eCertCheckResult) -> {
+                                     // Determined by SMP lookup
+                                     aJson.add ("c3Cert", CertificateHelper.getPEMEncodedCertificate (aAPCertificate));
+                                     aJson.add ("c3CertSubjectCN",
+                                                PeppolCertificateHelper.getSubjectCN (aAPCertificate));
+                                     aJson.add ("c3CertCheckDT", PDTWebDateHelper.getAsStringXSD (aCheckDT));
+                                     aJson.add ("c3CertCheckResult", eCertCheckResult);
+                                   })
+                                   .buildMessageCallback (new IAS4ClientBuildMessageCallback ()
+                                   {
+                                     public void onAS4Message (@Nonnull final AbstractAS4Message <?> aMsg)
+                                     {
+                                       // Created AS4 fields
+                                       final AS4UserMessage aUserMsg = (AS4UserMessage) aMsg;
+                                       aJson.add ("as4MessageId",
+                                                  aUserMsg.getEbms3UserMessage ().getMessageInfo ().getMessageId ());
+                                       aJson.add ("as4ConversationId",
+                                                  aUserMsg.getEbms3UserMessage ()
+                                                          .getCollaborationInfo ()
+                                                          .getConversationId ());
+                                     }
+                                   })
+                                   .signalMsgConsumer ( (aSignalMsg, aMessageMetadata, aState) -> {
+                                     // Add the full signal message to the JSON
+                                     // - a bit hacky ;-)
+                                     final GenericJAXBMarshaller <Ebms3SignalMessage> aMarshaller;
+                                     aMarshaller = new GenericJAXBMarshaller <> (Ebms3SignalMessage.class,
+                                                                                 null,
+                                                                                 x -> new JAXBElement <> (new QName ("http://docs.oasis-open.org/ebxml-msg/ebms/v3.0/ns/core/200704/",
+                                                                                                                     "SignalMessage"),
+                                                                                                          Ebms3SignalMessage.class,
+                                                                                                          null,
+                                                                                                          x));
+                                     aMarshaller.setNamespaceContext (Ebms3NamespaceHandler.getInstance ());
+                                     aJson.add ("as4ReceivedSignalMsg", aMarshaller.getAsString (aSignalMsg));
 
-                                    if (aSignalMsg.hasErrorEntries ())
-                                    {
-                                      // TODO extract the errors
-                                      aJson.add ("as4ResponseError", true);
-                                    }
-                                    else
-                                      aJson.add ("as4ResponseError", false);
-                                  })
-                                  .disableValidation ()
-                                  .sendMessageAndCheckForReceipt ();
+                                     if (aSignalMsg.hasErrorEntries ())
+                                     {
+                                       // TODO extract the errors
+                                       aJson.add ("as4ResponseError", true);
+                                     }
+                                     else
+                                       aJson.add ("as4ResponseError", false);
+                                   })
+                                   .disableValidation ();
+      eResult = aBuilder.sendMessageAndCheckForReceipt ();
       LOGGER.info ("Peppol client send result: " + eResult);
+
+      if (eResult.isSuccess ())
+      {
+        // TODO determine the enduser ID of the outbound message
+        final String sEndUserID = "TODO";
+
+        // TODO Enable when ready
+        if (false)
+          aBuilder.createAndStorePeppolReportingItemAfterSending (sEndUserID);
+      }
+
       aJson.add ("sendingResult", eResult);
     }
     catch (final Exception ex)
@@ -190,7 +203,8 @@ public class PeppolSenderController
     return aJson.getAsJsonString (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);
   }
 
-  @PostMapping (path = "/sendtest/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping (path = "/sendtest/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}",
+                produces = MediaType.APPLICATION_JSON_VALUE)
   public String sendPeppolTestMessage (@RequestBody final byte [] aPayloadBytes,
                                        @PathVariable final String senderId,
                                        @PathVariable final String receiverId,
@@ -210,7 +224,8 @@ public class PeppolSenderController
     return _sendPeppolMessage (aPayloadBytes, ESML.DIGIT_TEST, senderId, receiverId, docTypeId, processId, countryC1);
   }
 
-  @PostMapping (path = "/sendprod/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping (path = "/sendprod/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}",
+                produces = MediaType.APPLICATION_JSON_VALUE)
   public String sendPeppolProdMessage (@RequestBody final byte [] aPayloadBytes,
                                        @PathVariable final String senderId,
                                        @PathVariable final String receiverId,

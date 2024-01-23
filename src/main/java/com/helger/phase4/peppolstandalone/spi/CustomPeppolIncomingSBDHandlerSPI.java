@@ -27,11 +27,16 @@ import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.http.HttpHeaderMap;
 import com.helger.peppol.sbdh.PeppolSBDHData;
 import com.helger.peppol.utils.PeppolCertificateHelper;
+import com.helger.phase4.config.AS4Configuration;
 import com.helger.phase4.ebms3header.Ebms3Error;
 import com.helger.phase4.ebms3header.Ebms3UserMessage;
 import com.helger.phase4.messaging.IAS4IncomingMessageMetadata;
 import com.helger.phase4.peppol.servlet.IPhase4PeppolIncomingSBDHandlerSPI;
+import com.helger.phase4.peppol.servlet.Phase4PeppolServletMessageProcessorSPI;
 import com.helger.phase4.servlet.IAS4MessageState;
+import com.helper.peppol.reporting.api.PeppolReportingItem;
+import com.helper.peppol.reporting.api.backend.PeppolReportingBackend;
+import com.helper.peppol.reporting.api.backend.PeppolReportingBackendException;
 
 /**
  * This is a way of handling incoming Peppol messages
@@ -75,6 +80,31 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
       // Reporting (do this asynchronously as the last activity)
       // Note: this is a separate thread so that it does not block the sending
       // of the positive receipt message
+
+      // Peppol Reporting - enable if possible to be done in here
+      if (false)
+        try
+        {
+          LOGGER.info ("Creating Peppol Reporting Item and storing it");
+
+          // TODO determine correct values
+          final String sC3ID = "TODO-C3-ID";
+          final String sC4CountryCode = "AT";
+          final String sEndUserID = "EndUserID";
+          final PeppolReportingItem aReportingItem = Phase4PeppolServletMessageProcessorSPI.createPeppolReportingItemForReceivedMessage (aUserMessage,
+                                                                                                                                         aPeppolSBD,
+                                                                                                                                         aState,
+                                                                                                                                         sC3ID,
+                                                                                                                                         sC4CountryCode,
+                                                                                                                                         sEndUserID);
+          PeppolReportingBackend.withBackendDo (AS4Configuration.getConfig (),
+                                                aBackend -> aBackend.storeReportingItem (aReportingItem));
+        }
+        catch (final PeppolReportingBackendException ex)
+        {
+          LOGGER.error ("Failed to store Peppol Reporting Item", ex);
+          // TODO improve error handling
+        }
     }).start ();
   }
 

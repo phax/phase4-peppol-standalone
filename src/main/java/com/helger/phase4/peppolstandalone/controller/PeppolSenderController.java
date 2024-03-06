@@ -19,7 +19,6 @@ package com.helger.phase4.peppolstandalone.controller;
 import java.time.OffsetDateTime;
 
 import javax.annotation.Nonnull;
-import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +35,6 @@ import com.helger.commons.datetime.PDTWebDateHelper;
 import com.helger.commons.lang.StackTraceHelper;
 import com.helger.commons.system.EJavaVersion;
 import com.helger.commons.timing.StopWatch;
-import com.helger.jaxb.GenericJAXBMarshaller;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonObject;
 import com.helger.json.serialize.JsonWriterSettings;
@@ -47,8 +45,7 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phase4.client.IAS4ClientBuildMessageCallback;
 import com.helger.phase4.config.AS4Configuration;
 import com.helger.phase4.dump.AS4RawResponseConsumerWriteToFile;
-import com.helger.phase4.ebms3header.Ebms3SignalMessage;
-import com.helger.phase4.marshaller.Ebms3NamespaceHandler;
+import com.helger.phase4.marshaller.Ebms3SignalMessageMarshaller;
 import com.helger.phase4.messaging.domain.AS4UserMessage;
 import com.helger.phase4.messaging.domain.AbstractAS4Message;
 import com.helger.phase4.peppol.Phase4PeppolSender;
@@ -57,8 +54,6 @@ import com.helger.phase4.sender.AbstractAS4UserMessageBuilder.ESimpleUserMessage
 import com.helger.security.certificate.CertificateHelper;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.xml.serialize.read.DOMReader;
-
-import jakarta.xml.bind.JAXBElement;
 
 @RestController
 public class PeppolSenderController
@@ -144,18 +139,8 @@ public class PeppolSenderController
                                      }
                                    })
                                    .signalMsgConsumer ( (aSignalMsg, aMessageMetadata, aState) -> {
-                                     // Add the full signal message to the JSON
-                                     // - a bit hacky ;-)
-                                     final GenericJAXBMarshaller <Ebms3SignalMessage> aMarshaller;
-                                     aMarshaller = new GenericJAXBMarshaller <> (Ebms3SignalMessage.class,
-                                                                                 null,
-                                                                                 x -> new JAXBElement <> (new QName ("http://docs.oasis-open.org/ebxml-msg/ebms/v3.0/ns/core/200704/",
-                                                                                                                     "SignalMessage"),
-                                                                                                          Ebms3SignalMessage.class,
-                                                                                                          null,
-                                                                                                          x));
-                                     aMarshaller.setNamespaceContext (Ebms3NamespaceHandler.getInstance ());
-                                     aJson.add ("as4ReceivedSignalMsg", aMarshaller.getAsString (aSignalMsg));
+                                     aJson.add ("as4ReceivedSignalMsg",
+                                                new Ebms3SignalMessageMarshaller ().getAsString (aSignalMsg));
 
                                      if (aSignalMsg.hasErrorEntries ())
                                      {

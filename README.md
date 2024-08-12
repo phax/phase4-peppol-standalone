@@ -7,6 +7,8 @@ Use it as a template to add your own code.
 
 **Note:** because it is demo code, no releases are created - you have to modify it anyway.
 
+This project is part of my Peppol solution stack. See https://github.com/phax/peppol for other components and libraries in that area.
+
 # Functionality
 
 ## Functionality Receiving

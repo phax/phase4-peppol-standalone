@@ -46,11 +46,11 @@ import com.helger.phase4.client.IAS4ClientBuildMessageCallback;
 import com.helger.phase4.config.AS4Configuration;
 import com.helger.phase4.dump.AS4RawResponseConsumerWriteToFile;
 import com.helger.phase4.marshaller.Ebms3SignalMessageMarshaller;
-import com.helger.phase4.messaging.domain.AS4UserMessage;
-import com.helger.phase4.messaging.domain.AbstractAS4Message;
+import com.helger.phase4.model.message.AS4UserMessage;
+import com.helger.phase4.model.message.AbstractAS4Message;
 import com.helger.phase4.peppol.Phase4PeppolSender;
-import com.helger.phase4.peppol.Phase4PeppolSender.Builder;
-import com.helger.phase4.sender.AbstractAS4UserMessageBuilder.ESimpleUserMessageSendResult;
+import com.helger.phase4.peppol.Phase4PeppolSender.PeppolUserMessageBuilder;
+import com.helger.phase4.sender.EAS4UserMessageSendResult;
 import com.helger.security.certificate.CertificateHelper;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.xml.serialize.read.DOMReader;
@@ -81,7 +81,7 @@ public class PeppolSenderController
     aJson.add ("countryC1", countryC1);
     aJson.add ("senderPartyId", sMyPeppolSeatID);
 
-    ESimpleUserMessageSendResult eResult = null;
+    EAS4UserMessageSendResult eResult = null;
     final StopWatch aSW = StopWatch.createdStarted ();
     try
     {
@@ -101,7 +101,7 @@ public class PeppolSenderController
         aSMPClient.setSecureValidation (false);
       }
 
-      final Builder aBuilder;
+      final PeppolUserMessageBuilder aBuilder;
       aBuilder = Phase4PeppolSender.builder ()
                                    .documentTypeID (Phase4PeppolSender.IF.createDocumentTypeIdentifierWithDefaultScheme (docTypeId))
                                    .processID (Phase4PeppolSender.IF.createProcessIdentifierWithDefaultScheme (processId))
@@ -182,7 +182,7 @@ public class PeppolSenderController
     }
 
     // Result may be null
-    aJson.add ("success", eResult == ESimpleUserMessageSendResult.SUCCESS);
+    aJson.add ("success", eResult == EAS4UserMessageSendResult.SUCCESS);
 
     // Return result JSON
     return aJson.getAsJsonString (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);

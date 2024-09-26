@@ -33,10 +33,10 @@ import com.helger.peppol.utils.PeppolCertificateHelper;
 import com.helger.phase4.config.AS4Configuration;
 import com.helger.phase4.ebms3header.Ebms3Error;
 import com.helger.phase4.ebms3header.Ebms3UserMessage;
-import com.helger.phase4.messaging.IAS4IncomingMessageMetadata;
+import com.helger.phase4.incoming.IAS4IncomingMessageMetadata;
+import com.helger.phase4.incoming.IAS4IncomingMessageState;
 import com.helger.phase4.peppol.servlet.IPhase4PeppolIncomingSBDHandlerSPI;
 import com.helger.phase4.peppol.servlet.Phase4PeppolServletMessageProcessorSPI;
-import com.helger.phase4.servlet.IAS4MessageState;
 
 /**
  * This is a way of handling incoming Peppol messages
@@ -54,7 +54,7 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
                                  @Nonnull final byte [] aSBDBytes,
                                  @Nonnull final StandardBusinessDocument aSBD,
                                  @Nonnull final PeppolSBDHData aPeppolSBD,
-                                 @Nonnull final IAS4MessageState aState,
+                                 @Nonnull final IAS4IncomingMessageState aState,
                                  @Nonnull final ICommonsList <Ebms3Error> aProcessingErrorMessages) throws Exception
   {
     // Example code snippets how to get data
@@ -106,12 +106,5 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
           // TODO improve error handling
         }
     }).start ();
-  }
-
-  @Override
-  public boolean exceptionTranslatesToAS4Error ()
-  {
-    // If we have an Exception, tell the sender so via an AS4 Error Message
-    return true;
   }
 }

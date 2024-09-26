@@ -45,17 +45,21 @@ import com.helger.phase4.crypto.IAS4CryptoFactory;
 import com.helger.phase4.dump.AS4DumpManager;
 import com.helger.phase4.dump.AS4IncomingDumperFileBased;
 import com.helger.phase4.dump.AS4OutgoingDumperFileBased;
+import com.helger.phase4.incoming.AS4RequestHandler;
+import com.helger.phase4.incoming.AS4ServerInitializer;
+import com.helger.phase4.incoming.mgr.AS4ProfileSelector;
 import com.helger.phase4.mgr.MetaAS4Manager;
-import com.helger.phase4.peppol.servlet.Phase4PeppolServletConfiguration;
+import com.helger.phase4.peppol.servlet.Phase4PeppolDefaultReceiverConfiguration;
 import com.helger.phase4.profile.peppol.AS4PeppolProfileRegistarSPI;
 import com.helger.phase4.profile.peppol.PeppolCRLDownloader;
 import com.helger.phase4.profile.peppol.Phase4PeppolHttpClientSettings;
-import com.helger.phase4.servlet.AS4ServerInitializer;
+import com.helger.phase4.servlet.AS4UnifiedResponse;
 import com.helger.phase4.servlet.AS4XServletHandler;
-import com.helger.phase4.servlet.mgr.AS4ProfileSelector;
+import com.helger.phase4.servlet.IAS4ServletRequestHandlerCustomizer;
 import com.helger.photon.io.WebFileIO;
 import com.helger.servlet.ServletHelper;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
+import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.web.scope.mgr.WebScopeManager;
 import com.helger.xservlet.AbstractXServlet;
 import com.helger.xservlet.requesttrack.RequestTrackerSettings;
@@ -91,8 +95,21 @@ public class ServletConfig
       settings ().setMultipartEnabled (false);
       // HTTP POST only
       final AS4XServletHandler hdl = new AS4XServletHandler ();
-      // This method refers to the outer static method
-      hdl.setCryptoFactorySupplier (ServletConfig::getCryptoFactoryToUse);
+      hdl.setRequestHandlerCustomizer (new IAS4ServletRequestHandlerCustomizer ()
+      {
+        public void customizeBeforeHandling (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
+                                             @Nonnull final AS4UnifiedResponse aUnifiedResponse,
+                                             @Nonnull final AS4RequestHandler aRequestHandler)
+        {
+          aRequestHandler.setCryptoFactory (ServletConfig.getCryptoFactoryToUse ());
+        }
+
+        public void customizeAfterHandling (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
+                                            @Nonnull final AS4UnifiedResponse aUnifiedResponse,
+                                            @Nonnull final AS4RequestHandler aRequestHandler)
+        {}
+
+      });
       handlerRegistry ().registerHandler (EHttpMethod.POST, hdl);
     }
   }
@@ -174,12 +191,12 @@ public class ServletConfig
   {
     // Our server expects all SBDH to contain the COUNTRY_C1 element in SBDH
     // (this is the default setting, but added it here for easy modification)
-    Phase4PeppolServletConfiguration.setCheckSBDHForMandatoryCountryC1 (true);
+    Phase4PeppolDefaultReceiverConfiguration.setCheckSBDHForMandatoryCountryC1 (true);
 
     // Our server should check all signing certificates of incoming messages if
     // they are revoked or not
     // (this is the default setting, but added it here for easy modification)
-    Phase4PeppolServletConfiguration.setCheckSigningCertificateRevocation (true);
+    Phase4PeppolDefaultReceiverConfiguration.setCheckSigningCertificateRevocation (true);
 
     // Make sure the download of CRL is using Apache HttpClient and that the
     // provided settings are used. If e.g. a proxy is needed to access outbound
@@ -230,15 +247,15 @@ public class ServletConfig
     {
       // To process the message even though the receiver is not registered in
       // our AP
-      Phase4PeppolServletConfiguration.setReceiverCheckEnabled (true);
-      Phase4PeppolServletConfiguration.setSMPClient (new SMPClientReadOnly (URLHelper.getAsURI (sSMPURL)));
-      Phase4PeppolServletConfiguration.setAS4EndpointURL (sAPURL);
-      Phase4PeppolServletConfiguration.setAPCertificate (aAPCert);
+      Phase4PeppolDefaultReceiverConfiguration.setReceiverCheckEnabled (true);
+      Phase4PeppolDefaultReceiverConfiguration.setSMPClient (new SMPClientReadOnly (URLHelper.getAsURI (sSMPURL)));
+      Phase4PeppolDefaultReceiverConfiguration.setAS4EndpointURL (sAPURL);
+      Phase4PeppolDefaultReceiverConfiguration.setAPCertificate (aAPCert);
       LOGGER.info ("phase4 Peppol receiver checks are enabled");
     }
     else
     {
-      Phase4PeppolServletConfiguration.setReceiverCheckEnabled (false);
+      Phase4PeppolDefaultReceiverConfiguration.setReceiverCheckEnabled (false);
       LOGGER.warn ("phase4 Peppol receiver checks are disabled");
     }
   }

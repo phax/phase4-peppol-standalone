@@ -49,7 +49,7 @@ import com.helger.phase4.marshaller.Ebms3SignalMessageMarshaller;
 import com.helger.phase4.model.message.AS4UserMessage;
 import com.helger.phase4.model.message.AbstractAS4Message;
 import com.helger.phase4.peppol.Phase4PeppolSender;
-import com.helger.phase4.peppol.Phase4PeppolSender.Builder;
+import com.helger.phase4.peppol.Phase4PeppolSender.PeppolUserMessageBuilder;
 import com.helger.phase4.sender.EAS4UserMessageSendResult;
 import com.helger.security.certificate.CertificateHelper;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
@@ -101,7 +101,7 @@ public class PeppolSenderController
         aSMPClient.setSecureValidation (false);
       }
 
-      final Builder aBuilder;
+      final PeppolUserMessageBuilder aBuilder;
       aBuilder = Phase4PeppolSender.builder ()
                                    .documentTypeID (Phase4PeppolSender.IF.createDocumentTypeIdentifierWithDefaultScheme (docTypeId))
                                    .processID (Phase4PeppolSender.IF.createProcessIdentifierWithDefaultScheme (processId))

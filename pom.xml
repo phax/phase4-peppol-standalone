@@ -37,7 +37,20 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-  
+
+  <repositories>
+    <repository>
+      <id>central-snapshots</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
   <!-- Include here to not bloat the global scope -->  
   <dependencyManagement>
     <dependencies>

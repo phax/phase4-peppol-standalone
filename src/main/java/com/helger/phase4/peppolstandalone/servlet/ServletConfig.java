@@ -40,15 +40,17 @@ import com.helger.httpclient.HttpDebugger;
 import com.helger.peppol.utils.EPeppolCertificateCheckResult;
 import com.helger.peppol.utils.PeppolCertificateChecker;
 import com.helger.phase4.config.AS4Configuration;
-import com.helger.phase4.crypto.AS4CryptoFactoryProperties;
+import com.helger.phase4.crypto.AS4CryptoFactoryConfiguration;
 import com.helger.phase4.crypto.IAS4CryptoFactory;
 import com.helger.phase4.dump.AS4DumpManager;
 import com.helger.phase4.dump.AS4IncomingDumperFileBased;
 import com.helger.phase4.dump.AS4OutgoingDumperFileBased;
+import com.helger.phase4.incoming.AS4IncomingProfileSelectorConstant;
 import com.helger.phase4.incoming.AS4RequestHandler;
 import com.helger.phase4.incoming.AS4ServerInitializer;
 import com.helger.phase4.incoming.mgr.AS4ProfileSelector;
 import com.helger.phase4.mgr.MetaAS4Manager;
+import com.helger.phase4.model.pmode.resolve.AS4DefaultPModeResolver;
 import com.helger.phase4.peppol.servlet.Phase4PeppolDefaultReceiverConfiguration;
 import com.helger.phase4.profile.peppol.AS4PeppolProfileRegistarSPI;
 import com.helger.phase4.profile.peppol.PeppolCRLDownloader;
@@ -82,7 +84,7 @@ public class ServletConfig
   @Nonnull
   public static IAS4CryptoFactory getCryptoFactoryToUse ()
   {
-    final IAS4CryptoFactory ret = AS4CryptoFactoryProperties.getDefaultInstance ();
+    final IAS4CryptoFactory ret = AS4CryptoFactoryConfiguration.getDefaultInstance ();
     // If you have a custom crypto factory, build/return it here
     return ret;
   }
@@ -93,7 +95,8 @@ public class ServletConfig
     {
       // Multipart is handled specifically inside
       settings ().setMultipartEnabled (false);
-      // HTTP POST only
+
+      // The main XServlet handler to handle the inbound request
       final AS4XServletHandler hdl = new AS4XServletHandler ();
       hdl.setRequestHandlerCustomizer (new IAS4ServletRequestHandlerCustomizer ()
       {
@@ -102,14 +105,26 @@ public class ServletConfig
                                              @Nonnull final AS4RequestHandler aRequestHandler)
         {
           aRequestHandler.setCryptoFactory (ServletConfig.getCryptoFactoryToUse ());
+
+          // Specific setters, dependent on a specific AS4 profile ID
+          // This example code only uses the global one (if any)
+          final String sAS4ProfileID = AS4ProfileSelector.getDefaultAS4ProfileID ();
+          if (StringHelper.hasText (sAS4ProfileID))
+          {
+            aRequestHandler.setPModeResolver (new AS4DefaultPModeResolver (sAS4ProfileID));
+            aRequestHandler.setIncomingProfileSelector (new AS4IncomingProfileSelectorConstant (sAS4ProfileID));
+          }
         }
 
         public void customizeAfterHandling (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                                             @Nonnull final AS4UnifiedResponse aUnifiedResponse,
                                             @Nonnull final AS4RequestHandler aRequestHandler)
-        {}
-
+        {
+          // empty
+        }
       });
+
+      // HTTP POST only
       handlerRegistry ().registerHandler (EHttpMethod.POST, hdl);
     }
   }
@@ -153,8 +168,8 @@ public class ServletConfig
     HttpDebugger.setEnabled (false);
 
     // Sanity check
-    if (CommandMap.getDefaultCommandMap ().createDataContentHandler (CMimeType.MULTIPART_RELATED.getAsString ()) ==
-        null)
+    if (CommandMap.getDefaultCommandMap ()
+                  .createDataContentHandler (CMimeType.MULTIPART_RELATED.getAsString ()) == null)
     {
       throw new IllegalStateException ("No DataContentHandler for MIME Type '" +
                                        CMimeType.MULTIPART_RELATED.getAsString () +
@@ -178,11 +193,13 @@ public class ServletConfig
   private static void _initAS4 ()
   {
     // Enforce Peppol profile usage
-    AS4ProfileSelector.setCustomAS4ProfileID (AS4PeppolProfileRegistarSPI.AS4_PROFILE_ID);
+    // This is the programmatic way to enforce exactly this one profile
+    // In a multi-profile environment, that will not work
+    AS4ProfileSelector.setCustomDefaultAS4ProfileID (AS4PeppolProfileRegistarSPI.AS4_PROFILE_ID);
 
     AS4ServerInitializer.initAS4Server ();
 
-    // TODO dump all messages to a file
+    // dump all messages to a file
     AS4DumpManager.setIncomingDumper (new AS4IncomingDumperFileBased ());
     AS4DumpManager.setOutgoingDumper (new AS4OutgoingDumperFileBased ());
   }
@@ -204,12 +221,12 @@ public class ServletConfig
     PeppolCRLDownloader.setAsDefaultCRLCache (new Phase4PeppolHttpClientSettings ());
 
     // Check if crypto properties are okay
-    final KeyStore aKS = AS4CryptoFactoryProperties.getDefaultInstance ().getKeyStore ();
+    final KeyStore aKS = getCryptoFactoryToUse ().getKeyStore ();
     if (aKS == null)
       throw new InitializationException ("Failed to load configured AS4 Key store - fix the configuration");
     LOGGER.info ("Successfully loaded configured AS4 key store from the crypto factory");
 
-    final KeyStore.PrivateKeyEntry aPKE = AS4CryptoFactoryProperties.getDefaultInstance ().getPrivateKeyEntry ();
+    final KeyStore.PrivateKeyEntry aPKE = getCryptoFactoryToUse ().getPrivateKeyEntry ();
     if (aPKE == null)
       throw new InitializationException ("Failed to load configured AS4 private key - fix the configuration");
     LOGGER.info ("Successfully loaded configured AS4 private key from the crypto factory");

@@ -22,7 +22,7 @@
   <parent>
     <groupId>com.helger.phase4</groupId>
     <artifactId>phase4-parent-pom</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.0-beta2</version>
   </parent>
   <artifactId>phase4-peppol-standalone</artifactId>
   <name>phase4-peppol-standalone</name>
@@ -38,6 +38,8 @@
     </license>
   </licenses>
 
+<!-- Enable when using a SNAPSHOT version: -->
+<!--
   <repositories>
     <repository>
       <id>central-snapshots</id>
@@ -50,6 +52,7 @@
       </snapshots>
     </repository>
   </repositories>
+  -->
 
   <!-- Include here to not bloat the global scope -->  
   <dependencyManagement>

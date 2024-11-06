@@ -52,6 +52,8 @@ import com.helger.phase4.incoming.mgr.AS4ProfileSelector;
 import com.helger.phase4.mgr.MetaAS4Manager;
 import com.helger.phase4.model.pmode.resolve.AS4DefaultPModeResolver;
 import com.helger.phase4.peppol.servlet.Phase4PeppolDefaultReceiverConfiguration;
+import com.helger.phase4.peppol.servlet.Phase4PeppolReceiverConfiguration;
+import com.helger.phase4.peppol.servlet.Phase4PeppolServletMessageProcessorSPI;
 import com.helger.phase4.profile.peppol.AS4PeppolProfileRegistarSPI;
 import com.helger.phase4.profile.peppol.PeppolCRLDownloader;
 import com.helger.phase4.profile.peppol.Phase4PeppolHttpClientSettings;
@@ -59,6 +61,7 @@ import com.helger.phase4.servlet.AS4UnifiedResponse;
 import com.helger.phase4.servlet.AS4XServletHandler;
 import com.helger.phase4.servlet.IAS4ServletRequestHandlerCustomizer;
 import com.helger.photon.io.WebFileIO;
+import com.helger.security.certificate.CertificateHelper;
 import com.helger.servlet.ServletHelper;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
@@ -104,6 +107,7 @@ public class ServletConfig
                                              @Nonnull final AS4UnifiedResponse aUnifiedResponse,
                                              @Nonnull final AS4RequestHandler aRequestHandler)
         {
+          // This method refers to the outer static method
           aRequestHandler.setCryptoFactory (ServletConfig.getCryptoFactoryToUse ());
 
           // Specific setters, dependent on a specific AS4 profile ID
@@ -113,6 +117,50 @@ public class ServletConfig
           {
             aRequestHandler.setPModeResolver (new AS4DefaultPModeResolver (sAS4ProfileID));
             aRequestHandler.setIncomingProfileSelector (new AS4IncomingProfileSelectorConstant (sAS4ProfileID));
+
+            // Example code to disable PMode validation
+            if (false)
+            {
+              final boolean bValidateAgainstProfile = false;
+              aRequestHandler.setIncomingProfileSelector (new AS4IncomingProfileSelectorConstant (sAS4ProfileID,
+                                                                                                  bValidateAgainstProfile));
+            }
+          }
+
+          // Example code for changing the Peppol receiver data based on the
+          // source URL
+          if (false)
+          {
+            final String sUrl = aRequestScope.getURLDecoded ();
+
+            // The receiver check data you want to set
+            final Phase4PeppolReceiverConfiguration aReceiverCheckData;
+            if (sUrl != null && sUrl.startsWith ("https://ap-prod.example.org/as4"))
+            {
+              aReceiverCheckData = new Phase4PeppolReceiverConfiguration (true,
+                                                                          new SMPClientReadOnly (URLHelper.getAsURI ("http://smp-prod.example.org")),
+                                                                          Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE,
+                                                                          "https://ap-prod.example.org/as4",
+                                                                          CertificateHelper.convertStringToCertficateOrNull ("....Public Prod AP Cert...."),
+                                                                          Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks (),
+                                                                          Phase4PeppolDefaultReceiverConfiguration.isCheckSBDHForMandatoryCountryC1 (),
+                                                                          Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation ());
+            }
+            else
+            {
+              aReceiverCheckData = new Phase4PeppolReceiverConfiguration (true,
+                                                                          new SMPClientReadOnly (URLHelper.getAsURI ("http://smp-test.example.org")),
+                                                                          Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE,
+                                                                          "https://ap-test.example.org/as4",
+                                                                          CertificateHelper.convertStringToCertficateOrNull ("....Public Test AP Cert...."),
+                                                                          Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks (),
+                                                                          Phase4PeppolDefaultReceiverConfiguration.isCheckSBDHForMandatoryCountryC1 (),
+                                                                          Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation ());
+            }
+
+            // Find the right SPI handler
+            aRequestHandler.getProcessorOfType (Phase4PeppolServletMessageProcessorSPI.class)
+                           .setReceiverCheckData (aReceiverCheckData);
           }
         }
 
@@ -168,8 +216,8 @@ public class ServletConfig
     HttpDebugger.setEnabled (false);
 
     // Sanity check
-    if (CommandMap.getDefaultCommandMap ()
-                  .createDataContentHandler (CMimeType.MULTIPART_RELATED.getAsString ()) == null)
+    if (CommandMap.getDefaultCommandMap ().createDataContentHandler (CMimeType.MULTIPART_RELATED.getAsString ()) ==
+        null)
     {
       throw new IllegalStateException ("No DataContentHandler for MIME Type '" +
                                        CMimeType.MULTIPART_RELATED.getAsString () +
@@ -211,8 +259,8 @@ public class ServletConfig
     Phase4PeppolDefaultReceiverConfiguration.setCheckSBDHForMandatoryCountryC1 (true);
 
     // Our server should check all signing certificates of incoming messages if
-    // they are revoked or not
-    // (this is the default setting, but added it here for easy modification)
+    // they are revoked or not (this is the default setting, but added it here
+    // for easy modification)
     Phase4PeppolDefaultReceiverConfiguration.setCheckSigningCertificateRevocation (true);
 
     // Make sure the download of CRL is using Apache HttpClient and that the
@@ -220,13 +268,16 @@ public class ServletConfig
     // resources, it can be configured here
     PeppolCRLDownloader.setAsDefaultCRLCache (new Phase4PeppolHttpClientSettings ());
 
+    // Throws an exception if configuration parameters are missing
+    final IAS4CryptoFactory aCF = getCryptoFactoryToUse ();
+
     // Check if crypto properties are okay
-    final KeyStore aKS = getCryptoFactoryToUse ().getKeyStore ();
+    final KeyStore aKS = aCF.getKeyStore ();
     if (aKS == null)
       throw new InitializationException ("Failed to load configured AS4 Key store - fix the configuration");
     LOGGER.info ("Successfully loaded configured AS4 key store from the crypto factory");
 
-    final KeyStore.PrivateKeyEntry aPKE = getCryptoFactoryToUse ().getPrivateKeyEntry ();
+    final KeyStore.PrivateKeyEntry aPKE = aCF.getPrivateKeyEntry ();
     if (aPKE == null)
       throw new InitializationException ("Failed to load configured AS4 private key - fix the configuration");
     LOGGER.info ("Successfully loaded configured AS4 private key from the crypto factory");
@@ -266,6 +317,7 @@ public class ServletConfig
       // our AP
       Phase4PeppolDefaultReceiverConfiguration.setReceiverCheckEnabled (true);
       Phase4PeppolDefaultReceiverConfiguration.setSMPClient (new SMPClientReadOnly (URLHelper.getAsURI (sSMPURL)));
+      Phase4PeppolDefaultReceiverConfiguration.setWildcardSelectionMode (Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE);
       Phase4PeppolDefaultReceiverConfiguration.setAS4EndpointURL (sAPURL);
       Phase4PeppolDefaultReceiverConfiguration.setAPCertificate (aAPCert);
       LOGGER.info ("phase4 Peppol receiver checks are enabled");

@@ -286,11 +286,14 @@ public class ServletConfig
     // * No caching
     // * Use global certificate check mode
     final X509Certificate aAPCert = (X509Certificate) aPKE.getCertificate ();
-    final EPeppolCertificateCheckResult eCheckResult = PeppolCertificateChecker.checkPeppolAPCertificate (aAPCert,
-                                                                                                          MetaAS4Manager.getTimestampMgr ()
-                                                                                                                        .getCurrentDateTime (),
-                                                                                                          ETriState.FALSE,
-                                                                                                          null);
+    // TODO Instead of "peppolAllAP" it should be "peppolTestAP" or
+    // "peppolProdAP" depending on the stage you run
+    final EPeppolCertificateCheckResult eCheckResult = PeppolCertificateChecker.peppolAllAP ()
+                                                                               .checkCertificate (aAPCert,
+                                                                                                  MetaAS4Manager.getTimestampMgr ()
+                                                                                                                .getCurrentDateTime (),
+                                                                                                  ETriState.FALSE,
+                                                                                                  null);
     if (eCheckResult.isInvalid ())
     {
       // TODO Change from "true" to "false" once you have a Peppol

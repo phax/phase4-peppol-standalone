@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.w3c.dom.Document;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.datetime.PDTFactory;
@@ -53,7 +52,6 @@ import com.helger.phase4.peppol.Phase4PeppolSender.PeppolUserMessageBuilder;
 import com.helger.phase4.sender.EAS4UserMessageSendResult;
 import com.helger.security.certificate.CertificateHelper;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
-import com.helger.xml.serialize.read.DOMReader;
 
 @RestController
 public class PeppolSenderController
@@ -61,13 +59,13 @@ public class PeppolSenderController
   private static final Logger LOGGER = LoggerFactory.getLogger (PeppolSenderController.class);
 
   @Nonnull
-  private String _sendPeppolMessage (@Nonnull final byte [] aPayloadBytes,
-                                     @Nonnull final ISMLInfo aSmlInfo,
-                                     @Nonnull @Nonempty final String senderId,
-                                     @Nonnull @Nonempty final String receiverId,
-                                     @Nonnull @Nonempty final String docTypeId,
-                                     @Nonnull @Nonempty final String processId,
-                                     @Nonnull @Nonempty final String countryC1)
+  private String _sendPeppolMessageCreatingSbdh (@Nonnull final byte [] aPayloadBytes,
+                                                 @Nonnull final ISMLInfo aSmlInfo,
+                                                 @Nonnull @Nonempty final String senderId,
+                                                 @Nonnull @Nonempty final String receiverId,
+                                                 @Nonnull @Nonempty final String docTypeId,
+                                                 @Nonnull @Nonempty final String processId,
+                                                 @Nonnull @Nonempty final String countryC1)
   {
     final String sMyPeppolSeatID = AS4Configuration.getConfig ().getAsString ("peppol.seatid");
 
@@ -85,10 +83,6 @@ public class PeppolSenderController
     final StopWatch aSW = StopWatch.createdStarted ();
     try
     {
-      final Document aDoc = DOMReader.readXMLDOM (aPayloadBytes);
-      if (aDoc == null)
-        throw new IllegalStateException ("Failed to read provided payload as XML");
-
       // Start configuring here
       final IParticipantIdentifier aReceiverID = Phase4PeppolSender.IF.createParticipantIdentifierWithDefaultScheme (receiverId);
 
@@ -109,7 +103,7 @@ public class PeppolSenderController
                                    .receiverParticipantID (aReceiverID)
                                    .senderPartyID (sMyPeppolSeatID)
                                    .countryC1 (countryC1)
-                                   .payload (aDoc.getDocumentElement ())
+                                   .payload (aPayloadBytes)
                                    .smpClient (aSMPClient)
                                    .rawResponseConsumer (new AS4RawResponseConsumerWriteToFile ())
                                    .endpointURLConsumer (endpointUrl -> {
@@ -157,6 +151,7 @@ public class PeppolSenderController
       if (eResult.isSuccess ())
       {
         // TODO determine the enduser ID of the outbound message
+        // In many simple cases, this might be the sender's participant ID
         final String sEndUserID = "TODO";
 
         // TODO Enable when ready
@@ -206,7 +201,13 @@ public class PeppolSenderController
                  "' and '" +
                  processId +
                  "'");
-    return _sendPeppolMessage (aPayloadBytes, ESML.DIGIT_TEST, senderId, receiverId, docTypeId, processId, countryC1);
+    return _sendPeppolMessageCreatingSbdh (aPayloadBytes,
+                                           ESML.DIGIT_TEST,
+                                           senderId,
+                                           receiverId,
+                                           docTypeId,
+                                           processId,
+                                           countryC1);
   }
 
   @PostMapping (path = "/sendprod/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}",
@@ -227,12 +228,12 @@ public class PeppolSenderController
                  "' and '" +
                  processId +
                  "'");
-    return _sendPeppolMessage (aPayloadBytes,
-                               ESML.DIGIT_PRODUCTION,
-                               senderId,
-                               receiverId,
-                               docTypeId,
-                               processId,
-                               countryC1);
+    return _sendPeppolMessageCreatingSbdh (aPayloadBytes,
+                                           ESML.DIGIT_PRODUCTION,
+                                           senderId,
+                                           receiverId,
+                                           docTypeId,
+                                           processId,
+                                           countryC1);
   }
 }

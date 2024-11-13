@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.w3c.dom.Document;
 
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.datetime.PDTFactory;
@@ -49,9 +50,11 @@ import com.helger.phase4.model.message.AS4UserMessage;
 import com.helger.phase4.model.message.AbstractAS4Message;
 import com.helger.phase4.peppol.Phase4PeppolSender;
 import com.helger.phase4.peppol.Phase4PeppolSender.PeppolUserMessageBuilder;
+import com.helger.phase4.profile.peppol.Phase4PeppolHttpClientSettings;
 import com.helger.phase4.sender.EAS4UserMessageSendResult;
 import com.helger.security.certificate.CertificateHelper;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
+import com.helger.xml.serialize.read.DOMReader;
 
 @RestController
 public class PeppolSenderController
@@ -83,27 +86,39 @@ public class PeppolSenderController
     final StopWatch aSW = StopWatch.createdStarted ();
     try
     {
+      // Payload must be XML - even for Text and Binary content
+      final Document aDoc = DOMReader.readXMLDOM (aPayloadBytes);
+      if (aDoc == null)
+        throw new IllegalStateException ("Failed to read provided payload as XML");
+
       // Start configuring here
       final IParticipantIdentifier aReceiverID = Phase4PeppolSender.IF.createParticipantIdentifierWithDefaultScheme (receiverId);
 
       final SMPClientReadOnly aSMPClient = new SMPClientReadOnly (Phase4PeppolSender.URL_PROVIDER,
                                                                   aReceiverID,
                                                                   aSmlInfo);
+      aSMPClient.withHttpClientSettings (aHCS -> {
+        // TODO Add SMP outbound proxy settings here
+      });
       if (EJavaVersion.getCurrentVersion ().isNewerOrEqualsThan (EJavaVersion.JDK_17))
       {
         // Work around the disabled SHA-1 in XMLDsig issue
         aSMPClient.setSecureValidation (false);
       }
 
+      final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
+      // TODO Add AP outbound proxy settings here
+
       final PeppolUserMessageBuilder aBuilder;
       aBuilder = Phase4PeppolSender.builder ()
+                                   .httpClientFactory (aHCS)
                                    .documentTypeID (Phase4PeppolSender.IF.createDocumentTypeIdentifierWithDefaultScheme (docTypeId))
                                    .processID (Phase4PeppolSender.IF.createProcessIdentifierWithDefaultScheme (processId))
                                    .senderParticipantID (Phase4PeppolSender.IF.createParticipantIdentifierWithDefaultScheme (senderId))
                                    .receiverParticipantID (aReceiverID)
                                    .senderPartyID (sMyPeppolSeatID)
                                    .countryC1 (countryC1)
-                                   .payload (aPayloadBytes)
+                                   .payload (aDoc.getDocumentElement ())
                                    .smpClient (aSMPClient)
                                    .rawResponseConsumer (new AS4RawResponseConsumerWriteToFile ())
                                    .endpointURLConsumer (endpointUrl -> {

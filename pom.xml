@@ -145,7 +145,7 @@
           </execution>
         </executions>
         <configuration>
-          <mainClass>com.helger.phase4.peppolstandalone.Phase4PeppolStandaloneApplication</mainClass>
+          <mainClass>com.mysupply.phase4.peppolstandalone.Phase4PeppolStandaloneApplication</mainClass>
           <layout>ZIP</layout>
         </configuration>
       </plugin>

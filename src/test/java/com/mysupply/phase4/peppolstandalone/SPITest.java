@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phase4.peppolstandalone;
+package com.mysupply.phase4.peppolstandalone;
 
 import org.junit.jupiter.api.Test;
 

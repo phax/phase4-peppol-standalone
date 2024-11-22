@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phase4.peppolstandalone.servlet;
+package com.mysupply.phase4.peppolstandalone.servlet;
 
 import java.io.File;
 import java.security.KeyStore;
@@ -305,7 +305,6 @@ public class ServletConfig
         throw new InitializationException ("The provided certificate is not a Peppol certificate. Check result: " +
                                            eCheckResult);
       }
-
     }
     else
       LOGGER.info ("Sucessfully checked that the provided Peppol AP certificate is valid.");

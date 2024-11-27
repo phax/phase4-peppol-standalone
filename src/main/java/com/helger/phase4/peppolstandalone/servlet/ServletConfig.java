@@ -38,6 +38,7 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.URLHelper;
 import com.helger.httpclient.HttpDebugger;
 import com.helger.peppol.utils.EPeppolCertificateCheckResult;
+import com.helger.peppol.utils.PeppolCAChecker;
 import com.helger.peppol.utils.PeppolCertificateChecker;
 import com.helger.phase4.config.AS4Configuration;
 import com.helger.phase4.crypto.AS4CryptoFactoryConfiguration;
@@ -54,6 +55,7 @@ import com.helger.phase4.model.pmode.resolve.AS4DefaultPModeResolver;
 import com.helger.phase4.peppol.servlet.Phase4PeppolDefaultReceiverConfiguration;
 import com.helger.phase4.peppol.servlet.Phase4PeppolReceiverConfiguration;
 import com.helger.phase4.peppol.servlet.Phase4PeppolServletMessageProcessorSPI;
+import com.helger.phase4.peppolstandalone.model.EStageType;
 import com.helger.phase4.profile.peppol.AS4PeppolProfileRegistarSPI;
 import com.helger.phase4.profile.peppol.PeppolCRLDownloader;
 import com.helger.phase4.profile.peppol.Phase4PeppolHttpClientSettings;
@@ -282,24 +284,27 @@ public class ServletConfig
       throw new InitializationException ("Failed to load configured AS4 private key - fix the configuration");
     LOGGER.info ("Successfully loaded configured AS4 private key from the crypto factory");
 
+    // TODO configure the stage correctly
+    final EStageType eStage = EStageType.TEST;
+
     // Check the configured Peppol AP certificate
     // * No caching
     // * Use global certificate check mode
     final X509Certificate aAPCert = (X509Certificate) aPKE.getCertificate ();
-    // TODO Instead of "peppolAllAP" it should be "peppolTestAP" or
-    // "peppolProdAP" depending on the stage you run
-    final EPeppolCertificateCheckResult eCheckResult = PeppolCertificateChecker.peppolAllAP ()
-                                                                               .checkCertificate (aAPCert,
-                                                                                                  MetaAS4Manager.getTimestampMgr ()
-                                                                                                                .getCurrentDateTime (),
-                                                                                                  ETriState.FALSE,
-                                                                                                  null);
+
+    final PeppolCAChecker aChecker = eStage == EStageType.PRODUCTION ? PeppolCertificateChecker.peppolProductionAP ()
+                                                                     : PeppolCertificateChecker.peppolTestAP ();
+    final EPeppolCertificateCheckResult eCheckResult = aChecker.checkCertificate (aAPCert,
+                                                                                  MetaAS4Manager.getTimestampMgr ()
+                                                                                                .getCurrentDateTime (),
+                                                                                  ETriState.FALSE,
+                                                                                  null);
     if (eCheckResult.isInvalid ())
     {
       // TODO Change from "true" to "false" once you have a Peppol
       // certificate so that an exception is thrown
       if (true)
-        LOGGER.error ("The provided certificate is not a Peppol certificate. Check result: " + eCheckResult);
+        LOGGER.error ("The provided certificate is not a valid Peppol certificate. Check result: " + eCheckResult);
       else
       {
         throw new InitializationException ("The provided certificate is not a Peppol certificate. Check result: " +

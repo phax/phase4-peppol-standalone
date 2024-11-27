@@ -185,6 +185,7 @@ public class PeppolSenderController
                                          if (err.getShortDescription () != null)
                                            aErrorDetails.add ("shortDescription", err.getShortDescription ());
                                          aErrors.add (aErrorDetails);
+                                         LOGGER.warn ("AS4 error received: " + aErrorDetails.getAsJsonString ());
                                        }
                                        aJson.add ("as4ResponseErrors", aErrors);
                                        aJson.add ("as4ResponseError", true);
@@ -395,6 +396,7 @@ public class PeppolSenderController
                                          if (err.getShortDescription () != null)
                                            aErrorDetails.add ("shortDescription", err.getShortDescription ());
                                          aErrors.add (aErrorDetails);
+                                         LOGGER.warn ("AS4 error received: " + aErrorDetails.getAsJsonString ());
                                        }
                                        aJson.add ("as4ResponseErrors", aErrors);
                                      }

@@ -20,6 +20,8 @@ import java.time.OffsetDateTime;
 
 import javax.annotation.Nonnull;
 
+import com.helger.commons.exception.InitializationException;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -73,232 +75,9 @@ public class PeppolSenderController
   private static final Logger LOGGER = LoggerFactory.getLogger (PeppolSenderController.class);
 
   @Nonnull
-  private String _sendPeppolMessageCreatingSbdh (@Nonnull final byte [] aPayloadBytes,
-                                                 @Nonnull final ISMLInfo aSmlInfo,
-                                                 @Nonnull @Nonempty final String senderId,
-                                                 @Nonnull @Nonempty final String receiverId,
-                                                 @Nonnull @Nonempty final String docTypeId,
-                                                 @Nonnull @Nonempty final String processId,
-                                                 @Nonnull @Nonempty final String countryC1)
-  {
-    final String sMyPeppolSeatID = AS4Configuration.getConfig ().getAsString ("peppol.seatid");
-
-    final OffsetDateTime aNowUTC = PDTFactory.getCurrentOffsetDateTimeUTC ();
-    final IJsonObject aJson = new JsonObject ();
-    aJson.add ("currentDateTimeUTC", PDTWebDateHelper.getAsStringXSD (aNowUTC));
-    aJson.add ("senderId", senderId);
-    aJson.add ("receiverId", receiverId);
-    aJson.add ("docTypeId", docTypeId);
-    aJson.add ("processId", processId);
-    aJson.add ("countryC1", countryC1);
-    aJson.add ("senderPartyId", sMyPeppolSeatID);
-
-    EAS4UserMessageSendResult eResult = null;
-    final StopWatch aSW = StopWatch.createdStarted ();
-    try
-    {
-      // Payload must be XML - even for Text and Binary content
-      final Document aDoc = DOMReader.readXMLDOM (aPayloadBytes);
-      if (aDoc == null)
-        throw new IllegalStateException ("Failed to read provided payload as XML");
-
-      // Start configuring here
-      final IParticipantIdentifier aReceiverID = Phase4PeppolSender.IF.createParticipantIdentifierWithDefaultScheme (receiverId);
-
-      final SMPClientReadOnly aSMPClient = new SMPClientReadOnly (Phase4PeppolSender.URL_PROVIDER,
-                                                                  aReceiverID,
-                                                                  aSmlInfo);
-      aSMPClient.withHttpClientSettings (aHCS -> {
-        // TODO Add SMP outbound proxy settings here
-      });
-      if (EJavaVersion.getCurrentVersion ().isNewerOrEqualsThan (EJavaVersion.JDK_17))
-      {
-        // Work around the disabled SHA-1 in XMLDsig issue
-        aSMPClient.setSecureValidation (false);
-      }
-
-      final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
-      // TODO Add AP outbound proxy settings here
-
-      final PeppolUserMessageBuilder aBuilder;
-      aBuilder = Phase4PeppolSender.builder ()
-                                   .httpClientFactory (aHCS)
-                                   .documentTypeID (Phase4PeppolSender.IF.createDocumentTypeIdentifierWithDefaultScheme (docTypeId))
-                                   .processID (Phase4PeppolSender.IF.createProcessIdentifierWithDefaultScheme (processId))
-                                   .senderParticipantID (Phase4PeppolSender.IF.createParticipantIdentifierWithDefaultScheme (senderId))
-                                   .receiverParticipantID (aReceiverID)
-                                   .senderPartyID (sMyPeppolSeatID)
-                                   .countryC1 (countryC1)
-                                   .payload (aDoc.getDocumentElement ())
-                                   .smpClient (aSMPClient)
-                                   .rawResponseConsumer (new AS4RawResponseConsumerWriteToFile ())
-                                   .endpointURLConsumer (endpointUrl -> {
-                                     // Determined by SMP lookup
-                                     aJson.add ("c3EndpointUrl", endpointUrl);
-                                   })
-                                   .certificateConsumer ( (aAPCertificate, aCheckDT, eCertCheckResult) -> {
-                                     // Determined by SMP lookup
-                                     aJson.add ("c3Cert", CertificateHelper.getPEMEncodedCertificate (aAPCertificate));
-                                     aJson.add ("c3CertSubjectCN",
-                                                PeppolCertificateHelper.getSubjectCN (aAPCertificate));
-                                     aJson.add ("c3CertCheckDT", PDTWebDateHelper.getAsStringXSD (aCheckDT));
-                                     aJson.add ("c3CertCheckResult", eCertCheckResult);
-                                   })
-                                   .buildMessageCallback (new IAS4ClientBuildMessageCallback ()
-                                   {
-                                     public void onAS4Message (@Nonnull final AbstractAS4Message <?> aMsg)
-                                     {
-                                       // Created AS4 fields
-                                       final AS4UserMessage aUserMsg = (AS4UserMessage) aMsg;
-                                       aJson.add ("as4MessageId",
-                                                  aUserMsg.getEbms3UserMessage ().getMessageInfo ().getMessageId ());
-                                       aJson.add ("as4ConversationId",
-                                                  aUserMsg.getEbms3UserMessage ()
-                                                          .getCollaborationInfo ()
-                                                          .getConversationId ());
-                                     }
-                                   })
-                                   .signalMsgConsumer ( (aSignalMsg, aMessageMetadata, aState) -> {
-                                     aJson.add ("as4ReceivedSignalMsg",
-                                                new Ebms3SignalMessageMarshaller ().getAsString (aSignalMsg));
-
-                                     if (aSignalMsg.hasErrorEntries ())
-                                     {
-                                       final IJsonArray aErrors = new JsonArray ();
-                                       for (final Ebms3Error err : aSignalMsg.getError ())
-                                       {
-                                         final IJsonObject aErrorDetails = new JsonObject ();
-                                         if (err.getDescription () != null)
-                                           aErrorDetails.add ("description", err.getDescriptionValue ());
-                                         if (err.getErrorDetail () != null)
-                                           aErrorDetails.add ("errorDetails", err.getErrorDetail ());
-                                         if (err.getCategory () != null)
-                                           aErrorDetails.add ("category", err.getCategory ());
-                                         if (err.getRefToMessageInError () != null)
-                                           aErrorDetails.add ("refToMessageInError", err.getRefToMessageInError ());
-                                         if (err.getErrorCode () != null)
-                                           aErrorDetails.add ("errorCode", err.getErrorCode ());
-                                         if (err.getOrigin () != null)
-                                           aErrorDetails.add ("origin", err.getOrigin ());
-                                         if (err.getSeverity () != null)
-                                           aErrorDetails.add ("severity", err.getSeverity ());
-                                         if (err.getShortDescription () != null)
-                                           aErrorDetails.add ("shortDescription", err.getShortDescription ());
-                                         aErrors.add (aErrorDetails);
-                                       }
-                                       aJson.add ("as4ResponseErrors", aErrors);
-                                       aJson.add ("as4ResponseError", true);
-                                     }
-                                     else
-                                       aJson.add ("as4ResponseError", false);
-                                   })
-                                   .disableValidation ();
-      final Wrapper <Phase4Exception> aCaughtEx = new Wrapper <> ();
-      eResult = aBuilder.sendMessageAndCheckForReceipt (aCaughtEx::set);
-      LOGGER.info ("Peppol client send result: " + eResult);
-
-      if (eResult.isSuccess ())
-      {
-        // TODO determine the enduser ID of the outbound message
-        // In many simple cases, this might be the sender's participant ID
-        final String sEndUserID = "TODO";
-
-        // TODO Enable when ready
-        if (false)
-          aBuilder.createAndStorePeppolReportingItemAfterSending (sEndUserID);
-      }
-
-      aJson.add ("sendingResult", eResult);
-
-      if (aCaughtEx.isSet ())
-      {
-        final Phase4Exception ex = aCaughtEx.get ();
-        LOGGER.error ("Error sending Peppol message via AS4", ex);
-        aJson.add ("sendingException",
-                   new JsonObject ().add ("class", ex.getClass ().getName ())
-                                    .add ("message", ex.getMessage ())
-                                    .add ("stackTrace", StackTraceHelper.getStackAsString (ex)));
-      }
-    }
-    catch (final Exception ex)
-    {
-      // Mostly errors on HTTP level
-      LOGGER.error ("Error sending Peppol message via AS4", ex);
-      aJson.add ("sendingException",
-                 new JsonObject ().add ("class", ex.getClass ().getName ())
-                                  .add ("message", ex.getMessage ())
-                                  .add ("stackTrace", StackTraceHelper.getStackAsString (ex)));
-    }
-    finally
-    {
-      aSW.stop ();
-      aJson.add ("overallDurationMillis", aSW.getMillis ());
-    }
-
-    // Result may be null
-    aJson.add ("success", eResult == EAS4UserMessageSendResult.SUCCESS);
-
-    // Return result JSON
-    return aJson.getAsJsonString (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);
-  }
-
-  @PostMapping (path = "/sendtest/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}",
-                produces = MediaType.APPLICATION_JSON_VALUE)
-  public String sendPeppolTestMessage (@RequestBody final byte [] aPayloadBytes,
-                                       @PathVariable final String senderId,
-                                       @PathVariable final String receiverId,
-                                       @PathVariable final String docTypeId,
-                                       @PathVariable final String processId,
-                                       @PathVariable final String countryC1)
-  {
-    LOGGER.info ("Trying to send Peppol Test message from '" +
-                 senderId +
-                 "' to '" +
-                 receiverId +
-                 "' using '" +
-                 docTypeId +
-                 "' and '" +
-                 processId +
-                 "'");
-    return _sendPeppolMessageCreatingSbdh (aPayloadBytes,
-                                           ESML.DIGIT_TEST,
-                                           senderId,
-                                           receiverId,
-                                           docTypeId,
-                                           processId,
-                                           countryC1);
-  }
-
-  @PostMapping (path = "/sendprod/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}",
-                produces = MediaType.APPLICATION_JSON_VALUE)
-  public String sendPeppolProdMessage (@RequestBody final byte [] aPayloadBytes,
-                                       @PathVariable final String senderId,
-                                       @PathVariable final String receiverId,
-                                       @PathVariable final String docTypeId,
-                                       @PathVariable final String processId,
-                                       @PathVariable final String countryC1)
-  {
-    LOGGER.info ("Trying to send Peppol Prod message from '" +
-                 senderId +
-                 "' to '" +
-                 receiverId +
-                 "' using '" +
-                 docTypeId +
-                 "' and '" +
-                 processId +
-                 "'");
-    return _sendPeppolMessageCreatingSbdh (aPayloadBytes,
-                                           ESML.DIGIT_PRODUCTION,
-                                           senderId,
-                                           receiverId,
-                                           docTypeId,
-                                           processId,
-                                           countryC1);
-  }
-
-  @Nonnull
   private String _sendPeppolMessagePredefinedSbdh (@Nonnull final PeppolSBDHData aData,
-                                                   @Nonnull final ISMLInfo aSmlInfo)
+                                                   @Nonnull final ISMLInfo aSmlInfo,
+                                                   @Nonnull HttpServletResponse aHttpResponse)
   {
     final String sMyPeppolSeatID = AS4Configuration.getConfig ().getAsString ("peppol.seatid");
 
@@ -405,16 +184,16 @@ public class PeppolSenderController
       eResult = aBuilder.sendMessageAndCheckForReceipt (aCaughtEx::set);
       LOGGER.info ("Peppol client send result: " + eResult);
 
-      if (eResult.isSuccess ())
-      {
-        // TODO determine the enduser ID of the outbound message
-        // In many simple cases, this might be the sender's participant ID
-        final String sEndUserID = "TODO";
-
-        // TODO Enable when ready
-        if (false)
-          aBuilder.createAndStorePeppolReportingItemAfterSending (sEndUserID);
-      }
+//      if (eResult.isSuccess ())
+//      {
+//        // TODO determine the enduser ID of the outbound message
+//        // In many simple cases, this might be the sender's participant ID
+//        final String sEndUserID = "TODO";
+//
+//        // TODO Enable when ready
+//        if (false)
+//          aBuilder.createAndStorePeppolReportingItemAfterSending (sEndUserID);
+//      }
 
       aJson.add ("sendingResult", eResult);
 
@@ -450,8 +229,8 @@ public class PeppolSenderController
     return aJson.getAsJsonString (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);
   }
 
-  @PostMapping (path = "/sendsbdhtest", produces = MediaType.APPLICATION_JSON_VALUE)
-  public String sendPeppolTestMessage (@RequestBody final byte [] aPayloadBytes)
+  @PostMapping (path = "/send", produces = MediaType.APPLICATION_JSON_VALUE)
+  public String sendPeppolTestMessage (@RequestBody final byte [] aPayloadBytes, HttpServletResponse aHttpResponse)
   {
     final PeppolSBDHData aData;
     try
@@ -465,8 +244,8 @@ public class PeppolSenderController
       final IJsonObject aJson = new JsonObject ();
       aJson.add ("sbdhParsingException",
                  new JsonObject ().add ("class", ex.getClass ().getName ())
-                                  .add ("message", ex.getMessage ())
-                                  .add ("stackTrace", StackTraceHelper.getStackAsString (ex)));
+                                  .add ("message", ex.getMessage ()));
+      LOGGER.error("An error occurred during receival of outgoing message.", ex);
       aJson.add ("success", false);
       return aJson.getAsJsonString (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);
     }
@@ -489,6 +268,15 @@ public class PeppolSenderController
                  countryC1 +
                  "'");
 
-    return _sendPeppolMessagePredefinedSbdh (aData, ESML.DIGIT_TEST);
+    String smlToUse = AS4Configuration.getConfig ().getAsString("peppol.smlToUse");
+    if(smlToUse == null || smlToUse.isEmpty()) {
+      throw new InitializationException("peppol.smlToUse is not set in the configuration.");
+    } else if(smlToUse.equalsIgnoreCase("SML")) {
+      return _sendPeppolMessagePredefinedSbdh (aData, ESML.DIGIT_PRODUCTION, aHttpResponse);
+    } else if(smlToUse.equalsIgnoreCase("SMK")) {
+      return _sendPeppolMessagePredefinedSbdh (aData, ESML.DIGIT_TEST, aHttpResponse);
+    } else {
+      throw new InitializationException("peppol.smlToUse is not set to a valid value in the configuration.");
+    }
   }
 }

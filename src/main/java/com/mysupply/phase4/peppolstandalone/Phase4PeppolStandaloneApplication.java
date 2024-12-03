@@ -22,8 +22,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class Phase4PeppolStandaloneApplication
 {
-  public static void main (final String [] args)
+  public static void main(final String [] args)
   {
-    SpringApplication.run (Phase4PeppolStandaloneApplication.class, args);
+    SpringApplication.run(Phase4PeppolStandaloneApplication.class, args);
   }
 }

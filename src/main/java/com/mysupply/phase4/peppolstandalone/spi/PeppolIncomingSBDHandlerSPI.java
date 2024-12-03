@@ -18,9 +18,10 @@ package com.mysupply.phase4.peppolstandalone.spi;
 
 import javax.annotation.Nonnull;
 
+import com.mysupply.phase4.persistence.SBDRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.unece.cefact.namespaces.sbdh.StandardBusinessDocument;
 
 import com.helger.commons.annotation.IsSPIImplementation;
@@ -38,7 +39,7 @@ import com.helger.phase4.incoming.IAS4IncomingMessageMetadata;
 import com.helger.phase4.incoming.IAS4IncomingMessageState;
 import com.helger.phase4.peppol.servlet.IPhase4PeppolIncomingSBDHandlerSPI;
 import com.helger.phase4.peppol.servlet.Phase4PeppolServletMessageProcessorSPI;
-import persistence.ISBDRepository;
+import com.mysupply.phase4.persistence.ISBDRepository;
 
 /**
  * This is a way of handling incoming Peppol messages
@@ -46,15 +47,11 @@ import persistence.ISBDRepository;
  * @author Philip Helger
  */
 @IsSPIImplementation
+@Component
 public class PeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingSBDHandlerSPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(PeppolIncomingSBDHandlerSPI.class);
 
-    private final ISBDRepository sbdRepository;
-
-    @Autowired
-    public PeppolIncomingSBDHandlerSPI(ISBDRepository sbdRepository) {
-        this.sbdRepository = sbdRepository;
-    }
+    private final ISBDRepository sbdRepository = new SBDRepository();
 
     public void handleIncomingSBD(@Nonnull final IAS4IncomingMessageMetadata aMessageMetadata,
                                   @Nonnull final HttpHeaderMap aHeaders,

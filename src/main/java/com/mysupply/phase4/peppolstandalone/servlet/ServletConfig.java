@@ -74,285 +74,258 @@ import jakarta.annotation.PreDestroy;
 import jakarta.servlet.ServletContext;
 
 @Configuration
-public class ServletConfig
-{
-  private static final Logger LOGGER = LoggerFactory.getLogger (ServletConfig.class);
+public class ServletConfig {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServletConfig.class);
 
-  /**
-   * This method is a placeholder for retrieving a custom
-   * {@link IAS4CryptoFactory}.
-   *
-   * @return the {@link IAS4CryptoFactory} to use. May not be <code>null</code>.
-   */
-  @Nonnull
-  public static IAS4CryptoFactory getCryptoFactoryToUse ()
-  {
-    final IAS4CryptoFactory ret = AS4CryptoFactoryConfiguration.getDefaultInstance ();
-    // If you have a custom crypto factory, build/return it here
-    return ret;
-  }
+    /**
+     * This method is a placeholder for retrieving a custom
+     * {@link IAS4CryptoFactory}.
+     *
+     * @return the {@link IAS4CryptoFactory} to use. May not be <code>null</code>.
+     */
+    @Nonnull
+    public static IAS4CryptoFactory getCryptoFactoryToUse() {
+        final IAS4CryptoFactory ret = AS4CryptoFactoryConfiguration.getDefaultInstance();
+        // If you have a custom crypto factory, build/return it here
+        return ret;
+    }
 
-  public static class MyAS4Servlet extends AbstractXServlet
-  {
-    public MyAS4Servlet ()
-    {
-      // Multipart is handled specifically inside
-      settings ().setMultipartEnabled (false);
+    public static class MyAS4Servlet extends AbstractXServlet {
+        public MyAS4Servlet() {
+            // Multipart is handled specifically inside
+            settings().setMultipartEnabled(false);
 
-      // The main XServlet handler to handle the inbound request
-      final AS4XServletHandler hdl = new AS4XServletHandler ();
-      hdl.setRequestHandlerCustomizer (new IAS4ServletRequestHandlerCustomizer ()
-      {
-        public void customizeBeforeHandling (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                                             @Nonnull final AS4UnifiedResponse aUnifiedResponse,
-                                             @Nonnull final AS4RequestHandler aRequestHandler)
-        {
-          // This method refers to the outer static method
-          aRequestHandler.setCryptoFactory (ServletConfig.getCryptoFactoryToUse ());
+            // The main XServlet handler to handle the inbound request
+            final AS4XServletHandler hdl = new AS4XServletHandler();
+            hdl.setRequestHandlerCustomizer(new IAS4ServletRequestHandlerCustomizer() {
+                public void customizeBeforeHandling(@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
+                                                    @Nonnull final AS4UnifiedResponse aUnifiedResponse,
+                                                    @Nonnull final AS4RequestHandler aRequestHandler) {
+                    // This method refers to the outer static method
+                    aRequestHandler.setCryptoFactory(ServletConfig.getCryptoFactoryToUse());
 
-          // Specific setters, dependent on a specific AS4 profile ID
-          // This example code only uses the global one (if any)
-          final String sAS4ProfileID = AS4ProfileSelector.getDefaultAS4ProfileID ();
-          if (StringHelper.hasText (sAS4ProfileID))
-          {
-            aRequestHandler.setPModeResolver (new AS4DefaultPModeResolver (sAS4ProfileID));
-            aRequestHandler.setIncomingProfileSelector (new AS4IncomingProfileSelectorConstant (sAS4ProfileID));
+                    // Specific setters, dependent on a specific AS4 profile ID
+                    // This example code only uses the global one (if any)
+                    final String sAS4ProfileID = AS4ProfileSelector.getDefaultAS4ProfileID();
+                    if (StringHelper.hasText(sAS4ProfileID)) {
+                        aRequestHandler.setPModeResolver(new AS4DefaultPModeResolver(sAS4ProfileID));
+                        aRequestHandler.setIncomingProfileSelector(new AS4IncomingProfileSelectorConstant(sAS4ProfileID));
 
-            // Example code to disable PMode validation
-            if (false)
-            {
-              final boolean bValidateAgainstProfile = false;
-              aRequestHandler.setIncomingProfileSelector (new AS4IncomingProfileSelectorConstant (sAS4ProfileID,
-                                                                                                  bValidateAgainstProfile));
-            }
-          }
+                        // Example code to disable PMode validation
+                        if (false) {
+                            final boolean bValidateAgainstProfile = false;
+                            aRequestHandler.setIncomingProfileSelector(new AS4IncomingProfileSelectorConstant(sAS4ProfileID,
+                                    bValidateAgainstProfile));
+                        }
+                    }
 
-          // Example code for changing the Peppol receiver data based on the
-          // source URL
-          if (false)
-          {
-            final String sUrl = aRequestScope.getURLDecoded ();
+                    // Example code for changing the Peppol receiver data based on the
+                    // source URL
+                    if (false) {
+                        final String sUrl = aRequestScope.getURLDecoded();
 
-            // The receiver check data you want to set
-            final Phase4PeppolReceiverConfiguration aReceiverCheckData;
-            if (sUrl != null && sUrl.startsWith ("https://ap-prod.example.org/as4"))
-            {
-              aReceiverCheckData = new Phase4PeppolReceiverConfiguration (true,
-                                                                          new SMPClientReadOnly (URLHelper.getAsURI ("http://smp-prod.example.org")),
-                                                                          Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE,
-                                                                          "https://ap-prod.example.org/as4",
-                                                                          CertificateHelper.convertStringToCertficateOrNull ("....Public Prod AP Cert...."),
-                                                                          Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks (),
-                                                                          Phase4PeppolDefaultReceiverConfiguration.isCheckSBDHForMandatoryCountryC1 (),
-                                                                          Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation ());
-            }
-            else
-            {
-              aReceiverCheckData = new Phase4PeppolReceiverConfiguration (true,
-                                                                          new SMPClientReadOnly (URLHelper.getAsURI ("http://smp-test.example.org")),
-                                                                          Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE,
-                                                                          "https://ap-test.example.org/as4",
-                                                                          CertificateHelper.convertStringToCertficateOrNull ("....Public Test AP Cert...."),
-                                                                          Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks (),
-                                                                          Phase4PeppolDefaultReceiverConfiguration.isCheckSBDHForMandatoryCountryC1 (),
-                                                                          Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation ());
-            }
+                        // The receiver check data you want to set
+                        final Phase4PeppolReceiverConfiguration aReceiverCheckData;
+                        if (sUrl != null && sUrl.startsWith("https://ap-prod.example.org/as4")) {
+                            aReceiverCheckData = new Phase4PeppolReceiverConfiguration(true,
+                                    new SMPClientReadOnly(URLHelper.getAsURI("http://smp-prod.example.org")),
+                                    Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE,
+                                    "https://ap-prod.example.org/as4",
+                                    CertificateHelper.convertStringToCertficateOrNull("....Public Prod AP Cert...."),
+                                    Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks(),
+                                    Phase4PeppolDefaultReceiverConfiguration.isCheckSBDHForMandatoryCountryC1(),
+                                    Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation());
+                        } else {
+                            aReceiverCheckData = new Phase4PeppolReceiverConfiguration(true,
+                                    new SMPClientReadOnly(URLHelper.getAsURI("http://smp-test.example.org")),
+                                    Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE,
+                                    "https://ap-test.example.org/as4",
+                                    CertificateHelper.convertStringToCertficateOrNull("....Public Test AP Cert...."),
+                                    Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks(),
+                                    Phase4PeppolDefaultReceiverConfiguration.isCheckSBDHForMandatoryCountryC1(),
+                                    Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation());
+                        }
 
-            // Find the right SPI handler
-            aRequestHandler.getProcessorOfType (Phase4PeppolServletMessageProcessorSPI.class)
-                           .setReceiverCheckData (aReceiverCheckData);
-          }
+                        // Find the right SPI handler
+                        aRequestHandler.getProcessorOfType(Phase4PeppolServletMessageProcessorSPI.class)
+                                .setReceiverCheckData(aReceiverCheckData);
+                    }
+                }
+
+                public void customizeAfterHandling(@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
+                                                   @Nonnull final AS4UnifiedResponse aUnifiedResponse,
+                                                   @Nonnull final AS4RequestHandler aRequestHandler) {
+                    // empty
+                }
+            });
+
+            // HTTP POST only
+            handlerRegistry().registerHandler(EHttpMethod.POST, hdl);
+        }
+    }
+
+    @Bean
+    public ServletRegistrationBean<MyAS4Servlet> servletRegistrationBean(final ServletContext ctx) {
+        // Must be called BEFORE the servlet is instantiated
+        _init(ctx);
+        final ServletRegistrationBean<MyAS4Servlet> bean = new ServletRegistrationBean<>(new MyAS4Servlet(),
+                true,
+                "/as4");
+        bean.setLoadOnStartup(1);
+        return bean;
+    }
+
+    private void _init(@Nonnull final ServletContext aSC) {
+        // Do it only once
+        if (!WebScopeManager.isGlobalScopePresent()) {
+            WebScopeManager.onGlobalBegin(aSC);
+            _initGlobalSettings(aSC);
+            _initAS4();
+            _initPeppolAS4();
+        }
+    }
+
+    private static void _initGlobalSettings(@Nonnull final ServletContext aSC) {
+        // Logging: JUL to SLF4J
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
+
+        if (GlobalDebug.isDebugMode()) {
+            RequestTrackerSettings.setLongRunningRequestsCheckEnabled(false);
+            RequestTrackerSettings.setParallelRunningRequestsCheckEnabled(false);
         }
 
-        public void customizeAfterHandling (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                                            @Nonnull final AS4UnifiedResponse aUnifiedResponse,
-                                            @Nonnull final AS4RequestHandler aRequestHandler)
-        {
-          // empty
+        HttpDebugger.setEnabled(false);
+
+        // Sanity check
+        if (CommandMap.getDefaultCommandMap().createDataContentHandler(CMimeType.MULTIPART_RELATED.getAsString()) ==
+                null) {
+            throw new IllegalStateException("No DataContentHandler for MIME Type '" +
+                    CMimeType.MULTIPART_RELATED.getAsString() +
+                    "' is available. There seems to be a problem with the dependencies/packaging");
         }
-      });
 
-      // HTTP POST only
-      handlerRegistry ().registerHandler (EHttpMethod.POST, hdl);
-    }
-  }
-
-  @Bean
-  public ServletRegistrationBean <MyAS4Servlet> servletRegistrationBean (final ServletContext ctx)
-  {
-    // Must be called BEFORE the servlet is instantiated
-    _init (ctx);
-    final ServletRegistrationBean <MyAS4Servlet> bean = new ServletRegistrationBean <> (new MyAS4Servlet (),
-                                                                                        true,
-                                                                                        "/as4");
-    bean.setLoadOnStartup (1);
-    return bean;
-  }
-
-  private void _init (@Nonnull final ServletContext aSC)
-  {
-    // Do it only once
-    if (!WebScopeManager.isGlobalScopePresent ())
-    {
-      WebScopeManager.onGlobalBegin (aSC);
-      _initGlobalSettings (aSC);
-      _initAS4 ();
-      _initPeppolAS4 ();
-    }
-  }
-
-  private static void _initGlobalSettings (@Nonnull final ServletContext aSC)
-  {
-    // Logging: JUL to SLF4J
-    SLF4JBridgeHandler.removeHandlersForRootLogger ();
-    SLF4JBridgeHandler.install ();
-
-    if (GlobalDebug.isDebugMode ())
-    {
-      RequestTrackerSettings.setLongRunningRequestsCheckEnabled (false);
-      RequestTrackerSettings.setParallelRunningRequestsCheckEnabled (false);
+        // Init the data path
+        {
+            // Get the ServletContext base path
+            final String sServletContextPath = ServletHelper.getServletContextBasePath(aSC);
+            // Get the data path
+            final String sDataPath = AS4Configuration.getDataPath();
+            if (StringHelper.hasNoText(sDataPath))
+                throw new InitializationException("No data path was provided!");
+            final boolean bFileAccessCheck = false;
+            // Init the IO layer
+            WebFileIO.initPaths(new File(sDataPath).getAbsoluteFile(), sServletContextPath, bFileAccessCheck);
+        }
     }
 
-    HttpDebugger.setEnabled (false);
+    private static void _initAS4() {
+        // Enforce Peppol profile usage
+        // This is the programmatic way to enforce exactly this one profile
+        // In a multi-profile environment, that will not work
+        AS4ProfileSelector.setCustomDefaultAS4ProfileID(AS4PeppolProfileRegistarSPI.AS4_PROFILE_ID);
 
-    // Sanity check
-    if (CommandMap.getDefaultCommandMap ().createDataContentHandler (CMimeType.MULTIPART_RELATED.getAsString ()) ==
-        null)
-    {
-      throw new IllegalStateException ("No DataContentHandler for MIME Type '" +
-                                       CMimeType.MULTIPART_RELATED.getAsString () +
-                                       "' is available. There seems to be a problem with the dependencies/packaging");
+        AS4ServerInitializer.initAS4Server();
+
+        // dump all messages to a file
+        AS4DumpManager.setIncomingDumper(new AS4IncomingDumperFileBased());
+        AS4DumpManager.setOutgoingDumper(new AS4OutgoingDumperFileBased());
     }
 
-    // Init the data path
-    {
-      // Get the ServletContext base path
-      final String sServletContextPath = ServletHelper.getServletContextBasePath (aSC);
-      // Get the data path
-      final String sDataPath = AS4Configuration.getDataPath ();
-      if (StringHelper.hasNoText (sDataPath))
-        throw new InitializationException ("No data path was provided!");
-      final boolean bFileAccessCheck = false;
-      // Init the IO layer
-      WebFileIO.initPaths (new File (sDataPath).getAbsoluteFile (), sServletContextPath, bFileAccessCheck);
+    private static void _initPeppolAS4() {
+        // Our server expects all SBDH to contain the COUNTRY_C1 element in SBDH
+        // (this is the default setting, but added it here for easy modification)
+        Phase4PeppolDefaultReceiverConfiguration.setCheckSBDHForMandatoryCountryC1(true);
+
+        // Our server should check all signing certificates of incoming messages if
+        // they are revoked or not (this is the default setting, but added it here
+        // for easy modification)
+        Phase4PeppolDefaultReceiverConfiguration.setCheckSigningCertificateRevocation(true);
+
+        // Make sure the download of CRL is using Apache HttpClient and that the
+        // provided settings are used. If e.g. a proxy is needed to access outbound
+        // resources, it can be configured here
+        PeppolCRLDownloader.setAsDefaultCRLCache(new Phase4PeppolHttpClientSettings());
+
+        X509Certificate aAPCert = validateAPCertificate();
+
+        // Eventually enable the receiver check, so that for each incoming request
+        // the validity is crosscheck against the owning SMP
+        final String sSMPURL = AS4Configuration.getConfig().getAsString("smp.url");
+        final String sAPURL = AS4Configuration.getThisEndpointAddress();
+        if (StringHelper.hasText(sSMPURL) && StringHelper.hasText(sAPURL)) {
+            // To process the message even though the receiver is not registered in
+            // our AP
+            Phase4PeppolDefaultReceiverConfiguration.setReceiverCheckEnabled(true);
+            Phase4PeppolDefaultReceiverConfiguration.setSMPClient(new SMPClientReadOnly(URLHelper.getAsURI(sSMPURL)));
+            Phase4PeppolDefaultReceiverConfiguration.setWildcardSelectionMode(Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE);
+            Phase4PeppolDefaultReceiverConfiguration.setAS4EndpointURL(sAPURL);
+            Phase4PeppolDefaultReceiverConfiguration.setAPCertificate(aAPCert);
+            LOGGER.info("phase4 Peppol receiver checks are enabled");
+        } else {
+            Phase4PeppolDefaultReceiverConfiguration.setReceiverCheckEnabled(false);
+            LOGGER.warn("phase4 Peppol receiver checks are disabled");
+        }
     }
-  }
 
-  private static void _initAS4 ()
-  {
-    // Enforce Peppol profile usage
-    // This is the programmatic way to enforce exactly this one profile
-    // In a multi-profile environment, that will not work
-    AS4ProfileSelector.setCustomDefaultAS4ProfileID (AS4PeppolProfileRegistarSPI.AS4_PROFILE_ID);
+    private static X509Certificate validateAPCertificate() throws InitializationException {
+        // Throws an exception if configuration parameters are missing
+        final IAS4CryptoFactory aCF = getCryptoFactoryToUse();
 
-    AS4ServerInitializer.initAS4Server ();
+        // Check if crypto properties are okay
+        final KeyStore aKS = aCF.getKeyStore();
+        if (aKS == null)
+            throw new InitializationException("Failed to load configured AS4 Key store - fix the configuration");
+        LOGGER.info("Successfully loaded configured AS4 key store from the crypto factory");
 
-    // dump all messages to a file
-    AS4DumpManager.setIncomingDumper (new AS4IncomingDumperFileBased ());
-    AS4DumpManager.setOutgoingDumper (new AS4OutgoingDumperFileBased ());
-  }
+        final KeyStore.PrivateKeyEntry aPKE = aCF.getPrivateKeyEntry();
+        if (aPKE == null)
+            throw new InitializationException("Failed to load configured AS4 private key - fix the configuration");
+        LOGGER.info("Successfully loaded configured AS4 private key from the crypto factory");
 
-  private static void _initPeppolAS4 ()
-  {
-    // Our server expects all SBDH to contain the COUNTRY_C1 element in SBDH
-    // (this is the default setting, but added it here for easy modification)
-    Phase4PeppolDefaultReceiverConfiguration.setCheckSBDHForMandatoryCountryC1 (true);
+        final X509Certificate aAPCert = (X509Certificate) aPKE.getCertificate();
+        final EPeppolCertificateCheckResult testCertificateCheckResult = PeppolCertificateChecker.peppolTestAP()
+                .checkCertificate(aAPCert,
+                        MetaAS4Manager.getTimestampMgr()
+                                .getCurrentDateTime(),
+                        ETriState.FALSE,
+                        null);
 
-    // Our server should check all signing certificates of incoming messages if
-    // they are revoked or not (this is the default setting, but added it here
-    // for easy modification)
-    Phase4PeppolDefaultReceiverConfiguration.setCheckSigningCertificateRevocation (true);
+        final EPeppolCertificateCheckResult prodCertificateCheckResult = PeppolCertificateChecker.peppolProductionAP()
+                .checkCertificate(aAPCert,
+                        MetaAS4Manager.getTimestampMgr()
+                                .getCurrentDateTime(),
+                        ETriState.FALSE,
+                        null);
 
-    // Make sure the download of CRL is using Apache HttpClient and that the
-    // provided settings are used. If e.g. a proxy is needed to access outbound
-    // resources, it can be configured here
-    PeppolCRLDownloader.setAsDefaultCRLCache (new Phase4PeppolHttpClientSettings ());
+        if(testCertificateCheckResult.isValid() || prodCertificateCheckResult.isValid()) {
+            LOGGER.info("Successfully checked that the provided Peppol AP certificate is valid.");
+        } else if (testCertificateCheckResult.isInvalid() && prodCertificateCheckResult.isInvalid()) {
+            throw new InitializationException("The provided certificate is not a Peppol certificate. Check result: " +
+                    testCertificateCheckResult);
+        }
 
-    // Throws an exception if configuration parameters are missing
-    final IAS4CryptoFactory aCF = getCryptoFactoryToUse ();
-
-    // Check if crypto properties are okay
-    final KeyStore aKS = aCF.getKeyStore ();
-    if (aKS == null)
-      throw new InitializationException ("Failed to load configured AS4 Key store - fix the configuration");
-    LOGGER.info ("Successfully loaded configured AS4 key store from the crypto factory");
-
-    final KeyStore.PrivateKeyEntry aPKE = aCF.getPrivateKeyEntry ();
-    if (aPKE == null)
-      throw new InitializationException ("Failed to load configured AS4 private key - fix the configuration");
-    LOGGER.info ("Successfully loaded configured AS4 private key from the crypto factory");
-
-    // Check the configured Peppol AP certificate
-    // * No caching
-    // * Use global certificate check mode
-    final X509Certificate aAPCert = (X509Certificate) aPKE.getCertificate ();
-    // TODO Instead of "peppolAllAP" it should be "peppolTestAP" or
-    // "peppolProdAP" depending on the stage you run
-    final EPeppolCertificateCheckResult eCheckResult = PeppolCertificateChecker.peppolAllAP ()
-                                                                               .checkCertificate (aAPCert,
-                                                                                                  MetaAS4Manager.getTimestampMgr ()
-                                                                                                                .getCurrentDateTime (),
-                                                                                                  ETriState.FALSE,
-                                                                                                  null);
-    if (eCheckResult.isInvalid ())
-    {
-      // TODO Change from "true" to "false" once you have a Peppol
-      // certificate so that an exception is thrown
-      if (true)
-        LOGGER.error ("The provided certificate is not a Peppol certificate. Check result: " + eCheckResult);
-      else
-      {
-        throw new InitializationException ("The provided certificate is not a Peppol certificate. Check result: " +
-                                           eCheckResult);
-      }
+        return aAPCert;
     }
-    else
-      LOGGER.info ("Sucessfully checked that the provided Peppol AP certificate is valid.");
 
-    // Eventually enable the receiver check, so that for each incoming request
-    // the validity is crosscheck against the owning SMP
-    final String sSMPURL = AS4Configuration.getConfig ().getAsString ("smp.url");
-    final String sAPURL = AS4Configuration.getThisEndpointAddress ();
-    if (StringHelper.hasText (sSMPURL) && StringHelper.hasText (sAPURL))
-    {
-      // To process the message even though the receiver is not registered in
-      // our AP
-      Phase4PeppolDefaultReceiverConfiguration.setReceiverCheckEnabled (true);
-      Phase4PeppolDefaultReceiverConfiguration.setSMPClient (new SMPClientReadOnly (URLHelper.getAsURI (sSMPURL)));
-      Phase4PeppolDefaultReceiverConfiguration.setWildcardSelectionMode (Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE);
-      Phase4PeppolDefaultReceiverConfiguration.setAS4EndpointURL (sAPURL);
-      Phase4PeppolDefaultReceiverConfiguration.setAPCertificate (aAPCert);
-      LOGGER.info ("phase4 Peppol receiver checks are enabled");
+    /**
+     * Special class that is only present to have a graceful shutdown.
+     *
+     * @author Philip Helger
+     */
+    private static final class Destroyer {
+        @PreDestroy
+        public void destroy() {
+            if (WebScopeManager.isGlobalScopePresent()) {
+                AS4ServerInitializer.shutdownAS4Server();
+                WebFileIO.resetPaths();
+                WebScopeManager.onGlobalEnd();
+            }
+        }
     }
-    else
-    {
-      Phase4PeppolDefaultReceiverConfiguration.setReceiverCheckEnabled (false);
-      LOGGER.warn ("phase4 Peppol receiver checks are disabled");
-    }
-  }
 
-  /**
-   * Special class that is only present to have a graceful shutdown.
-   *
-   * @author Philip Helger
-   */
-  private static final class Destroyer
-  {
-    @PreDestroy
-    public void destroy ()
-    {
-      if (WebScopeManager.isGlobalScopePresent ())
-      {
-        AS4ServerInitializer.shutdownAS4Server ();
-        WebFileIO.resetPaths ();
-        WebScopeManager.onGlobalEnd ();
-      }
+    @Bean
+    public Destroyer destroyer() {
+        return new Destroyer();
     }
-  }
-
-  @Bean
-  public Destroyer destroyer ()
-  {
-    return new Destroyer ();
-  }
 }

@@ -232,7 +232,7 @@ public class PeppolSenderController
   }
 
   @PostMapping (path = "/send", produces = MediaType.APPLICATION_JSON_VALUE)
-  public String sendPeppolTestMessage (@RequestBody final byte [] aPayloadBytes, HttpServletResponse aHttpResponse) throws ConfigurationException {
+  public String sendMessage (@RequestBody final byte [] aPayloadBytes, HttpServletResponse aHttpResponse) throws ConfigurationException {
     final PeppolSBDHData aData;
     try
     {

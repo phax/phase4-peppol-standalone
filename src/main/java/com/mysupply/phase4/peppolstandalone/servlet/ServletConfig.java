@@ -284,23 +284,37 @@ public class ServletConfig {
         LOGGER.info("Successfully loaded configured AS4 private key from the crypto factory");
 
         final X509Certificate aAPCert = (X509Certificate) aPKE.getCertificate();
-        final EPeppolCertificateCheckResult testCertificateCheckResult = PeppolCertificateChecker.peppolTestAP()
+        EPeppolCertificateCheckResult allAPCertificateCheckResult = PeppolCertificateChecker.peppolAllAP()
                 .checkCertificate(aAPCert,
                         MetaAS4Manager.getTimestampMgr()
                                 .getCurrentDateTime(),
                         ETriState.FALSE,
                         null);
 
-        final EPeppolCertificateCheckResult prodCertificateCheckResult = PeppolCertificateChecker.peppolProductionAP()
+        EPeppolCertificateCheckResult testCertificateCheckResult = PeppolCertificateChecker.peppolTestAP()
                 .checkCertificate(aAPCert,
                         MetaAS4Manager.getTimestampMgr()
                                 .getCurrentDateTime(),
                         ETriState.FALSE,
                         null);
 
-        if(testCertificateCheckResult.isValid() || prodCertificateCheckResult.isValid()) {
+        EPeppolCertificateCheckResult eB2BCertificateCheckResult = PeppolCertificateChecker.peppolTestEb2bAP()
+                .checkCertificate(aAPCert,
+                        MetaAS4Manager.getTimestampMgr()
+                                .getCurrentDateTime(),
+                        ETriState.FALSE,
+                        null);
+
+        EPeppolCertificateCheckResult prodCertificateCheckResult = PeppolCertificateChecker.peppolProductionAP()
+                .checkCertificate(aAPCert,
+                        MetaAS4Manager.getTimestampMgr()
+                                .getCurrentDateTime(),
+                        ETriState.FALSE,
+                        null);
+
+        if(allAPCertificateCheckResult.isValid() || testCertificateCheckResult.isValid() || eB2BCertificateCheckResult.isValid() || prodCertificateCheckResult.isValid()) {
             LOGGER.info("Successfully checked that the provided Peppol AP certificate is valid.");
-        } else if (testCertificateCheckResult.isInvalid() && prodCertificateCheckResult.isInvalid()) {
+        } else if (allAPCertificateCheckResult.isInvalid() && testCertificateCheckResult.isInvalid() && eB2BCertificateCheckResult.isInvalid() && prodCertificateCheckResult.isInvalid()) {
             throw new InitializationException("The provided certificate is not a Peppol certificate. Check result: " +
                     testCertificateCheckResult);
         }

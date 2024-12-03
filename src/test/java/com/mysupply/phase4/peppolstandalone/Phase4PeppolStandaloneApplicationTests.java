@@ -24,5 +24,8 @@ class Phase4PeppolStandaloneApplicationTests
 {
   @Test
   void testContextLoads ()
-  {}
+  {
+    // Just test if the application context starts
+    // Needs the application.properties file to be configured with a valid Peppol certificate
+  }
 }

@@ -19,8 +19,10 @@ package com.mysupply.phase4.peppolstandalone.controller;
 import java.time.OffsetDateTime;
 
 import javax.annotation.Nonnull;
+import javax.naming.ConfigurationException;
 
 import com.helger.commons.exception.InitializationException;
+import com.mysupply.phase4.domain.enums.MetadataProviderEnum;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -230,8 +232,7 @@ public class PeppolSenderController
   }
 
   @PostMapping (path = "/send", produces = MediaType.APPLICATION_JSON_VALUE)
-  public String sendPeppolTestMessage (@RequestBody final byte [] aPayloadBytes, HttpServletResponse aHttpResponse)
-  {
+  public String sendPeppolTestMessage (@RequestBody final byte [] aPayloadBytes, HttpServletResponse aHttpResponse) throws ConfigurationException {
     final PeppolSBDHData aData;
     try
     {
@@ -270,13 +271,13 @@ public class PeppolSenderController
 
     String smlToUse = AS4Configuration.getConfig ().getAsString("peppol.smlToUse");
     if(smlToUse == null || smlToUse.isEmpty()) {
-      throw new InitializationException("peppol.smlToUse is not set in the configuration.");
-    } else if(smlToUse.equalsIgnoreCase("SML")) {
+      throw new ConfigurationException("peppol.smlToUse is not set in the configuration.");
+    } else if(smlToUse.equalsIgnoreCase(MetadataProviderEnum.SML.name())) {
       return _sendPeppolMessagePredefinedSbdh (aData, ESML.DIGIT_PRODUCTION, aHttpResponse);
-    } else if(smlToUse.equalsIgnoreCase("SMK")) {
+    } else if(smlToUse.equalsIgnoreCase(MetadataProviderEnum.SMK.name())) {
       return _sendPeppolMessagePredefinedSbdh (aData, ESML.DIGIT_TEST, aHttpResponse);
     } else {
-      throw new InitializationException("peppol.smlToUse is not set to a valid value in the configuration.");
+      throw new ConfigurationException("peppol.smlToUse is not set to a valid value in the configuration.");
     }
   }
 }

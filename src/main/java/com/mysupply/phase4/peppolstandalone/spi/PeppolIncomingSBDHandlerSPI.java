@@ -79,41 +79,5 @@ public class PeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingSBDHand
         // TODO add your code here
         // E.g. write to disk, write to S3, write to database, write to queue...
         // In case there is an error, send an Exception
-
-        // Last action in this method
-        new Thread(() -> {
-            // TODO If you have a way to determine the real end user of the message
-            // here, this might be a good opportunity to store the data for Peppol
-            // Reporting (do this asynchronously as the last activity)
-            // Note: this is a separate thread so that it does not block the sending
-            // of the positive receipt message
-
-            // Peppol Reporting - enable if possible to be done in here
-            final boolean createPeppolReportingItem = AS4Configuration
-                    .getConfig()
-                    .getAsBoolean("peppol.createReportingItem");
-
-            if (createPeppolReportingItem)
-                try {
-                    LOGGER.info("Creating Peppol Reporting Item and storing it");
-
-                    // TODO determine correct values
-                    final String sC3ID = "TODO-C3-ID";
-                    final String sC4CountryCode = "AT";
-                    final String sEndUserID = "EndUserID";
-                    final PeppolReportingItem aReportingItem = Phase4PeppolServletMessageProcessorSPI.createPeppolReportingItemForReceivedMessage(aUserMessage,
-                            aPeppolSBD,
-                            aState,
-                            sC3ID,
-                            sC4CountryCode,
-                            sEndUserID);
-
-                    PeppolReportingBackend.withBackendDo(AS4Configuration.getConfig(),
-                            aBackend -> aBackend.storeReportingItem(aReportingItem));
-                } catch (final PeppolReportingBackendException ex) {
-                    LOGGER.error("Failed to store Peppol Reporting Item", ex);
-                    // TODO improve error handling
-                }
-        }).start();
     }
 }

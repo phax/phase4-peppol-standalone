@@ -55,7 +55,7 @@
   -->
   
   <properties>
-    <spring-boot.version>3.3.5</spring-boot.version>
+    <spring-boot.version>3.4.0</spring-boot.version>
   </properties>
 
   <!-- Include here to not bloat the global scope -->  

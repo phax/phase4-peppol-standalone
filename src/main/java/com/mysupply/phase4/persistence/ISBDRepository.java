@@ -5,7 +5,6 @@ import org.unece.cefact.namespaces.sbdh.StandardBusinessDocument;
 
 import java.util.UUID;
 
-@IsSPIInterface
 public interface ISBDRepository {
     void save(StandardBusinessDocument standardBusinessDocument);
     StandardBusinessDocument get(UUID documentId);

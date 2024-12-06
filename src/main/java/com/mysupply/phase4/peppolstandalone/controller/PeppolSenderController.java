@@ -178,9 +178,11 @@ public class PeppolSenderController
                                          aErrors.add (aErrorDetails);
                                        }
                                        aJson.add ("as4ResponseErrors", aErrors);
+                                       aHttpResponse.setStatus(500);
                                      }
                                      else
                                        aJson.add ("as4ResponseError", false);
+                                      aHttpResponse.setStatus(500);
                                    });
       final Wrapper <Phase4Exception> aCaughtEx = new Wrapper <> ();
       eResult = aBuilder.sendMessageAndCheckForReceipt (aCaughtEx::set);
@@ -190,11 +192,11 @@ public class PeppolSenderController
 //      {
 //        // TODO determine the enduser ID of the outbound message
 //        // In many simple cases, this might be the sender's participant ID
-//        final String sEndUserID = "TODO";
+//        final String sEndUserID = aData.getSenderAsIdentifier().getURIEncoded();
 //
 //        // TODO Enable when ready
-//        if (false)
-//          aBuilder.createAndStorePeppolReportingItemAfterSending (sEndUserID);
+////        if (false)
+//          aBuilder.createAndStorePeppolReportingItemAfterSending(sEndUserID);
 //      }
 
       aJson.add ("sendingResult", eResult);
@@ -207,6 +209,8 @@ public class PeppolSenderController
                    new JsonObject ().add ("class", ex.getClass ().getName ())
                                     .add ("message", ex.getMessage ())
                                     .add ("stackTrace", StackTraceHelper.getStackAsString (ex)));
+
+        aHttpResponse.setStatus(500);
       }
     }
     catch (final Exception ex)
@@ -217,6 +221,8 @@ public class PeppolSenderController
                  new JsonObject ().add ("class", ex.getClass ().getName ())
                                   .add ("message", ex.getMessage ())
                                   .add ("stackTrace", StackTraceHelper.getStackAsString (ex)));
+
+      aHttpResponse.setStatus(500);
     }
     finally
     {
@@ -257,7 +263,7 @@ public class PeppolSenderController
     final String processId = aData.getProcessAsIdentifier ().getURIEncoded ();
     final String countryC1 = aData.getCountryC1 ();
 
-    LOGGER.info ("Trying to send Peppol Test SBDH message from '" +
+    LOGGER.info ("Trying to send Peppol SBDH message from '" +
                  senderId +
                  "' to '" +
                  receiverId +

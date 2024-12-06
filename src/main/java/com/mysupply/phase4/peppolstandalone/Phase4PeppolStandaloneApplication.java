@@ -18,7 +18,10 @@ package com.mysupply.phase4.peppolstandalone;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
+@ComponentScan(basePackages = "com.mysupply.phase4")
+@ComponentScan("com.helger")
 @SpringBootApplication
 public class Phase4PeppolStandaloneApplication
 {

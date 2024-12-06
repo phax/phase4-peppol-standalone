@@ -21,7 +21,6 @@ import javax.annotation.Nonnull;
 import com.mysupply.phase4.persistence.SBDRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.unece.cefact.namespaces.sbdh.StandardBusinessDocument;
 

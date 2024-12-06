@@ -21,19 +21,15 @@ import java.time.OffsetDateTime;
 import javax.annotation.Nonnull;
 import javax.naming.ConfigurationException;
 
-import com.helger.commons.exception.InitializationException;
 import com.mysupply.phase4.domain.enums.MetadataProviderEnum;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.w3c.dom.Document;
 
-import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.datetime.PDTWebDateHelper;
 import com.helger.commons.io.stream.NonBlockingByteArrayInputStream;
@@ -62,14 +58,12 @@ import com.helger.phase4.marshaller.Ebms3SignalMessageMarshaller;
 import com.helger.phase4.model.message.AS4UserMessage;
 import com.helger.phase4.model.message.AbstractAS4Message;
 import com.helger.phase4.peppol.Phase4PeppolSender;
-import com.helger.phase4.peppol.Phase4PeppolSender.PeppolUserMessageBuilder;
 import com.helger.phase4.peppol.Phase4PeppolSender.PeppolUserMessageSBDHBuilder;
 import com.helger.phase4.profile.peppol.Phase4PeppolHttpClientSettings;
 import com.helger.phase4.sender.EAS4UserMessageSendResult;
 import com.helger.phase4.util.Phase4Exception;
 import com.helger.security.certificate.CertificateHelper;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
-import com.helger.xml.serialize.read.DOMReader;
 
 @RestController
 public class PeppolSenderController

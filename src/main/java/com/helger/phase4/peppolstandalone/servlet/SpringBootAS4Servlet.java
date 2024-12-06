@@ -81,25 +81,31 @@ public class SpringBootAS4Servlet extends AbstractXServlet
           final Phase4PeppolReceiverConfiguration aReceiverCheckData;
           if (sUrl != null && sUrl.startsWith ("https://ap-prod.example.org/as4"))
           {
-            aReceiverCheckData = new Phase4PeppolReceiverConfiguration (true,
-                                                                        new SMPClientReadOnly (URLHelper.getAsURI ("http://smp-prod.example.org")),
-                                                                        Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE,
-                                                                        "https://ap-prod.example.org/as4",
-                                                                        CertificateHelper.convertStringToCertficateOrNull ("....Public Prod AP Cert...."),
-                                                                        Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks (),
-                                                                        Phase4PeppolDefaultReceiverConfiguration.isCheckSBDHForMandatoryCountryC1 (),
-                                                                        Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation ());
+            aReceiverCheckData = Phase4PeppolReceiverConfiguration.builder ()
+                                                                  .receiverCheckEnabled (true)
+                                                                  .serviceMetadataProvider (new SMPClientReadOnly (URLHelper.getAsURI ("http://smp-prod.example.org")))
+                                                                  .wildcardSelectionMode (Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE)
+                                                                  .as4EndpointUrl ("https://ap-prod.example.org/as4")
+                                                                  .apCertificate (CertificateHelper.convertStringToCertficateOrNull ("....Public Prod AP Cert...."))
+                                                                  .sbdhIdentifierFactoryPeppol ()
+                                                                  .performSBDHValueChecks (Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks ())
+                                                                  .checkSBDHForMandatoryCountryC1 (Phase4PeppolDefaultReceiverConfiguration.isCheckSBDHForMandatoryCountryC1 ())
+                                                                  .checkSigningCertificateRevocation (Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation ())
+                                                                  .build ();
           }
           else
           {
-            aReceiverCheckData = new Phase4PeppolReceiverConfiguration (true,
-                                                                        new SMPClientReadOnly (URLHelper.getAsURI ("http://smp-test.example.org")),
-                                                                        Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE,
-                                                                        "https://ap-test.example.org/as4",
-                                                                        CertificateHelper.convertStringToCertficateOrNull ("....Public Test AP Cert...."),
-                                                                        Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks (),
-                                                                        Phase4PeppolDefaultReceiverConfiguration.isCheckSBDHForMandatoryCountryC1 (),
-                                                                        Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation ());
+            aReceiverCheckData = Phase4PeppolReceiverConfiguration.builder ()
+                                                                  .receiverCheckEnabled (true)
+                                                                  .serviceMetadataProvider (new SMPClientReadOnly (URLHelper.getAsURI ("http://smp-test.example.org")))
+                                                                  .wildcardSelectionMode (Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE)
+                                                                  .as4EndpointUrl ("https://ap-test.example.org/as4")
+                                                                  .apCertificate (CertificateHelper.convertStringToCertficateOrNull ("....Public Test AP Cert...."))
+                                                                  .sbdhIdentifierFactoryPeppol ()
+                                                                  .performSBDHValueChecks (Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks ())
+                                                                  .checkSBDHForMandatoryCountryC1 (Phase4PeppolDefaultReceiverConfiguration.isCheckSBDHForMandatoryCountryC1 ())
+                                                                  .checkSigningCertificateRevocation (Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation ())
+                                                                  .build ();
           }
 
           // Find the right SPI handler

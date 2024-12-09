@@ -18,10 +18,15 @@ package com.mysupply.phase4.peppolstandalone;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @ComponentScan(basePackages = "com.mysupply.phase4")
 @ComponentScan("com.helger")
+@ComponentScan("com.mysupply.phase4.peppolstandalone.spi")
+@EnableJpaRepositories("com.mysupply.phase4.persistence")
+@EntityScan(basePackages = "com.mysupply.phase4.domain")
 @SpringBootApplication
 public class Phase4PeppolStandaloneApplication
 {

@@ -8,9 +8,9 @@ import com.helger.peppol.reporting.api.PeppolReportingItem;
 import com.helger.peppol.reporting.api.backend.IPeppolReportingBackendSPI;
 import com.helger.peppol.reporting.api.backend.PeppolReportingBackendException;
 import com.mysupply.phase4.domain.PeppolReportingItemWrapper;
+import com.mysupply.phase4.peppolstandalone.servlet.SpringContextHolder;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.*;
 import org.slf4j.Logger;
@@ -30,13 +30,14 @@ import java.util.UUID;
 public class PeppolReportingService implements IPeppolReportingBackendSPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(PeppolReportingService.class);
     private final String instanceId = this.getClass().getName() + " - " + UUID.randomUUID();
-    private final EntityManagerFactory entityManagerFactory;
+    private EntityManagerFactory entityManagerFactory;
 
     public PeppolReportingService() {
         LOGGER.debug("Created new instance of " + this.getClass().getName() + "with instanceId: " + this.instanceId);
-        this.entityManagerFactory = Persistence.createEntityManagerFactory("persister");
+        SpringContextHolder.autowireBean(this);
     }
 
+    @Autowired
     public PeppolReportingService(EntityManagerFactory entityManagerFactory) {
         this.entityManagerFactory = entityManagerFactory;
     }
@@ -150,5 +151,10 @@ public class PeppolReportingService implements IPeppolReportingBackendSPI {
                 entityManager.close();
             }
         }
+    }
+
+    @Autowired
+    private void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
+        this.entityManagerFactory = entityManagerFactory;
     }
 }

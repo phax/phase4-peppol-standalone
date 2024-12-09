@@ -18,9 +18,12 @@ package com.mysupply.phase4.peppolstandalone.spi;
 
 import javax.annotation.Nonnull;
 
-import com.mysupply.phase4.persistence.SBDRepository;
+import com.mysupply.phase4.domain.Document;
+import com.mysupply.phase4.peppolstandalone.servlet.SpringContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Component;
 import org.unece.cefact.namespaces.sbdh.StandardBusinessDocument;
 
@@ -48,13 +51,15 @@ import com.mysupply.phase4.persistence.ISBDRepository;
  */
 @IsSPIImplementation
 @Component
+@Configurable
 public class PeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingSBDHandlerSPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(PeppolIncomingSBDHandlerSPI.class);
 
-    private final ISBDRepository sbdRepository;
+    @Autowired
+    private ISBDRepository sbdRepository;
 
     public PeppolIncomingSBDHandlerSPI() {
-        this.sbdRepository = new SBDRepository();
+        SpringContextHolder.autowireBean(this);
     }
 
     public void handleIncomingSBD(@Nonnull final IAS4IncomingMessageMetadata aMessageMetadata,
@@ -93,6 +98,15 @@ public class PeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingSBDHand
         // TODO add your code here
         // E.g. write to disk, write to S3, write to database, write to queue...
         // In case there is an error, send an Exception
+        try {
+            Document documentToStore = new Document(aSBDBytes);
+            this.sbdRepository.save(documentToStore);
+            LOGGER.info("SBD saved successfully");
+        } catch (Exception ex) {
+            LOGGER.error("Failed to save SBD", ex);
+            throw new Exception("Failed to save SBD");
+        }
+
 
         // Last action in this method
         new Thread(() -> {
@@ -130,5 +144,10 @@ public class PeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingSBDHand
                     // TODO improve error handling
                 }
         }).start();
+    }
+
+    @Autowired
+    private void setSbdRepository(ISBDRepository sbdRepository) {
+        this.sbdRepository = sbdRepository;
     }
 }

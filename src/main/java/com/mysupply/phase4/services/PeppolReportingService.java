@@ -8,7 +8,7 @@ import com.helger.peppol.reporting.api.PeppolReportingItem;
 import com.helger.peppol.reporting.api.backend.IPeppolReportingBackendSPI;
 import com.helger.peppol.reporting.api.backend.PeppolReportingBackendException;
 import com.mysupply.phase4.domain.PeppolReportingItemWrapper;
-import com.mysupply.phase4.peppolstandalone.servlet.SpringContextHolder;
+import com.mysupply.phase4.peppolstandalone.context.SpringContextHolder;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Query;

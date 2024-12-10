@@ -10,9 +10,6 @@ public class Document {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     private byte[] document;
-//    @ManyToOne
-//    @JoinColumn(name = "peppol_reporting_item_id")
-//    private PeppolReportingItemWrapper peppolReportingItem;
 
     protected Document() {
 
@@ -33,12 +30,4 @@ public class Document {
     public UUID getId() {
         return id;
     }
-
-//    public PeppolReportingItemWrapper getPeppolReportingItem() {
-//        return peppolReportingItem;
-//    }
-//
-//    public void setPeppolReportingItem(PeppolReportingItemWrapper peppolReportingItem) {
-//        this.peppolReportingItem = peppolReportingItem;
-//    }
 }

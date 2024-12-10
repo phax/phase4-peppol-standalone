@@ -1,4 +1,4 @@
-package com.mysupply.phase4.peppolstandalone.servlet;
+package com.mysupply.phase4.peppolstandalone.context;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;

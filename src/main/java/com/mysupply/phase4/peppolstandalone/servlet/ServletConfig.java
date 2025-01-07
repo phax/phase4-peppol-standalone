@@ -209,6 +209,7 @@ public class ServletConfig {
         {
             // Get the ServletContext base path
             final String sServletContextPath = ServletHelper.getServletContextBasePath(aSC);
+            LOGGER.info("servletContextPath located as:" + sServletContextPath);
             // Get the data path
             final String sDataPath = AS4Configuration.getDataPath();
             if (StringHelper.hasNoText(sDataPath))

@@ -52,8 +52,6 @@ import com.helger.phase4.incoming.mgr.AS4ProfileSelector;
 import com.helger.phase4.mgr.MetaAS4Manager;
 import com.helger.phase4.model.pmode.resolve.AS4DefaultPModeResolver;
 import com.helger.phase4.peppol.servlet.Phase4PeppolDefaultReceiverConfiguration;
-import com.helger.phase4.peppol.servlet.Phase4PeppolReceiverConfiguration;
-import com.helger.phase4.peppol.servlet.Phase4PeppolServletMessageProcessorSPI;
 import com.helger.phase4.profile.peppol.AS4PeppolProfileRegistarSPI;
 import com.helger.phase4.profile.peppol.PeppolCRLDownloader;
 import com.helger.phase4.profile.peppol.Phase4PeppolHttpClientSettings;
@@ -61,7 +59,6 @@ import com.helger.phase4.servlet.AS4UnifiedResponse;
 import com.helger.phase4.servlet.AS4XServletHandler;
 import com.helger.phase4.servlet.IAS4ServletRequestHandlerCustomizer;
 import com.helger.photon.io.WebFileIO;
-import com.helger.security.certificate.CertificateHelper;
 import com.helger.servlet.ServletHelper;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
@@ -85,93 +82,21 @@ public class ServletConfig {
      */
     @Nonnull
     public static IAS4CryptoFactory getCryptoFactoryToUse() {
-        final IAS4CryptoFactory ret = AS4CryptoFactoryConfiguration.getDefaultInstance();
-        // If you have a custom crypto factory, build/return it here
-        return ret;
-    }
-
-    public static class MyAS4Servlet extends AbstractXServlet {
-        public MyAS4Servlet() {
-            // Multipart is handled specifically inside
-            settings().setMultipartEnabled(false);
-
-            // The main XServlet handler to handle the inbound request
-            final AS4XServletHandler hdl = new AS4XServletHandler();
-            hdl.setRequestHandlerCustomizer(new IAS4ServletRequestHandlerCustomizer() {
-                public void customizeBeforeHandling(@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                                                    @Nonnull final AS4UnifiedResponse aUnifiedResponse,
-                                                    @Nonnull final AS4RequestHandler aRequestHandler) {
-                    // This method refers to the outer static method
-                    aRequestHandler.setCryptoFactory(ServletConfig.getCryptoFactoryToUse());
-
-                    // Specific setters, dependent on a specific AS4 profile ID
-                    // This example code only uses the global one (if any)
-                    final String sAS4ProfileID = AS4ProfileSelector.getDefaultAS4ProfileID();
-                    if (StringHelper.hasText(sAS4ProfileID)) {
-                        aRequestHandler.setPModeResolver(new AS4DefaultPModeResolver(sAS4ProfileID));
-                        aRequestHandler.setIncomingProfileSelector(new AS4IncomingProfileSelectorConstant(sAS4ProfileID));
-
-                        // Example code to disable PMode validation
-                        if (false) {
-                            final boolean bValidateAgainstProfile = false;
-                            aRequestHandler.setIncomingProfileSelector(new AS4IncomingProfileSelectorConstant(sAS4ProfileID,
-                                    bValidateAgainstProfile));
-                        }
-                    }
-
-                    // Example code for changing the Peppol receiver data based on the
-                    // source URL
-                    if (false) {
-//                        final String sUrl = aRequestScope.getURLDecoded();
-//
-//                        // The receiver check data you want to set
-//                        final Phase4PeppolReceiverConfiguration aReceiverCheckData;
-//                        if (sUrl != null && sUrl.startsWith("https://ap-prod.example.org/as4")) {
-//                            aReceiverCheckData = new Phase4PeppolReceiverConfiguration(true,
-//                                    new SMPClientReadOnly(URLHelper.getAsURI("http://smp-prod.example.org")),
-//                                    Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE,
-//                                    "https://ap-prod.example.org/as4",
-//                                    CertificateHelper.convertStringToCertficateOrNull("....Public Prod AP Cert...."),
-//                                    Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks(),
-//                                    Phase4PeppolDefaultReceiverConfiguration.isCheckSBDHForMandatoryCountryC1(),
-//                                    Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation());
-//                        } else {
-//                            aReceiverCheckData = new Phase4PeppolReceiverConfiguration(true,
-//                                    new SMPClientReadOnly(URLHelper.getAsURI("http://smp-test.example.org")),
-//                                    Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE,
-//                                    "https://ap-test.example.org/as4",
-//                                    CertificateHelper.convertStringToCertficateOrNull("....Public Test AP Cert...."),
-//                                    Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks(),
-//                                    Phase4PeppolDefaultReceiverConfiguration.isCheckSBDHForMandatoryCountryC1(),
-//                                    Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation());
-//                        }
-
-                        // Find the right SPI handler
-                        //aRequestHandler.getProcessorOfType(Phase4PeppolServletMessageProcessorSPI.class)
-                        //        .setReceiverCheckData(aReceiverCheckData);
-                    }
-                }
-
-                public void customizeAfterHandling(@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                                                   @Nonnull final AS4UnifiedResponse aUnifiedResponse,
-                                                   @Nonnull final AS4RequestHandler aRequestHandler) {
-                    // empty
-                }
-            });
-
-            // HTTP POST only
-            handlerRegistry().registerHandler(EHttpMethod.POST, hdl);
-        }
+        final IAS4CryptoFactory as4CryptoFactory = AS4CryptoFactoryConfiguration.getDefaultInstance();
+        return as4CryptoFactory;
     }
 
     @Bean
-    public ServletRegistrationBean<MyAS4Servlet> servletRegistrationBean(final ServletContext ctx) {
+    public ServletRegistrationBean <AS4Servlet> servletRegistrationBean (final ServletContext ctx)
+    {
         // Must be called BEFORE the servlet is instantiated
-        _init(ctx);
-        final ServletRegistrationBean<MyAS4Servlet> bean = new ServletRegistrationBean<>(new MyAS4Servlet(),
+        _init (ctx);
+
+        // Instantiate and register Servlet
+        final ServletRegistrationBean <AS4Servlet> bean = new ServletRegistrationBean <> (new AS4Servlet (),
                 true,
                 "/as4");
-        bean.setLoadOnStartup(1);
+        bean.setLoadOnStartup (1);
         return bean;
     }
 

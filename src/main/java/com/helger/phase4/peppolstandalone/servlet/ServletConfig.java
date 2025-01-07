@@ -49,7 +49,7 @@ import com.helger.phase4.incoming.AS4ServerInitializer;
 import com.helger.phase4.incoming.mgr.AS4ProfileSelector;
 import com.helger.phase4.mgr.MetaAS4Manager;
 import com.helger.phase4.peppol.servlet.Phase4PeppolDefaultReceiverConfiguration;
-import com.helger.phase4.peppolstandalone.model.EStageType;
+import com.mysupply.phase4.domain.enums.EStageType;
 import com.helger.phase4.profile.peppol.AS4PeppolProfileRegistarSPI;
 import com.helger.phase4.profile.peppol.PeppolCRLDownloader;
 import com.helger.phase4.profile.peppol.Phase4PeppolHttpClientSettings;
@@ -82,19 +82,19 @@ public class ServletConfig
     return ret;
   }
 
-  @Bean
-  public ServletRegistrationBean <SpringBootAS4Servlet> servletRegistrationBean (final ServletContext ctx)
-  {
+  //@Bean
+  //public ServletRegistrationBean <SpringBootAS4Servlet> servletRegistrationBean (final ServletContext ctx)
+  //{
     // Must be called BEFORE the servlet is instantiated
-    _init (ctx);
+  //  _init (ctx);
 
     // Instantiate and register Servlet
-    final ServletRegistrationBean <SpringBootAS4Servlet> bean = new ServletRegistrationBean <> (new SpringBootAS4Servlet (),
-                                                                                                true,
-                                                                                                "/as4");
-    bean.setLoadOnStartup (1);
-    return bean;
-  }
+  //  final ServletRegistrationBean <SpringBootAS4Servlet> bean = new ServletRegistrationBean <> (new SpringBootAS4Servlet (),
+  //                                                                                              true,
+  //                                                                                              "/as4");
+  //  bean.setLoadOnStartup (1);
+  //  return bean;
+  //}
 
   private void _init (@Nonnull final ServletContext aSC)
   {

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phase4.peppolstandalone.model;
+package com.mysupply.phase4.domain.enums;
 
 /**
  * Defines the stage of the application.

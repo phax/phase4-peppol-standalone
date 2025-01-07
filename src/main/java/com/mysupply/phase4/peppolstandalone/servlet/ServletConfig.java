@@ -122,33 +122,33 @@ public class ServletConfig {
                     // Example code for changing the Peppol receiver data based on the
                     // source URL
                     if (false) {
-                        final String sUrl = aRequestScope.getURLDecoded();
-
-                        // The receiver check data you want to set
-                        final Phase4PeppolReceiverConfiguration aReceiverCheckData;
-                        if (sUrl != null && sUrl.startsWith("https://ap-prod.example.org/as4")) {
-                            aReceiverCheckData = new Phase4PeppolReceiverConfiguration(true,
-                                    new SMPClientReadOnly(URLHelper.getAsURI("http://smp-prod.example.org")),
-                                    Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE,
-                                    "https://ap-prod.example.org/as4",
-                                    CertificateHelper.convertStringToCertficateOrNull("....Public Prod AP Cert...."),
-                                    Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks(),
-                                    Phase4PeppolDefaultReceiverConfiguration.isCheckSBDHForMandatoryCountryC1(),
-                                    Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation());
-                        } else {
-                            aReceiverCheckData = new Phase4PeppolReceiverConfiguration(true,
-                                    new SMPClientReadOnly(URLHelper.getAsURI("http://smp-test.example.org")),
-                                    Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE,
-                                    "https://ap-test.example.org/as4",
-                                    CertificateHelper.convertStringToCertficateOrNull("....Public Test AP Cert...."),
-                                    Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks(),
-                                    Phase4PeppolDefaultReceiverConfiguration.isCheckSBDHForMandatoryCountryC1(),
-                                    Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation());
-                        }
+//                        final String sUrl = aRequestScope.getURLDecoded();
+//
+//                        // The receiver check data you want to set
+//                        final Phase4PeppolReceiverConfiguration aReceiverCheckData;
+//                        if (sUrl != null && sUrl.startsWith("https://ap-prod.example.org/as4")) {
+//                            aReceiverCheckData = new Phase4PeppolReceiverConfiguration(true,
+//                                    new SMPClientReadOnly(URLHelper.getAsURI("http://smp-prod.example.org")),
+//                                    Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE,
+//                                    "https://ap-prod.example.org/as4",
+//                                    CertificateHelper.convertStringToCertficateOrNull("....Public Prod AP Cert...."),
+//                                    Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks(),
+//                                    Phase4PeppolDefaultReceiverConfiguration.isCheckSBDHForMandatoryCountryC1(),
+//                                    Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation());
+//                        } else {
+//                            aReceiverCheckData = new Phase4PeppolReceiverConfiguration(true,
+//                                    new SMPClientReadOnly(URLHelper.getAsURI("http://smp-test.example.org")),
+//                                    Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE,
+//                                    "https://ap-test.example.org/as4",
+//                                    CertificateHelper.convertStringToCertficateOrNull("....Public Test AP Cert...."),
+//                                    Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks(),
+//                                    Phase4PeppolDefaultReceiverConfiguration.isCheckSBDHForMandatoryCountryC1(),
+//                                    Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation());
+//                        }
 
                         // Find the right SPI handler
-                        aRequestHandler.getProcessorOfType(Phase4PeppolServletMessageProcessorSPI.class)
-                                .setReceiverCheckData(aReceiverCheckData);
+                        //aRequestHandler.getProcessorOfType(Phase4PeppolServletMessageProcessorSPI.class)
+                        //        .setReceiverCheckData(aReceiverCheckData);
                     }
                 }
 
@@ -177,16 +177,19 @@ public class ServletConfig {
 
     private void _init(@Nonnull final ServletContext aSC) {
         // Do it only once
+        LOGGER.info("_init executing");
         if (!WebScopeManager.isGlobalScopePresent()) {
             WebScopeManager.onGlobalBegin(aSC);
             _initGlobalSettings(aSC);
             _initAS4();
             _initPeppolAS4();
         }
+        LOGGER.info("_init finished executing");
     }
 
     private static void _initGlobalSettings(@Nonnull final ServletContext aSC) {
         // Logging: JUL to SLF4J
+        LOGGER.info("_initGlobalSettings executing");
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
 
@@ -218,12 +221,14 @@ public class ServletConfig {
             // Init the IO layer
             WebFileIO.initPaths(new File(sDataPath).getAbsoluteFile(), sServletContextPath, bFileAccessCheck);
         }
+        LOGGER.info("_initGlobalSettings finished executing");
     }
 
     private static void _initAS4() {
         // Enforce Peppol profile usage
         // This is the programmatic way to enforce exactly this one profile
         // In a multi-profile environment, that will not work
+        LOGGER.info("_initAS4 executing");
         AS4ProfileSelector.setCustomDefaultAS4ProfileID(AS4PeppolProfileRegistarSPI.AS4_PROFILE_ID);
 
         AS4ServerInitializer.initAS4Server();
@@ -231,9 +236,11 @@ public class ServletConfig {
         // dump all messages to a file
         AS4DumpManager.setIncomingDumper(new AS4IncomingDumperFileBased());
         AS4DumpManager.setOutgoingDumper(new AS4OutgoingDumperFileBased());
+        LOGGER.info("_initAS4 finished executing");
     }
 
     private static void _initPeppolAS4() {
+        LOGGER.info("_initPeppolAS4 executing");
         // Our server expects all SBDH to contain the COUNTRY_C1 element in SBDH
         // (this is the default setting, but added it here for easy modification)
         Phase4PeppolDefaultReceiverConfiguration.setCheckSBDHForMandatoryCountryC1(true);
@@ -267,9 +274,11 @@ public class ServletConfig {
             Phase4PeppolDefaultReceiverConfiguration.setReceiverCheckEnabled(false);
             LOGGER.warn("phase4 Peppol receiver checks are disabled");
         }
+        LOGGER.info("_initPeppolAS4 finished executing");
     }
 
     private static X509Certificate validateAPCertificate() throws InitializationException {
+        LOGGER.info("Validating AP certificate");
         // Throws an exception if configuration parameters are missing
         final IAS4CryptoFactory aCF = getCryptoFactoryToUse();
 

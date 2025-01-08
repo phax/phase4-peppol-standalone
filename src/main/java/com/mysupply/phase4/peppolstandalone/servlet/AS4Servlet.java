@@ -26,7 +26,6 @@ import com.helger.phase4.model.pmode.resolve.AS4DefaultPModeResolver;
 import com.helger.phase4.peppol.servlet.Phase4PeppolDefaultReceiverConfiguration;
 import com.helger.phase4.peppol.servlet.Phase4PeppolReceiverConfiguration;
 import com.helger.phase4.peppol.servlet.Phase4PeppolServletMessageProcessorSPI;
-import com.helger.phase4.peppolstandalone.servlet.ServletConfig;
 import com.helger.phase4.servlet.AS4UnifiedResponse;
 import com.helger.phase4.servlet.AS4XServletHandler;
 import com.helger.phase4.servlet.IAS4ServletRequestHandlerCustomizer;

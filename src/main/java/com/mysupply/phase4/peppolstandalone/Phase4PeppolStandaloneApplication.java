@@ -25,7 +25,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @ComponentScan(basePackages = "com.mysupply.phase4")
 @ComponentScan("com.helger")
 @ComponentScan("com.mysupply.phase4.peppolstandalone.spi")
-@EnableJpaRepositories("com.mysupply.phase4.persistence")
+@EnableJpaRepositories(basePackages = "com.mysupply.phase4.persistence")
 @EntityScan(basePackages = "com.mysupply.phase4.domain")
 @SpringBootApplication
 public class Phase4PeppolStandaloneApplication

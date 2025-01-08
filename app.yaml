@@ -1,6 +1,6 @@
 java.app:
-    metadata:
-      name: phase4
-      namespace: peppol-tools
-      version: v0.1.0
-    project: .
+  metadata:
+    name: phase4
+    namespace: peppol-tools
+    version: v0.2.0
+  project: .

@@ -174,11 +174,17 @@ public class PeppolSenderController {
                     });
             final Wrapper<Phase4Exception> aCaughtEx = new Wrapper<>();
 
+            boolean isEB2B = AS4Configuration.getConfig().getAsBoolean("peppol.isEB2B");
+            if(isEB2B) {
+                eResult = aBuilder
+                        .peppolAP_CAChecker(PeppolCertificateChecker.peppolTestEb2bAP ()) // Needed for EB2B support
+                        .sendMessageAndCheckForReceipt(aCaughtEx::set);
+            } else {
+                eResult = aBuilder
+                        .sendMessageAndCheckForReceipt(aCaughtEx::set);
+            }
 
 
-            eResult = aBuilder
-                    .peppolAP_CAChecker(PeppolCertificateChecker.peppolTestEb2bAP ())
-                    .sendMessageAndCheckForReceipt(aCaughtEx::set);
             LOGGER.info("Peppol client send result: " + eResult);
 
             if (eResult.isSuccess()) {

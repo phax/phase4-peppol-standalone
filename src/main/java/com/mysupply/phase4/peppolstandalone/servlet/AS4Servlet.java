@@ -58,13 +58,11 @@ public class AS4Servlet extends AbstractXServlet
         AS4CryptoFactoryConfiguration aCryptoFactory = ServletConfig.getCryptoFactoryToUse ();
                 aRequestHandler.setCryptoFactory (aCryptoFactory);
 
-        final Phase4PeppolServletMessageProcessorSPI aSPIHandler = new Phase4PeppolServletMessageProcessorSPI ();
-        aSPIHandler.setReceiverCheckData (Phase4PeppolDefaultReceiverConfiguration.getAsReceiverCheckDataBuilder ()
-                .apCertificate (aCryptoFactory.getCertificate ())
-                .build ());
-        // Just to ensure the order is constant if we need more than one
-        // handler
-        aRequestHandler.setProcessorSupplier ( () -> new CommonsArrayList<>(aSPIHandler));
+        // by Philip Helger
+        aRequestHandler.getProcessorOfType (Phase4PeppolServletMessageProcessorSPI.class)
+                .setReceiverCheckData (Phase4PeppolDefaultReceiverConfiguration.getAsReceiverCheckDataBuilder ()
+                        .apCertificate (aCryptoFactory.getCertificate ())
+                        .build ());
 
         // Specific setters, dependent on a specific AS4 profile ID
         // This example code only uses the global one (if any)

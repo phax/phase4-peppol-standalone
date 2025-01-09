@@ -75,9 +75,9 @@ public class ServletConfig
    * @return the {@link IAS4CryptoFactory} to use. May not be <code>null</code>.
    */
   @Nonnull
-  public static IAS4CryptoFactory getCryptoFactoryToUse ()
+  public static AS4CryptoFactoryConfiguration getCryptoFactoryToUse ()
   {
-    final IAS4CryptoFactory ret = AS4CryptoFactoryConfiguration.getDefaultInstance ();
+    final AS4CryptoFactoryConfiguration ret = AS4CryptoFactoryConfiguration.getDefaultInstance ();
     // TODO If you have a custom crypto factory, build/return it here
     return ret;
   }
@@ -177,7 +177,7 @@ public class ServletConfig
     PeppolCRLDownloader.setAsDefaultCRLCache (new Phase4PeppolHttpClientSettings ());
 
     // Throws an exception if configuration parameters are missing
-    final IAS4CryptoFactory aCF = getCryptoFactoryToUse ();
+    final AS4CryptoFactoryConfiguration aCF = getCryptoFactoryToUse ();
 
     // Check if crypto properties are okay
     final KeyStore aKS = aCF.getKeyStore ();
@@ -198,6 +198,7 @@ public class ServletConfig
     // * Use global certificate check mode
     final X509Certificate aAPCert = (X509Certificate) aPKE.getCertificate ();
 
+    // For eB2B you want to check against the eB2B CA instead
     final PeppolCAChecker aChecker = eStage == EStageType.PRODUCTION ? PeppolCertificateChecker.peppolProductionAP ()
                                                                      : PeppolCertificateChecker.peppolTestAP ();
     final EPeppolCertificateCheckResult eCheckResult = aChecker.checkCertificate (aAPCert,

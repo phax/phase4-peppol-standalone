@@ -37,6 +37,8 @@ public class FlywayConfigBean {
             if(arg.equalsIgnoreCase("migrate")) {
                 this.printMigrationInfo(flyway);
                 flyway.migrate();
+                LOGGER.info("Migrations applied (if any), exiting application.");
+                System.exit(0);
             }
         }
 

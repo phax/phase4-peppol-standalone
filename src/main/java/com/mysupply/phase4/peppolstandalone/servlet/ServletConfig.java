@@ -81,8 +81,8 @@ public class ServletConfig {
      * @return the {@link IAS4CryptoFactory} to use. May not be <code>null</code>.
      */
     @Nonnull
-    public static IAS4CryptoFactory getCryptoFactoryToUse() {
-        final IAS4CryptoFactory as4CryptoFactory = AS4CryptoFactoryConfiguration.getDefaultInstance();
+    public static AS4CryptoFactoryConfiguration getCryptoFactoryToUse() {
+        final AS4CryptoFactoryConfiguration as4CryptoFactory = AS4CryptoFactoryConfiguration.getDefaultInstance();
         return as4CryptoFactory;
     }
 

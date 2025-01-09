@@ -71,8 +71,6 @@ public class PeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingSBDHand
                                   @Nonnull final IAS4IncomingMessageState aState,
                                   @Nonnull final ICommonsList<Ebms3Error> aProcessingErrorMessages) throws Exception {
 
-        String countryC4 = "C4";
-
         try {
             // Example code snippets how to get data
             String c1 = aPeppolSBD.getSenderAsIdentifier().getURIEncoded();
@@ -89,15 +87,13 @@ public class PeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingSBDHand
             LOGGER.info("  C4 = " + c4);
             LOGGER.info("  DocType = " + docType);
             LOGGER.info("  Process = " + process);
-            LOGGER.info("  CountryC1 = " + countryC1);
-            LOGGER.info("  CountryC4 = " + countryC4);
+            LOGGER.info("  CountryC1 = " + c1);
+            LOGGER.info("  CountryC2 = " + countryC1);
+            LOGGER.info("  CountryC4 = " + c4);
         } catch (NullPointerException ex) {
             LOGGER.error("An error occurred.", ex);
         }
 
-        // TODO add your code here
-        // E.g. write to disk, write to S3, write to database, write to queue...
-        // In case there is an error, send an Exception
         try {
             Document documentToStore = new Document(aSBDBytes);
             this.sbdRepository.save(documentToStore);
@@ -107,16 +103,7 @@ public class PeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingSBDHand
             throw new Exception("Failed to save SBD");
         }
 
-
-        // Last action in this method
         new Thread(() -> {
-            // TODO If you have a way to determine the real end user of the message
-            // here, this might be a good opportunity to store the data for Peppol
-            // Reporting (do this asynchronously as the last activity)
-            // Note: this is a separate thread so that it does not block the sending
-            // of the positive receipt message
-
-            // Peppol Reporting - enable if possible to be done in here
             final boolean createPeppolReportingItem = AS4Configuration
                     .getConfig()
                     .getAsBoolean("peppol.createReportingItem");
@@ -126,15 +113,14 @@ public class PeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingSBDHand
                     LOGGER.info("Creating Peppol Reporting Item and storing it");
 
                     // TODO determine correct values
-//                    final String sC3ID = "TODO-C3-ID";
                     final String sC3ID = "DK"; //mySupply is located in Denmark, we hardcode DK
-//                    final String sC4CountryCode = "AT";
+                    final String sC4ID = aPeppolSBD.getReceiverAsIdentifier().getURIEncoded();
                     final String sEndUserID = "EndUserID";
                     final PeppolReportingItem aReportingItem = Phase4PeppolServletMessageProcessorSPI.createPeppolReportingItemForReceivedMessage(aUserMessage,
                             aPeppolSBD,
                             aState,
                             sC3ID,
-                            countryC4,
+                            sC4ID,
                             sEndUserID);
 
                     PeppolReportingBackend.withBackendDo(AS4Configuration.getConfig(),

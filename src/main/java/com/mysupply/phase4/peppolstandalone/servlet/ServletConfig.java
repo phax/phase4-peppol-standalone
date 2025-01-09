@@ -250,8 +250,14 @@ public class ServletConfig {
         if(allAPCertificateCheckResult.isValid() || testCertificateCheckResult.isValid() || eB2BCertificateCheckResult.isValid() || prodCertificateCheckResult.isValid()) {
             LOGGER.info("Successfully checked that the provided Peppol AP certificate is valid.");
         } else if (allAPCertificateCheckResult.isInvalid() && testCertificateCheckResult.isInvalid() && eB2BCertificateCheckResult.isInvalid() && prodCertificateCheckResult.isInvalid()) {
-            throw new InitializationException("The provided certificate is not a Peppol certificate. Check result: " +
-                    testCertificateCheckResult);
+            throw new InitializationException("The provided certificate is not a Peppol certificate. Check results: " + System.lineSeparator() +
+                    allAPCertificateCheckResult +
+                    System.lineSeparator() +
+                    testCertificateCheckResult +
+                    System.lineSeparator() +
+                    eB2BCertificateCheckResult +
+                    System.lineSeparator() +
+                    prodCertificateCheckResult);
         }
 
         return aAPCert;

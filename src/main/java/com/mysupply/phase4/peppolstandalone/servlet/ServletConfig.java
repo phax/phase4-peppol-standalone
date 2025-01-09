@@ -270,67 +270,6 @@ public class ServletConfig {
         return aAPCert;
     }
 
-//    private static X509Certificate validateAPCertificate() throws InitializationException {
-//        LOGGER.info("Validating AP certificate");
-//        // Throws an exception if configuration parameters are missing
-//        final IAS4CryptoFactory aCF = getCryptoFactoryToUse();
-//
-//        // Check if crypto properties are okay
-//        final KeyStore aKS = aCF.getKeyStore();
-//        if (aKS == null)
-//            throw new InitializationException("Failed to load configured AS4 Key store - fix the configuration");
-//        LOGGER.info("Successfully loaded configured AS4 key store from the crypto factory");
-//
-//        final KeyStore.PrivateKeyEntry aPKE = aCF.getPrivateKeyEntry();
-//        if (aPKE == null)
-//            throw new InitializationException("Failed to load configured AS4 private key - fix the configuration");
-//        LOGGER.info("Successfully loaded configured AS4 private key from the crypto factory");
-//
-//        final X509Certificate aAPCert = (X509Certificate) aPKE.getCertificate();
-////        EPeppolCertificateCheckResult allAPCertificateCheckResult = PeppolCertificateChecker.peppolAllAP()
-////                .checkCertificate(aAPCert,
-////                        MetaAS4Manager.getTimestampMgr()
-////                                .getCurrentDateTime(),
-////                        ETriState.FALSE,
-////                        null);
-////
-////        EPeppolCertificateCheckResult testCertificateCheckResult = PeppolCertificateChecker.peppolTestAP()
-////                .checkCertificate(aAPCert,
-////                        MetaAS4Manager.getTimestampMgr()
-////                                .getCurrentDateTime(),
-////                        ETriState.FALSE,
-////                        null);
-//
-//        EPeppolCertificateCheckResult eB2BCertificateCheckResult = PeppolCertificateChecker.peppolTestEb2bAP()
-//                .checkCertificate(aAPCert,
-//                        MetaAS4Manager.getTimestampMgr()
-//                                .getCurrentDateTime(),
-//                        ETriState.FALSE,
-//                        null);
-//
-////        EPeppolCertificateCheckResult prodCertificateCheckResult = PeppolCertificateChecker.peppolProductionAP()
-////                .checkCertificate(aAPCert,
-////                        MetaAS4Manager.getTimestampMgr()
-////                                .getCurrentDateTime(),
-////                        ETriState.FALSE,
-////                        null);
-//
-//        if(eB2BCertificateCheckResult.isValid()) {
-//            LOGGER.info("Successfully checked that the provided Peppol AP certificate is valid. Check result: " + eB2BCertificateCheckResult);
-//        } else if (eB2BCertificateCheckResult.isInvalid()) {
-//            throw new InitializationException("The provided certificate is not a Peppol certificate. Check results: " + System.lineSeparator() +
-////                    allAPCertificateCheckResult +
-////                    System.lineSeparator() +
-////                    testCertificateCheckResult +
-////                    System.lineSeparator() +
-//                    eB2BCertificateCheckResult);
-////                    System.lineSeparator() +
-////                    prodCertificateCheckResult);
-//        }
-//
-//        return aAPCert;
-//    }
-
     /**
      * Special class that is only present to have a graceful shutdown.
      *

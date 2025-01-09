@@ -21,6 +21,8 @@ import java.time.OffsetDateTime;
 import javax.annotation.Nonnull;
 import javax.naming.ConfigurationException;
 
+import com.helger.peppol.utils.PeppolCAChecker;
+import com.helger.peppol.utils.PeppolCertificateChecker;
 import com.mysupply.phase4.domain.enums.MetadataProviderEnum;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -171,7 +173,12 @@ public class PeppolSenderController {
                         aHttpResponse.setStatus(500);
                     });
             final Wrapper<Phase4Exception> aCaughtEx = new Wrapper<>();
-            eResult = aBuilder.sendMessageAndCheckForReceipt(aCaughtEx::set);
+
+
+
+            eResult = aBuilder
+                    .peppolAP_CAChecker(PeppolCertificateChecker.peppolTestEb2bAP ())
+                    .sendMessageAndCheckForReceipt(aCaughtEx::set);
             LOGGER.info("Peppol client send result: " + eResult);
 
             if (eResult.isSuccess()) {

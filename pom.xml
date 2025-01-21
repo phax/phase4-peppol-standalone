@@ -17,7 +17,9 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.helger.phase4</groupId>
@@ -29,7 +31,7 @@
   <description>phase4 Peppol demo application</description>
   <url>https://github.com/phax/phase4-peppol-standalone</url>
   <inceptionYear>2023</inceptionYear>
-  
+
   <licenses>
     <license>
       <name>Apache 2</name>
@@ -38,8 +40,8 @@
     </license>
   </licenses>
 
-<!-- Enable when using a SNAPSHOT version: -->
-<!--
+  <!-- Enable when using a SNAPSHOT version: -->
+  <!--
   <repositories>
     <repository>
       <id>central-snapshots</id>
@@ -53,13 +55,13 @@
     </repository>
   </repositories>
   -->
-  
+
   <properties>
     <junit.jupiter.version>5.11.4</junit.jupiter.version>
     <spring-boot.version>3.4.1</spring-boot.version>
   </properties>
 
-  <!-- Include here to not bloat the global scope -->  
+  <!-- Include here to not bloat the global scope -->
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -110,7 +112,7 @@
       <groupId>com.helger.phase4</groupId>
       <artifactId>phase4-peppol-client</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-impl</artifactId>
@@ -122,9 +124,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-        <groupId>org.junit.jupiter</groupId>
-        <artifactId>junit-jupiter-engine</artifactId>
-        <version>${junit.jupiter.version}</version>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>${junit.jupiter.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -152,7 +154,8 @@
           </execution>
         </executions>
         <configuration>
-          <mainClass>com.helger.phase4.peppolstandalone.Phase4PeppolStandaloneApplication</mainClass>
+          <mainClass>
+            com.helger.phase4.peppolstandalone.Phase4PeppolStandaloneApplication</mainClass>
           <layout>ZIP</layout>
         </configuration>
       </plugin>

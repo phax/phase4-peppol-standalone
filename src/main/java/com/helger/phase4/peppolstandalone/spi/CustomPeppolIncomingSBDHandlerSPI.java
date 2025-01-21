@@ -57,11 +57,13 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
                                  @Nonnull final IAS4IncomingMessageState aState,
                                  @Nonnull final ICommonsList <Ebms3Error> aProcessingErrorMessages) throws Exception
   {
+    final String sMyPeppolSeatID = AS4Configuration.getConfig ().getAsString ("peppol.seatid");
+
     // Example code snippets how to get data
     LOGGER.info ("Received a new Peppol Message");
     LOGGER.info ("  C1 = " + aPeppolSBD.getSenderAsIdentifier ().getURIEncoded ());
     LOGGER.info ("  C2 = " + PeppolCertificateHelper.getSubjectCN (aState.getUsedCertificate ()));
-    // C3 is you
+    LOGGER.info ("  C3 = " + sMyPeppolSeatID);
     LOGGER.info ("  C4 = " + aPeppolSBD.getReceiverAsIdentifier ().getURIEncoded ());
     LOGGER.info ("  DocType = " + aPeppolSBD.getDocumentTypeAsIdentifier ().getURIEncoded ());
     LOGGER.info ("  Process = " + aPeppolSBD.getProcessAsIdentifier ().getURIEncoded ());
@@ -88,7 +90,7 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
           LOGGER.info ("Creating Peppol Reporting Item and storing it");
 
           // TODO determine correct values
-          final String sC3ID = "TODO-C3-ID";
+          final String sC3ID = sMyPeppolSeatID;
           final String sC4CountryCode = "AT";
           final String sEndUserID = "EndUserID";
           final PeppolReportingItem aReportingItem = Phase4PeppolServletMessageProcessorSPI.createPeppolReportingItemForReceivedMessage (aUserMessage,

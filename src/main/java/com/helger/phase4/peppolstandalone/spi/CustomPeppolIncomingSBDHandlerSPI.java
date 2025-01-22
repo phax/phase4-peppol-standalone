@@ -83,16 +83,18 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
       // Note: this is a separate thread so that it does not block the sending
       // of the positive receipt message
 
-      // Peppol Reporting - enable if possible to be done in here
+      // TODO Peppol Reporting - enable if possible to be done in here
       if (false)
         try
         {
           LOGGER.info ("Creating Peppol Reporting Item and storing it");
 
-          // TODO determine correct values
+          // TODO determine correct values for the next three fields
           final String sC3ID = sMyPeppolSeatID;
           final String sC4CountryCode = "AT";
           final String sEndUserID = "EndUserID";
+
+          // Create the reporting item
           final PeppolReportingItem aReportingItem = Phase4PeppolServletMessageProcessorSPI.createPeppolReportingItemForReceivedMessage (aUserMessage,
                                                                                                                                          aPeppolSBD,
                                                                                                                                          aState,

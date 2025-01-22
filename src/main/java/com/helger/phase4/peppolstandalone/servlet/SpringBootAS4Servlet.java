@@ -65,7 +65,8 @@ public class SpringBootAS4Servlet extends AbstractXServlet
           aRequestHandler.setPModeResolver (new AS4DefaultPModeResolver (sAS4ProfileID));
           aRequestHandler.setIncomingProfileSelector (new AS4IncomingProfileSelectorConstant (sAS4ProfileID));
 
-          // Example code to disable PMode validation
+          // TODO Example code to disable PMode validation
+          // Delete the block if you don't need it
           if (false)
           {
             final boolean bValidateAgainstProfile = false;
@@ -74,8 +75,9 @@ public class SpringBootAS4Servlet extends AbstractXServlet
           }
         }
 
-        // Example code for changing the Peppol receiver data based on the
+        // TODO Example code for changing the Peppol receiver data based on the
         // source URL
+        // Delete the block if you don't need it
         if (false)
         {
           final String sUrl = aRequestScope.getURLDecoded ();

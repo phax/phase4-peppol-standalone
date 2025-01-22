@@ -67,6 +67,12 @@ import com.helger.security.certificate.CertificateHelper;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.xml.serialize.read.DOMReader;
 
+/**
+ * This is the primary REST controller for the APIs to send messages over
+ * Peppol.
+ *
+ * @author Philip Helger
+ */
 @RestController
 public class PeppolSenderController
 {
@@ -109,9 +115,12 @@ public class PeppolSenderController
       final SMPClientReadOnly aSMPClient = new SMPClientReadOnly (Phase4PeppolSender.URL_PROVIDER,
                                                                   aReceiverID,
                                                                   aSmlInfo);
+
       aSMPClient.withHttpClientSettings (aHCS -> {
         // TODO Add SMP outbound proxy settings here
+        // If this block is not used, it may be removed
       });
+
       if (EJavaVersion.getCurrentVersion ().isNewerOrEqualsThan (EJavaVersion.JDK_17))
       {
         // Work around the disabled SHA-1 in XMLDsig issue
@@ -319,6 +328,7 @@ public class PeppolSenderController
     aJson.add ("senderPartyId", sMyPeppolSeatID);
 
     EAS4UserMessageSendResult eResult = null;
+    boolean bExceptionCaught = false;
     final StopWatch aSW = StopWatch.createdStarted ();
     try
     {
@@ -328,9 +338,12 @@ public class PeppolSenderController
       final SMPClientReadOnly aSMPClient = new SMPClientReadOnly (Phase4PeppolSender.URL_PROVIDER,
                                                                   aReceiverID,
                                                                   aSmlInfo);
+
       aSMPClient.withHttpClientSettings (aHCS -> {
         // TODO Add SMP outbound proxy settings here
+        // If this block is not used, it may be removed
       });
+
       if (EJavaVersion.getCurrentVersion ().isNewerOrEqualsThan (EJavaVersion.JDK_17))
       {
         // Work around the disabled SHA-1 in XMLDsig issue
@@ -433,6 +446,7 @@ public class PeppolSenderController
                    new JsonObject ().add ("class", ex.getClass ().getName ())
                                     .add ("message", ex.getMessage ())
                                     .add ("stackTrace", StackTraceHelper.getStackAsString (ex)));
+        bExceptionCaught = true;
       }
     }
     catch (final Exception ex)
@@ -443,6 +457,7 @@ public class PeppolSenderController
                  new JsonObject ().add ("class", ex.getClass ().getName ())
                                   .add ("message", ex.getMessage ())
                                   .add ("stackTrace", StackTraceHelper.getStackAsString (ex)));
+      bExceptionCaught = true;
     }
     finally
     {
@@ -451,7 +466,9 @@ public class PeppolSenderController
     }
 
     // Result may be null
-    aJson.add ("success", eResult == EAS4UserMessageSendResult.SUCCESS);
+    final boolean bSendingSuccess = eResult != null && eResult.isSuccess ();
+    aJson.add ("sendingSuccess", bSendingSuccess);
+    aJson.add ("overallSuccess", bSendingSuccess && !bExceptionCaught);
 
     // Return result JSON
     return aJson.getAsJsonString (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);

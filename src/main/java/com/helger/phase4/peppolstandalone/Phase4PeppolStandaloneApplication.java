@@ -19,6 +19,11 @@ package com.helger.phase4.peppolstandalone;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * This is the application entrypoint.
+ *
+ * @author Philip Helger
+ */
 @SpringBootApplication
 public class Phase4PeppolStandaloneApplication
 {

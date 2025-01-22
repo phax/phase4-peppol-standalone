@@ -25,4 +25,14 @@ public enum EStageType
 {
   TEST,
   PRODUCTION;
+
+  public boolean isTest ()
+  {
+    return this == TEST;
+  }
+
+  public boolean isProduction ()
+  {
+    return this == PRODUCTION;
+  }
 }

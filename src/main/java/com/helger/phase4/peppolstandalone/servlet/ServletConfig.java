@@ -198,9 +198,9 @@ public class ServletConfig
     // * Use global certificate check mode
     final X509Certificate aAPCert = (X509Certificate) aPKE.getCertificate ();
 
-    // For eB2B you want to check against the eB2B CA instead
-    final PeppolCAChecker aChecker = eStage == EStageType.PRODUCTION ? PeppolCertificateChecker.peppolProductionAP ()
-                                                                     : PeppolCertificateChecker.peppolTestAP ();
+    // Note: For eB2B you want to check against the eB2B CA instead
+    final PeppolCAChecker aChecker = eStage.isProduction () ? PeppolCertificateChecker.peppolProductionAP ()
+                                                            : PeppolCertificateChecker.peppolTestAP ();
     final EPeppolCertificateCheckResult eCheckResult = aChecker.checkCertificate (aAPCert,
                                                                                   MetaAS4Manager.getTimestampMgr ()
                                                                                                 .getCurrentDateTime (),
@@ -245,7 +245,8 @@ public class ServletConfig
   }
 
   /**
-   * Special class that is only present to have a graceful shutdown.
+   * Special class that is only present to have a graceful shutdown. The the
+   * bean method below.
    *
    * @author Philip Helger
    */

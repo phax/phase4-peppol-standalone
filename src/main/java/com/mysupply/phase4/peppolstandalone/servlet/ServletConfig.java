@@ -173,7 +173,13 @@ public class ServletConfig {
         // Our server should check all signing certificates of incoming messages if
         // they are revoked or not (this is the default setting, but added it here
         // for easy modification)
-        Phase4PeppolDefaultReceiverConfiguration.setCheckSigningCertificateRevocation(true);
+        final boolean isEB2B = AS4Configuration.getConfig().getAsBoolean("peppol.isEB2B");
+        if(isEB2B) {
+            // This is a temporary solution, Helger: "this is just temporary until I can provide the CA Checker into this configuration"
+            Phase4PeppolDefaultReceiverConfiguration.setCheckSigningCertificateRevocation(false);
+        } else {
+            Phase4PeppolDefaultReceiverConfiguration.setCheckSigningCertificateRevocation(true);
+        }
 
         // Make sure the download of CRL is using Apache HttpClient and that the
         // provided settings are used. If e.g. a proxy is needed to access outbound

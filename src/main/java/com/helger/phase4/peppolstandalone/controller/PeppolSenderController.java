@@ -47,6 +47,8 @@ import com.helger.peppol.sbdh.read.PeppolSBDHDocumentReadException;
 import com.helger.peppol.sbdh.read.PeppolSBDHDocumentReader;
 import com.helger.peppol.sml.ESML;
 import com.helger.peppol.sml.ISMLInfo;
+import com.helger.peppol.utils.PeppolCAChecker;
+import com.helger.peppol.utils.PeppolCertificateChecker;
 import com.helger.peppol.utils.PeppolCertificateHelper;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
@@ -85,7 +87,8 @@ public class PeppolSenderController
                                                  @Nonnull @Nonempty final String receiverId,
                                                  @Nonnull @Nonempty final String docTypeId,
                                                  @Nonnull @Nonempty final String processId,
-                                                 @Nonnull @Nonempty final String countryC1)
+                                                 @Nonnull @Nonempty final String countryC1,
+                                                 @Nonnull final PeppolCAChecker apCAChecker)
   {
     final String sMyPeppolSeatID = AS4Configuration.getConfig ().getAsString ("peppol.seatid");
 
@@ -140,6 +143,7 @@ public class PeppolSenderController
                                    .senderPartyID (sMyPeppolSeatID)
                                    .countryC1 (countryC1)
                                    .payload (aDoc.getDocumentElement ())
+                                   .peppolAP_CAChecker (apCAChecker)
                                    .smpClient (aSMPClient)
                                    .rawResponseConsumer (new AS4RawResponseConsumerWriteToFile ())
                                    .endpointURLConsumer (endpointUrl -> {
@@ -281,7 +285,8 @@ public class PeppolSenderController
                                            receiverId,
                                            docTypeId,
                                            processId,
-                                           countryC1);
+                                           countryC1,
+                                           PeppolCertificateChecker.peppolTestAP ());
   }
 
   @PostMapping (path = "/sendprod/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}",
@@ -308,12 +313,14 @@ public class PeppolSenderController
                                            receiverId,
                                            docTypeId,
                                            processId,
-                                           countryC1);
+                                           countryC1,
+                                           PeppolCertificateChecker.peppolProductionAP ());
   }
 
   @Nonnull
   private String _sendPeppolMessagePredefinedSbdh (@Nonnull final PeppolSBDHData aData,
-                                                   @Nonnull final ISMLInfo aSmlInfo)
+                                                   @Nonnull final ISMLInfo aSmlInfo,
+                                                   @Nonnull final PeppolCAChecker apCAChecker)
   {
     final String sMyPeppolSeatID = AS4Configuration.getConfig ().getAsString ("peppol.seatid");
 
@@ -358,6 +365,7 @@ public class PeppolSenderController
                                    .httpClientFactory (aHCS)
                                    .payloadAndMetadata (aData)
                                    .senderPartyID (sMyPeppolSeatID)
+                                   .peppolAP_CAChecker (apCAChecker)
                                    .smpClient (aSMPClient)
                                    .rawResponseConsumer (new AS4RawResponseConsumerWriteToFile ())
                                    .endpointURLConsumer (endpointUrl -> {
@@ -513,6 +521,6 @@ public class PeppolSenderController
                  countryC1 +
                  "'");
 
-    return _sendPeppolMessagePredefinedSbdh (aData, ESML.DIGIT_TEST);
+    return _sendPeppolMessagePredefinedSbdh (aData, ESML.DIGIT_TEST, PeppolCertificateChecker.peppolTestAP ());
   }
 }

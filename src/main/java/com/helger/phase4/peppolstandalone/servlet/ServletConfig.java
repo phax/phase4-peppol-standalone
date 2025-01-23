@@ -199,13 +199,13 @@ public class ServletConfig
     final X509Certificate aAPCert = (X509Certificate) aPKE.getCertificate ();
 
     // Note: For eB2B you want to check against the eB2B CA instead
-    final PeppolCAChecker aChecker = eStage.isProduction () ? PeppolCertificateChecker.peppolProductionAP ()
-                                                            : PeppolCertificateChecker.peppolTestAP ();
-    final EPeppolCertificateCheckResult eCheckResult = aChecker.checkCertificate (aAPCert,
-                                                                                  MetaAS4Manager.getTimestampMgr ()
-                                                                                                .getCurrentDateTime (),
-                                                                                  ETriState.FALSE,
-                                                                                  null);
+    final PeppolCAChecker aAPCAChecker = eStage.isProduction () ? PeppolCertificateChecker.peppolProductionAP ()
+                                                                : PeppolCertificateChecker.peppolTestAP ();
+    final EPeppolCertificateCheckResult eCheckResult = aAPCAChecker.checkCertificate (aAPCert,
+                                                                                      MetaAS4Manager.getTimestampMgr ()
+                                                                                                    .getCurrentDateTime (),
+                                                                                      ETriState.FALSE,
+                                                                                      null);
     if (eCheckResult.isInvalid ())
     {
       // TODO Change from "true" to "false" once you have a Peppol
@@ -221,6 +221,9 @@ public class ServletConfig
     }
     else
       LOGGER.info ("Sucessfully checked that the provided Peppol AP certificate is valid.");
+
+    // Must be set independent on the enabled/disable status
+    Phase4PeppolDefaultReceiverConfiguration.setAPCAChecker (aAPCAChecker);
 
     // Eventually enable the receiver check, so that for each incoming request
     // the validity is crosscheck against the owning SMP

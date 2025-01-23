@@ -222,6 +222,7 @@ public class ServletConfig
       LOGGER.info ("Sucessfully checked that the provided Peppol AP certificate is valid.");
 
     // Must be set independent on the enabled/disable status
+    // This must be changed for eB2B
     Phase4PeppolDefaultReceiverConfiguration.setAPCAChecker (aAPCAChecker);
 
     // Eventually enable the receiver check, so that for each incoming request

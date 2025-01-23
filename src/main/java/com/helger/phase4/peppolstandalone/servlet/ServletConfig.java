@@ -41,6 +41,7 @@ import com.helger.peppol.utils.PeppolCAChecker;
 import com.helger.peppol.utils.PeppolCertificateChecker;
 import com.helger.phase4.config.AS4Configuration;
 import com.helger.phase4.crypto.AS4CryptoFactoryConfiguration;
+import com.helger.phase4.crypto.AS4CryptoFactoryInMemoryKeyStore;
 import com.helger.phase4.crypto.IAS4CryptoFactory;
 import com.helger.phase4.dump.AS4DumpManager;
 import com.helger.phase4.dump.AS4IncomingDumperFileBased;
@@ -75,7 +76,7 @@ public class ServletConfig
    * @return the {@link IAS4CryptoFactory} to use. May not be <code>null</code>.
    */
   @Nonnull
-  public static AS4CryptoFactoryConfiguration getCryptoFactoryToUse ()
+  public static AS4CryptoFactoryInMemoryKeyStore getCryptoFactoryToUse ()
   {
     final AS4CryptoFactoryConfiguration ret = AS4CryptoFactoryConfiguration.getDefaultInstance ();
     // TODO If you have a custom crypto factory, build/return it here
@@ -123,8 +124,8 @@ public class ServletConfig
     HttpDebugger.setEnabled (false);
 
     // Sanity check
-    if (CommandMap.getDefaultCommandMap ().createDataContentHandler (CMimeType.MULTIPART_RELATED.getAsString ()) ==
-        null)
+    if (CommandMap.getDefaultCommandMap ()
+                  .createDataContentHandler (CMimeType.MULTIPART_RELATED.getAsString ()) == null)
     {
       throw new IllegalStateException ("No DataContentHandler for MIME Type '" +
                                        CMimeType.MULTIPART_RELATED.getAsString () +
@@ -161,10 +162,6 @@ public class ServletConfig
 
   private static void _initPeppolAS4 ()
   {
-    // Our server expects all SBDH to contain the COUNTRY_C1 element in SBDH
-    // (this is the default setting, but added it here for easy modification)
-    Phase4PeppolDefaultReceiverConfiguration.setCheckSBDHForMandatoryCountryC1 (true);
-
     // Our server should check all signing certificates of incoming messages if
     // they are revoked or not (this is the default setting, but added it here
     // for easy modification)
@@ -173,19 +170,22 @@ public class ServletConfig
     // Make sure the download of CRL is using Apache HttpClient and that the
     // provided settings are used. If e.g. a proxy is needed to access outbound
     // resources, it can be configured here
-    // TODO eventually configure an outbound proxy here as well
-    PeppolCRLDownloader.setAsDefaultCRLCache (new Phase4PeppolHttpClientSettings ());
+    {
+      final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
+      // TODO eventually configure an outbound proxy here as well
+      PeppolCRLDownloader.setAsDefaultCRLCache (aHCS);
+    }
 
     // Throws an exception if configuration parameters are missing
-    final AS4CryptoFactoryConfiguration aCF = getCryptoFactoryToUse ();
+    final AS4CryptoFactoryInMemoryKeyStore aCryptoFactory = getCryptoFactoryToUse ();
 
-    // Check if crypto properties are okay
-    final KeyStore aKS = aCF.getKeyStore ();
+    // Check if crypto factory configuration is valid
+    final KeyStore aKS = aCryptoFactory.getKeyStore ();
     if (aKS == null)
       throw new InitializationException ("Failed to load configured AS4 Key store - fix the configuration");
     LOGGER.info ("Successfully loaded configured AS4 key store from the crypto factory");
 
-    final KeyStore.PrivateKeyEntry aPKE = aCF.getPrivateKeyEntry ();
+    final KeyStore.PrivateKeyEntry aPKE = aCryptoFactory.getPrivateKeyEntry ();
     if (aPKE == null)
       throw new InitializationException ("Failed to load configured AS4 private key - fix the configuration");
     LOGGER.info ("Successfully loaded configured AS4 private key from the crypto factory");
@@ -217,7 +217,6 @@ public class ServletConfig
         throw new InitializationException ("The provided certificate is not a Peppol certificate. Check result: " +
                                            eCheckResult);
       }
-
     }
     else
       LOGGER.info ("Sucessfully checked that the provided Peppol AP certificate is valid.");

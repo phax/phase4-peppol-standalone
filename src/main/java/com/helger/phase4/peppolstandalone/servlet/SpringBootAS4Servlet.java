@@ -21,7 +21,7 @@ import javax.annotation.Nonnull;
 import com.helger.commons.http.EHttpMethod;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.URLHelper;
-import com.helger.phase4.crypto.AS4CryptoFactoryConfiguration;
+import com.helger.phase4.crypto.AS4CryptoFactoryInMemoryKeyStore;
 import com.helger.phase4.incoming.AS4IncomingProfileSelectorConstant;
 import com.helger.phase4.incoming.AS4RequestHandler;
 import com.helger.phase4.incoming.mgr.AS4ProfileSelector;
@@ -52,7 +52,7 @@ public class SpringBootAS4Servlet extends AbstractXServlet
                                            @Nonnull final AS4UnifiedResponse aUnifiedResponse,
                                            @Nonnull final AS4RequestHandler aRequestHandler)
       {
-        final AS4CryptoFactoryConfiguration aCryptoFactory = ServletConfig.getCryptoFactoryToUse ();
+        final AS4CryptoFactoryInMemoryKeyStore aCryptoFactory = ServletConfig.getCryptoFactoryToUse ();
 
         // This method refers to the outer static method
         aRequestHandler.setCryptoFactory (aCryptoFactory);

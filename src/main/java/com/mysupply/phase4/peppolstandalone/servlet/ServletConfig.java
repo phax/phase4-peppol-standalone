@@ -22,6 +22,7 @@ import java.security.cert.X509Certificate;
 
 import javax.annotation.Nonnull;
 
+import com.helger.peppol.utils.PeppolCAChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -31,7 +32,6 @@ import org.springframework.context.annotation.Configuration;
 
 import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.exception.InitializationException;
-import com.helger.commons.http.EHttpMethod;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.state.ETriState;
 import com.helger.commons.string.StringHelper;
@@ -45,25 +45,17 @@ import com.helger.phase4.crypto.IAS4CryptoFactory;
 import com.helger.phase4.dump.AS4DumpManager;
 import com.helger.phase4.dump.AS4IncomingDumperFileBased;
 import com.helger.phase4.dump.AS4OutgoingDumperFileBased;
-import com.helger.phase4.incoming.AS4IncomingProfileSelectorConstant;
-import com.helger.phase4.incoming.AS4RequestHandler;
 import com.helger.phase4.incoming.AS4ServerInitializer;
 import com.helger.phase4.incoming.mgr.AS4ProfileSelector;
 import com.helger.phase4.mgr.MetaAS4Manager;
-import com.helger.phase4.model.pmode.resolve.AS4DefaultPModeResolver;
 import com.helger.phase4.peppol.servlet.Phase4PeppolDefaultReceiverConfiguration;
 import com.helger.phase4.profile.peppol.AS4PeppolProfileRegistarSPI;
 import com.helger.phase4.profile.peppol.PeppolCRLDownloader;
 import com.helger.phase4.profile.peppol.Phase4PeppolHttpClientSettings;
-import com.helger.phase4.servlet.AS4UnifiedResponse;
-import com.helger.phase4.servlet.AS4XServletHandler;
-import com.helger.phase4.servlet.IAS4ServletRequestHandlerCustomizer;
 import com.helger.photon.io.WebFileIO;
 import com.helger.servlet.ServletHelper;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
-import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.web.scope.mgr.WebScopeManager;
-import com.helger.xservlet.AbstractXServlet;
 import com.helger.xservlet.requesttrack.RequestTrackerSettings;
 
 import jakarta.activation.CommandMap;
@@ -173,13 +165,7 @@ public class ServletConfig {
         // Our server should check all signing certificates of incoming messages if
         // they are revoked or not (this is the default setting, but added it here
         // for easy modification)
-        final boolean isEB2B = AS4Configuration.getConfig().getAsBoolean("peppol.isEB2B");
-        if(isEB2B) {
-            // This is a temporary solution, Helger: "this is just temporary until I can provide the CA Checker into this configuration"
-            Phase4PeppolDefaultReceiverConfiguration.setCheckSigningCertificateRevocation(false);
-        } else {
-            Phase4PeppolDefaultReceiverConfiguration.setCheckSigningCertificateRevocation(true);
-        }
+        Phase4PeppolDefaultReceiverConfiguration.setCheckSigningCertificateRevocation(true);
 
         // Make sure the download of CRL is using Apache HttpClient and that the
         // provided settings are used. If e.g. a proxy is needed to access outbound
@@ -225,55 +211,72 @@ public class ServletConfig {
         LOGGER.info("Successfully loaded configured AS4 private key from the crypto factory");
 
         final X509Certificate aAPCert = (X509Certificate) aPKE.getCertificate();
-        EPeppolCertificateCheckResult allAPCertificateCheckResult = PeppolCertificateChecker.peppolAllAP()
-                .checkCertificate(aAPCert,
-                        MetaAS4Manager.getTimestampMgr()
-                                .getCurrentDateTime(),
-                        ETriState.FALSE,
-                        null);
 
-        EPeppolCertificateCheckResult testCertificateCheckResult = PeppolCertificateChecker.peppolTestAP()
-                .checkCertificate(aAPCert,
-                        MetaAS4Manager.getTimestampMgr()
-                                .getCurrentDateTime(),
-                        ETriState.FALSE,
-                        null);
-
-        EPeppolCertificateCheckResult eB2BCertificateCheckResult = PeppolCertificateChecker.peppolTestEb2bAP()
-                .checkCertificate(aAPCert,
-                        MetaAS4Manager.getTimestampMgr()
-                                .getCurrentDateTime(),
-                        ETriState.FALSE,
-                        null);
-
-        EPeppolCertificateCheckResult prodCertificateCheckResult = PeppolCertificateChecker.peppolProductionAP()
-                .checkCertificate(aAPCert,
-                        MetaAS4Manager.getTimestampMgr()
-                                .getCurrentDateTime(),
-                        ETriState.FALSE,
-                        null);
-
-        if(allAPCertificateCheckResult.isValid() || testCertificateCheckResult.isValid() || eB2BCertificateCheckResult.isValid() || prodCertificateCheckResult.isValid()) {
-            LOGGER.info("Successfully checked that the provided Peppol AP certificate is valid. Check results: " + System.lineSeparator() +
-                    allAPCertificateCheckResult +
-                    System.lineSeparator() +
-                    testCertificateCheckResult +
-                    System.lineSeparator() +
-                    eB2BCertificateCheckResult +
-                    System.lineSeparator() +
-                    prodCertificateCheckResult);
-        } else if (allAPCertificateCheckResult.isInvalid() && testCertificateCheckResult.isInvalid() && eB2BCertificateCheckResult.isInvalid() && prodCertificateCheckResult.isInvalid()) {
-            throw new InitializationException("The provided certificate is not a Peppol certificate. Check results: " + System.lineSeparator() +
-                    allAPCertificateCheckResult +
-                    System.lineSeparator() +
-                    testCertificateCheckResult +
-                    System.lineSeparator() +
-                    eB2BCertificateCheckResult +
-                    System.lineSeparator() +
-                    prodCertificateCheckResult);
-        }
+        performCertificateValidation(aAPCert);
 
         return aAPCert;
+    }
+
+    private static void performCertificateValidation(X509Certificate aAPCert) throws InitializationException {
+        PeppolCAChecker testAPChecker = PeppolCertificateChecker.peppolTestAP();
+        EPeppolCertificateCheckResult testCertificateCheckResult = testAPChecker
+                .checkCertificate(aAPCert,
+                        MetaAS4Manager.getTimestampMgr()
+                                .getCurrentDateTime(),
+                        ETriState.FALSE,
+                        null);
+
+        PeppolCAChecker testEb2bAPChecker = PeppolCertificateChecker.peppolTestEb2bAP();
+        EPeppolCertificateCheckResult eB2BCertificateCheckResult = testEb2bAPChecker
+                .checkCertificate(aAPCert,
+                        MetaAS4Manager.getTimestampMgr()
+                                .getCurrentDateTime(),
+                        ETriState.FALSE,
+                        null);
+
+        PeppolCAChecker prodAPChecker = PeppolCertificateChecker.peppolProductionAP();
+        EPeppolCertificateCheckResult prodCertificateCheckResult = prodAPChecker
+                .checkCertificate(aAPCert,
+                        MetaAS4Manager.getTimestampMgr()
+                                .getCurrentDateTime(),
+                        ETriState.FALSE,
+                        null);
+
+        PeppolCAChecker allAPChecker = PeppolCertificateChecker.peppolAllAP();
+        EPeppolCertificateCheckResult allAPCertificateCheckResult = allAPChecker
+                .checkCertificate(aAPCert,
+                        MetaAS4Manager.getTimestampMgr()
+                                .getCurrentDateTime(),
+                        ETriState.FALSE,
+                        null);
+
+        if (testCertificateCheckResult.isValid()) {
+            LOGGER.info("The provided certificate is a Peppol test certificate");
+            Phase4PeppolDefaultReceiverConfiguration.setAPCAChecker(testAPChecker);
+            return;
+        } else if (eB2BCertificateCheckResult.isValid()) {
+            LOGGER.info("The provided certificate is a Peppol eB2B test certificate");
+            Phase4PeppolDefaultReceiverConfiguration.setAPCAChecker(testEb2bAPChecker);
+            return;
+        } else if (prodCertificateCheckResult.isValid()) {
+            LOGGER.info("The provided certificate is a Peppol production certificate");
+            Phase4PeppolDefaultReceiverConfiguration.setAPCAChecker(prodAPChecker);
+            return;
+        } else if (allAPCertificateCheckResult.isValid()) {
+            LOGGER.info("The provided certificate is a Peppol certificate");
+            Phase4PeppolDefaultReceiverConfiguration.setAPCAChecker(allAPChecker);
+            return;
+        } else {
+            String message = "The provided certificate is not a valid Peppol certificate." + System.lineSeparator() +
+                    "Certificate check results: " + System.lineSeparator() +
+                    testCertificateCheckResult + System.lineSeparator() +
+                    eB2BCertificateCheckResult + System.lineSeparator() +
+                    prodCertificateCheckResult + System.lineSeparator() +
+                    allAPCertificateCheckResult;
+
+            LOGGER.error(message);
+            throw new InitializationException(message);
+        }
     }
 
     /**

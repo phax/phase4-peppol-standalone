@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phase4.peppolstandalone;
+package com.mysupply.phase4.domain.enums;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-
-@SpringBootTest
-class Phase4PeppolStandaloneApplicationTests
+/**
+ * Defines the stage of the application.
+ *
+ * @author Philip Helger
+ */
+public enum EStageType
 {
-  @Test
-  void testContextLoads ()
-  {}
+  TEST,
+  PRODUCTION;
 }

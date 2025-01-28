@@ -9,3 +9,4 @@ generated/
 private-*.properties
 *.p12
 *.jks
+.idea/

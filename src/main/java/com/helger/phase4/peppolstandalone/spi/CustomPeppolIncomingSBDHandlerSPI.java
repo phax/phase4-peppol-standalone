@@ -73,7 +73,8 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
     // E.g. write to disk, write to S3, write to database, write to queue...
     LOGGER.error ("You need to implement handleIncomingSBD to deal with incoming messages");
 
-    // In case there is an error, send an Exception
+    // In case there is an error, throw any Exception -> will lead to an AS4
+    // Error Message to the sender
 
     // Last action in this method
     new Thread ( () -> {

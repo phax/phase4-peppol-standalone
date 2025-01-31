@@ -278,6 +278,8 @@ public class PeppolSenderController
                  docTypeId +
                  "' and '" +
                  processId +
+                 "' for '" +
+                 countryC1 +
                  "'");
     return _sendPeppolMessageCreatingSbdh (aPayloadBytes,
                                            ESML.DIGIT_TEST,
@@ -306,6 +308,8 @@ public class PeppolSenderController
                  docTypeId +
                  "' and '" +
                  processId +
+                 "' for '" +
+                 countryC1 +
                  "'");
     return _sendPeppolMessageCreatingSbdh (aPayloadBytes,
                                            ESML.DIGIT_PRODUCTION,
@@ -483,7 +487,7 @@ public class PeppolSenderController
   }
 
   @PostMapping (path = "/sendsbdhtest", produces = MediaType.APPLICATION_JSON_VALUE)
-  public String sendPeppolTestMessage (@RequestBody final byte [] aPayloadBytes)
+  public String sendPeppolTestSbdhMessage (@RequestBody final byte [] aPayloadBytes)
   {
     final PeppolSBDHData aData;
     try
@@ -499,7 +503,8 @@ public class PeppolSenderController
                  new JsonObject ().add ("class", ex.getClass ().getName ())
                                   .add ("message", ex.getMessage ())
                                   .add ("stackTrace", StackTraceHelper.getStackAsString (ex)));
-      aJson.add ("success", false);
+      aJson.add ("sendingSuccess", false);
+      aJson.add ("overallSuccess", false);
       return aJson.getAsJsonString (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);
     }
 

@@ -22,6 +22,10 @@ This class contains a `TODO` where you need to implement the stuff you want to d
 
 Sending is triggered via an HTTP POST request.
 
+Since 2025-01-31 all the sending APIs mentioned below also require the HTTP Header `X-Token` to be present and have a specific value.
+What value that is, depends on the configuration property `phase4.api.requiredtoken`.
+The pre-configured value is `NjIh9tIx3Rgzme19mGIy` and should be changed in your own setup.
+
 To send to a production endpoint (using SML) use this URL (the SBDH is built inside):
 ```
 /sendprod/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}

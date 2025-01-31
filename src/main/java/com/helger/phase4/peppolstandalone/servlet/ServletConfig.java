@@ -50,6 +50,7 @@ import com.helger.phase4.incoming.AS4ServerInitializer;
 import com.helger.phase4.incoming.mgr.AS4ProfileSelector;
 import com.helger.phase4.mgr.MetaAS4Manager;
 import com.helger.phase4.peppol.servlet.Phase4PeppolDefaultReceiverConfiguration;
+import com.helger.phase4.peppolstandalone.APConfig;
 import com.helger.phase4.peppolstandalone.model.EStageType;
 import com.helger.phase4.profile.peppol.AS4PeppolProfileRegistarSPI;
 import com.helger.phase4.profile.peppol.PeppolCRLDownloader;
@@ -124,8 +125,8 @@ public class ServletConfig
     HttpDebugger.setEnabled (false);
 
     // Sanity check
-    if (CommandMap.getDefaultCommandMap ()
-                  .createDataContentHandler (CMimeType.MULTIPART_RELATED.getAsString ()) == null)
+    if (CommandMap.getDefaultCommandMap ().createDataContentHandler (CMimeType.MULTIPART_RELATED.getAsString ()) ==
+        null)
     {
       throw new IllegalStateException ("No DataContentHandler for MIME Type '" +
                                        CMimeType.MULTIPART_RELATED.getAsString () +
@@ -227,7 +228,7 @@ public class ServletConfig
 
     // Eventually enable the receiver check, so that for each incoming request
     // the validity is crosscheck against the owning SMP
-    final String sSMPURL = AS4Configuration.getConfig ().getAsString ("smp.url");
+    final String sSMPURL = APConfig.getMySmpUrl ();
     final String sAPURL = AS4Configuration.getThisEndpointAddress ();
     if (StringHelper.hasText (sSMPURL) && StringHelper.hasText (sAPURL))
     {

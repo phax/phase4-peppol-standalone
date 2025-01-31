@@ -37,6 +37,7 @@ import com.helger.phase4.incoming.IAS4IncomingMessageMetadata;
 import com.helger.phase4.incoming.IAS4IncomingMessageState;
 import com.helger.phase4.peppol.servlet.IPhase4PeppolIncomingSBDHandlerSPI;
 import com.helger.phase4.peppol.servlet.Phase4PeppolServletMessageProcessorSPI;
+import com.helger.phase4.peppolstandalone.APConfig;
 
 /**
  * This is a way of handling incoming Peppol messages
@@ -57,7 +58,7 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
                                  @Nonnull final IAS4IncomingMessageState aState,
                                  @Nonnull final ICommonsList <Ebms3Error> aProcessingErrorMessages) throws Exception
   {
-    final String sMyPeppolSeatID = AS4Configuration.getConfig ().getAsString ("peppol.seatid");
+    final String sMyPeppolSeatID = APConfig.getMyPeppolSeatID ();
 
     // Example code snippets how to get data
     LOGGER.info ("Received a new Peppol Message");

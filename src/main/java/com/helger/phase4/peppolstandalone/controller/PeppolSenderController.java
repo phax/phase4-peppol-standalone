@@ -53,7 +53,6 @@ import com.helger.peppol.utils.PeppolCertificateHelper;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.phase4.client.IAS4ClientBuildMessageCallback;
-import com.helger.phase4.config.AS4Configuration;
 import com.helger.phase4.dump.AS4RawResponseConsumerWriteToFile;
 import com.helger.phase4.ebms3header.Ebms3Error;
 import com.helger.phase4.marshaller.Ebms3SignalMessageMarshaller;
@@ -62,6 +61,7 @@ import com.helger.phase4.model.message.AbstractAS4Message;
 import com.helger.phase4.peppol.Phase4PeppolSender;
 import com.helger.phase4.peppol.Phase4PeppolSender.PeppolUserMessageBuilder;
 import com.helger.phase4.peppol.Phase4PeppolSender.PeppolUserMessageSBDHBuilder;
+import com.helger.phase4.peppolstandalone.APConfig;
 import com.helger.phase4.profile.peppol.Phase4PeppolHttpClientSettings;
 import com.helger.phase4.sender.EAS4UserMessageSendResult;
 import com.helger.phase4.util.Phase4Exception;
@@ -90,7 +90,7 @@ public class PeppolSenderController
                                                  @Nonnull @Nonempty final String countryC1,
                                                  @Nonnull final PeppolCAChecker apCAChecker)
   {
-    final String sMyPeppolSeatID = AS4Configuration.getConfig ().getAsString ("peppol.seatid");
+    final String sMyPeppolSeatID = APConfig.getMyPeppolSeatID ();
 
     final OffsetDateTime aNowUTC = PDTFactory.getCurrentOffsetDateTimeUTC ();
     final IJsonObject aJson = new JsonObject ();
@@ -322,7 +322,7 @@ public class PeppolSenderController
                                                    @Nonnull final ISMLInfo aSmlInfo,
                                                    @Nonnull final PeppolCAChecker apCAChecker)
   {
-    final String sMyPeppolSeatID = AS4Configuration.getConfig ().getAsString ("peppol.seatid");
+    final String sMyPeppolSeatID = APConfig.getMyPeppolSeatID ();
 
     final OffsetDateTime aNowUTC = PDTFactory.getCurrentOffsetDateTimeUTC ();
     final IJsonObject aJson = new JsonObject ();

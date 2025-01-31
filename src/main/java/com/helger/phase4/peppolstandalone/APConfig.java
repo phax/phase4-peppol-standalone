@@ -46,4 +46,10 @@ public final class APConfig
   {
     return _getConfig ().getAsString ("smp.url");
   }
+
+  @Nullable
+  public static String getPhase4ApiRequiredToken ()
+  {
+    return _getConfig ().getAsString ("phase4.api.requiredtoken");
+  }
 }

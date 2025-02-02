@@ -55,7 +55,7 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
                                  @Nonnull final byte [] aSBDBytes,
                                  @Nonnull final StandardBusinessDocument aSBD,
                                  @Nonnull final PeppolSBDHData aPeppolSBD,
-                                 @Nonnull final IAS4IncomingMessageState aState,
+                                 @Nonnull final IAS4IncomingMessageState aIncomingState,
                                  @Nonnull final ICommonsList <Ebms3Error> aProcessingErrorMessages) throws Exception
   {
     final String sMyPeppolSeatID = APConfig.getMyPeppolSeatID ();
@@ -63,7 +63,7 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
     // Example code snippets how to get data
     LOGGER.info ("Received a new Peppol Message");
     LOGGER.info ("  C1 = " + aPeppolSBD.getSenderAsIdentifier ().getURIEncoded ());
-    LOGGER.info ("  C2 = " + PeppolCertificateHelper.getSubjectCN (aState.getUsedCertificate ()));
+    LOGGER.info ("  C2 = " + PeppolCertificateHelper.getSubjectCN (aIncomingState.getUsedCertificate ()));
     LOGGER.info ("  C3 = " + sMyPeppolSeatID);
     LOGGER.info ("  C4 = " + aPeppolSBD.getReceiverAsIdentifier ().getURIEncoded ());
     LOGGER.info ("  DocType = " + aPeppolSBD.getDocumentTypeAsIdentifier ().getURIEncoded ());
@@ -99,7 +99,7 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
           // Create the reporting item
           final PeppolReportingItem aReportingItem = Phase4PeppolServletMessageProcessorSPI.createPeppolReportingItemForReceivedMessage (aUserMessage,
                                                                                                                                          aPeppolSBD,
-                                                                                                                                         aState,
+                                                                                                                                         aIncomingState,
                                                                                                                                          sC3ID,
                                                                                                                                          sC4CountryCode,
                                                                                                                                          sEndUserID);

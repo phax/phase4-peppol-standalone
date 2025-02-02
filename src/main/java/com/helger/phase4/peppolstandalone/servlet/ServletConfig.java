@@ -192,16 +192,17 @@ public class ServletConfig
     LOGGER.info ("Successfully loaded configured AS4 private key from the crypto factory");
 
     // TODO configure the stage correctly
-    final EStageType eStage = EStageType.TEST;
+    final EStageType eStage = APConfig.getPeppolStage ();
 
-    // Check the configured Peppol AP certificate
-    // * No caching
-    // * Use global certificate check mode
     final X509Certificate aAPCert = (X509Certificate) aPKE.getCertificate ();
 
     // Note: For eB2B you want to check against the eB2B CA instead
     final PeppolCAChecker aAPCAChecker = eStage.isProduction () ? PeppolCertificateChecker.peppolProductionAP ()
                                                                 : PeppolCertificateChecker.peppolTestAP ();
+
+    // Check the configured Peppol AP certificate
+    // * No caching
+    // * Use global certificate check mode
     final EPeppolCertificateCheckResult eCheckResult = aAPCAChecker.checkCertificate (aAPCert,
                                                                                       MetaAS4Manager.getTimestampMgr ()
                                                                                                     .getCurrentDateTime (),

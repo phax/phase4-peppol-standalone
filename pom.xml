@@ -139,6 +139,7 @@
         <configuration>
           <source>17</source>
           <target>17</target>
+          <!-- Required for Spring Boot -->
           <parameters>true</parameters>
         </configuration>
       </plugin>

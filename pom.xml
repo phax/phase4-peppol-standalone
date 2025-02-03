@@ -125,6 +125,7 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
+      <version>5.11.4</version>  <!-- transitive version is 5.10.9 :( -->
       <scope>test</scope>
     </dependency>
   </dependencies>

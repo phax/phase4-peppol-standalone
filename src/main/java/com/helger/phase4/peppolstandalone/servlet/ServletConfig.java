@@ -36,6 +36,7 @@ import com.helger.commons.state.ETriState;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.URLHelper;
 import com.helger.httpclient.HttpDebugger;
+import com.helger.peppol.servicedomain.EPeppolNetwork;
 import com.helger.peppol.utils.EPeppolCertificateCheckResult;
 import com.helger.peppol.utils.PeppolCAChecker;
 import com.helger.peppol.utils.PeppolCertificateChecker;
@@ -51,7 +52,6 @@ import com.helger.phase4.incoming.mgr.AS4ProfileSelector;
 import com.helger.phase4.mgr.MetaAS4Manager;
 import com.helger.phase4.peppol.servlet.Phase4PeppolDefaultReceiverConfiguration;
 import com.helger.phase4.peppolstandalone.APConfig;
-import com.helger.phase4.peppolstandalone.EStageType;
 import com.helger.phase4.profile.peppol.AS4PeppolProfileRegistarSPI;
 import com.helger.phase4.profile.peppol.PeppolCRLDownloader;
 import com.helger.phase4.profile.peppol.Phase4PeppolHttpClientSettings;
@@ -125,8 +125,8 @@ public class ServletConfig
     HttpDebugger.setEnabled (false);
 
     // Sanity check
-    if (CommandMap.getDefaultCommandMap ().createDataContentHandler (CMimeType.MULTIPART_RELATED.getAsString ()) ==
-        null)
+    if (CommandMap.getDefaultCommandMap ()
+                  .createDataContentHandler (CMimeType.MULTIPART_RELATED.getAsString ()) == null)
     {
       throw new IllegalStateException ("No DataContentHandler for MIME Type '" +
                                        CMimeType.MULTIPART_RELATED.getAsString () +
@@ -192,7 +192,7 @@ public class ServletConfig
     LOGGER.info ("Successfully loaded configured AS4 private key from the crypto factory");
 
     // TODO configure the stage correctly
-    final EStageType eStage = APConfig.getPeppolStage ();
+    final EPeppolNetwork eStage = APConfig.getPeppolStage ();
 
     final X509Certificate aAPCert = (X509Certificate) aPKE.getCertificate ();
 

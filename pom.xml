@@ -58,6 +58,7 @@
 
   <properties>
     <spring-boot.version>3.4.2</spring-boot.version>
+    <junit5.version>5.11.4</junit5.version>
   </properties>
 
   <!-- Include here to not bloat the global scope -->
@@ -124,8 +125,14 @@
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <version>5.11.4</version>  <!-- transitive version is 5.10.9 :( -->
+      <artifactId>junit-jupiter-api</artifactId><!--$NO-MVN-MAN-VER$-->
+      <version>${junit5.version}</version>  <!-- transitive version is 5.10.3 :( -->
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId><!--$NO-MVN-MAN-VER$-->
+      <version>${junit5.version}</version>  <!-- transitive version is 5.10.9 :( -->
       <scope>test</scope>
     </dependency>
   </dependencies>

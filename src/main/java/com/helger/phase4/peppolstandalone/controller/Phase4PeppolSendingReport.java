@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2015-2025 Philip Helger (www.helger.com)
+ * philip[at]helger[dot]com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.helger.phase4.peppolstandalone.controller;
 
 import java.security.cert.X509Certificate;
@@ -35,6 +51,7 @@ import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.serialize.MicroWriter;
 import com.helger.xml.serialize.write.EXMLSerializeIndent;
+import com.helger.xml.serialize.write.IXMLWriterSettings;
 import com.helger.xml.serialize.write.XMLWriterSettings;
 
 /**
@@ -42,8 +59,8 @@ import com.helger.xml.serialize.write.XMLWriterSettings;
  * sending.
  *
  * @author Philip Helger
+ * @since 3.0.5
  */
-// TODO use bundled version from 3.0.5 on
 public final class Phase4PeppolSendingReport
 {
   // State params
@@ -60,6 +77,9 @@ public final class Phase4PeppolSendingReport
   private IProcessIdentifier m_aProcessID;
   private String m_sCountryC1;
   private String m_sSenderPartyID;
+
+  // SBDH details
+  private String m_sSBDHInstanceIdentifier;
 
   // SMP lookup results
   private String m_sC3EndpointURL;
@@ -157,6 +177,16 @@ public final class Phase4PeppolSendingReport
   public void setSenderPartyID (@Nullable final String s)
   {
     m_sSenderPartyID = s;
+  }
+
+  public boolean hasSBDHInstanceIdentifier ()
+  {
+    return StringHelper.hasText (m_sSBDHInstanceIdentifier);
+  }
+
+  public void setSBDHInstanceIdentifier (@Nullable final String s)
+  {
+    m_sSBDHInstanceIdentifier = s;
   }
 
   public boolean hasC3EndpointURL ()
@@ -318,6 +348,9 @@ public final class Phase4PeppolSendingReport
     if (hasSenderPartyID ())
       aJson.add ("senderPartyId", m_sSenderPartyID);
 
+    if (hasSBDHInstanceIdentifier ())
+      aJson.add ("sbdhInstanceIdentifier", m_sSBDHInstanceIdentifier);
+
     if (hasC3EndpointURL ())
       aJson.add ("c3EndpointUrl", m_sC3EndpointURL);
     if (hasC3Cert ())
@@ -418,6 +451,9 @@ public final class Phase4PeppolSendingReport
     if (hasSenderPartyID ())
       ret.appendElement (sNamespaceURI, "SenderPartyID").appendText (m_sSenderPartyID);
 
+    if (hasSBDHInstanceIdentifier ())
+      ret.appendElement (sNamespaceURI, "SBDHInstanceIdentifier").appendText (m_sSBDHInstanceIdentifier);
+
     if (hasC3EndpointURL ())
       ret.appendElement (sNamespaceURI, "C3EndpointUrl").appendText (m_sC3EndpointURL);
     if (hasC3Cert ())
@@ -478,7 +514,12 @@ public final class Phase4PeppolSendingReport
   @Nonnull
   public String getAsXMLString ()
   {
-    return MicroWriter.getNodeAsString (getAsMicroElement (null, "PeppolSendingReport"),
-                                        new XMLWriterSettings ().setIndent (EXMLSerializeIndent.INDENT_AND_ALIGN));
+    return getAsXMLString (null, new XMLWriterSettings ().setIndent (EXMLSerializeIndent.INDENT_AND_ALIGN));
+  }
+
+  @Nonnull
+  public String getAsXMLString (@Nullable final String sNamespaceURI, @Nonnull final IXMLWriterSettings aXWS)
+  {
+    return MicroWriter.getNodeAsString (getAsMicroElement (sNamespaceURI, "PeppolSendingReport"), aXWS);
   }
 }

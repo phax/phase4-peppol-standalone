@@ -45,6 +45,7 @@ import com.helger.phase4.peppol.Phase4PeppolSender.PeppolUserMessageSBDHBuilder;
 import com.helger.phase4.peppolstandalone.APConfig;
 import com.helger.phase4.profile.peppol.Phase4PeppolHttpClientSettings;
 import com.helger.phase4.sender.EAS4UserMessageSendResult;
+import com.helger.phase4.sender.IAS4RawResponseConsumer;
 import com.helger.phase4.util.Phase4Exception;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.xml.serialize.read.DOMReader;
@@ -59,7 +60,6 @@ import com.helger.xml.serialize.read.DOMReader;
 final class PeppolSender
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (PeppolSender.class);
-  private static final IIdentifierFactory IF = PeppolIdentifierFactory.INSTANCE;
 
   private PeppolSender ()
   {}
@@ -87,14 +87,15 @@ final class PeppolSender
    */
   @Nonnull
   static Phase4PeppolSendingReport sendPeppolMessageCreatingSbdh (@Nonnull final ISMLInfo aSmlInfo,
-                                                            @Nonnull final PeppolCAChecker aAPCAChecker,
-                                                            @Nonnull final byte [] aPayloadBytes,
-                                                            @Nonnull @Nonempty final String sSenderID,
-                                                            @Nonnull @Nonempty final String sReceiverID,
-                                                            @Nonnull @Nonempty final String sDocTypeID,
-                                                            @Nonnull @Nonempty final String sProcessID,
-                                                            @Nonnull @Nonempty final String sCountryCodeC1)
+                                                                  @Nonnull final PeppolCAChecker aAPCAChecker,
+                                                                  @Nonnull final byte [] aPayloadBytes,
+                                                                  @Nonnull @Nonempty final String sSenderID,
+                                                                  @Nonnull @Nonempty final String sReceiverID,
+                                                                  @Nonnull @Nonempty final String sDocTypeID,
+                                                                  @Nonnull @Nonempty final String sProcessID,
+                                                                  @Nonnull @Nonempty final String sCountryCodeC1)
   {
+    final IIdentifierFactory aIF = PeppolIdentifierFactory.INSTANCE;
     final String sMyPeppolSeatID = APConfig.getMyPeppolSeatID ();
 
     final Phase4PeppolSendingReport aSendingReport = new Phase4PeppolSendingReport (aSmlInfo);
@@ -112,24 +113,24 @@ final class PeppolSender
         throw new IllegalStateException ("Failed to read provided payload as XML");
 
       // Start configuring here
-      final IParticipantIdentifier aSenderID = Phase4PeppolSender.IF.createParticipantIdentifierWithDefaultScheme (sSenderID);
+      final IParticipantIdentifier aSenderID = aIF.createParticipantIdentifierWithDefaultScheme (sSenderID);
       aSendingReport.setSenderID (aSenderID);
 
-      final IParticipantIdentifier aReceiverID = Phase4PeppolSender.IF.createParticipantIdentifierWithDefaultScheme (sReceiverID);
+      final IParticipantIdentifier aReceiverID = aIF.createParticipantIdentifierWithDefaultScheme (sReceiverID);
       aSendingReport.setReceiverID (aReceiverID);
 
-      IDocumentTypeIdentifier aDocTypeID = IF.parseDocumentTypeIdentifier (sDocTypeID);
+      IDocumentTypeIdentifier aDocTypeID = aIF.parseDocumentTypeIdentifier (sDocTypeID);
       if (aDocTypeID == null)
       {
         // Fallback to default scheme
-        aDocTypeID = IF.createDocumentTypeIdentifierWithDefaultScheme (sDocTypeID);
+        aDocTypeID = aIF.createDocumentTypeIdentifierWithDefaultScheme (sDocTypeID);
       }
       aSendingReport.setDocTypeID (aDocTypeID);
-      IProcessIdentifier aProcessID = IF.parseProcessIdentifier (sProcessID);
+      IProcessIdentifier aProcessID = aIF.parseProcessIdentifier (sProcessID);
       if (aProcessID == null)
       {
         // Fallback to default scheme
-        aProcessID = IF.createProcessIdentifierWithDefaultScheme (sProcessID);
+        aProcessID = aIF.createProcessIdentifierWithDefaultScheme (sProcessID);
       }
       aSendingReport.setProcessID (aProcessID);
 
@@ -151,6 +152,9 @@ final class PeppolSender
       final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
       // TODO Add AP outbound proxy settings here
 
+      // TODO set to null if your using the dumping
+      final IAS4RawResponseConsumer aRRC = new AS4RawResponseConsumerWriteToFile ();
+
       final PeppolUserMessageBuilder aBuilder;
       aBuilder = Phase4PeppolSender.builder ()
                                    .httpClientFactory (aHCS)
@@ -163,7 +167,13 @@ final class PeppolSender
                                    .payload (aDoc.getDocumentElement ())
                                    .peppolAP_CAChecker (aAPCAChecker)
                                    .smpClient (aSMPClient)
-                                   .rawResponseConsumer (new AS4RawResponseConsumerWriteToFile ())
+                                   .rawResponseConsumer (aRRC)
+                                   .sbdDocumentConsumer (sbd -> {
+                                     // Remember SBDH Instance Identifier
+                                     aSendingReport.setSBDHInstanceIdentifier (sbd.getStandardBusinessDocumentHeader ()
+                                                                                  .getDocumentIdentification ()
+                                                                                  .getInstanceIdentifier ());
+                                   })
                                    .endpointURLConsumer (sEndpointUrl -> {
                                      // Determined by SMP lookup
                                      aSendingReport.setC3EndpointURL (sEndpointUrl);
@@ -284,6 +294,9 @@ final class PeppolSender
       final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
       // TODO Add AP outbound proxy settings here
 
+      // TODO set to null if your using the dumping
+      final IAS4RawResponseConsumer aRRC = new AS4RawResponseConsumerWriteToFile ();
+
       final PeppolUserMessageSBDHBuilder aBuilder;
       aBuilder = Phase4PeppolSender.sbdhBuilder ()
                                    .httpClientFactory (aHCS)
@@ -291,7 +304,7 @@ final class PeppolSender
                                    .senderPartyID (sMyPeppolSeatID)
                                    .peppolAP_CAChecker (apCAChecker)
                                    .smpClient (aSMPClient)
-                                   .rawResponseConsumer (new AS4RawResponseConsumerWriteToFile ())
+                                   .rawResponseConsumer (aRRC)
                                    .endpointURLConsumer (sEndpointUrl -> {
                                      // Determined by SMP lookup
                                      aSendingReport.setC3EndpointURL (sEndpointUrl);

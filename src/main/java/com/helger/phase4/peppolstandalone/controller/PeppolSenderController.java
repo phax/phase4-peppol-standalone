@@ -85,13 +85,13 @@ public class PeppolSenderController
                  countryC1 +
                  "'");
     final Phase4PeppolSendingReport aSendingReport = PeppolSender.sendPeppolMessageCreatingSbdh (ESML.DIGIT_TEST,
-                                                                                           PeppolCertificateChecker.peppolTestAP (),
-                                                                                           aPayloadBytes,
-                                                                                           senderId,
-                                                                                           receiverId,
-                                                                                           docTypeId,
-                                                                                           processId,
-                                                                                           countryC1);
+                                                                                                 PeppolCertificateChecker.peppolTestAP (),
+                                                                                                 aPayloadBytes,
+                                                                                                 senderId,
+                                                                                                 receiverId,
+                                                                                                 docTypeId,
+                                                                                                 processId,
+                                                                                                 countryC1);
 
     // Return as JSON
     return aSendingReport.getAsJsonString ();
@@ -129,13 +129,13 @@ public class PeppolSenderController
                  countryC1 +
                  "'");
     final Phase4PeppolSendingReport aSendingReport = PeppolSender.sendPeppolMessageCreatingSbdh (ESML.DIGIT_PRODUCTION,
-                                                                                           PeppolCertificateChecker.peppolProductionAP (),
-                                                                                           aPayloadBytes,
-                                                                                           senderId,
-                                                                                           receiverId,
-                                                                                           docTypeId,
-                                                                                           processId,
-                                                                                           countryC1);
+                                                                                                 PeppolCertificateChecker.peppolProductionAP (),
+                                                                                                 aPayloadBytes,
+                                                                                                 senderId,
+                                                                                                 receiverId,
+                                                                                                 docTypeId,
+                                                                                                 processId,
+                                                                                                 countryC1);
 
     // Return as JSON
     return aSendingReport.getAsJsonString ();
@@ -179,6 +179,7 @@ public class PeppolSenderController
     aSendingReport.setDocTypeID (aData.getDocumentTypeAsIdentifier ());
     aSendingReport.setProcessID (aData.getProcessAsIdentifier ());
     aSendingReport.setCountryC1 (aData.getCountryC1 ());
+    aSendingReport.setSBDHInstanceIdentifier (aData.getInstanceIdentifier ());
 
     final String sSenderID = aData.getSenderAsIdentifier ().getURIEncoded ();
     final String sReceiverID = aData.getReceiverAsIdentifier ().getURIEncoded ();

@@ -255,17 +255,17 @@ final class PeppolSender
    *        The Peppol SBDH data to be send
    * @param aSmlInfo
    *        The SML to be used for receiver lookup
-   * @param aSendingReport
    * @param aAPCAChecker
    *        The Peppol CA checker to be used.
+   * @param aSendingReport
+   *        The sending report to be filled.
    */
   static void sendPeppolMessagePredefinedSbdh (@Nonnull final PeppolSBDHData aData,
                                                @Nonnull final ISMLInfo aSmlInfo,
-                                               @Nonnull final PeppolCAChecker apCAChecker,
+                                               @Nonnull final PeppolCAChecker aAPCAChecker,
                                                @Nonnull final Phase4PeppolSendingReport aSendingReport)
   {
     final String sMyPeppolSeatID = APConfig.getMyPeppolSeatID ();
-
     aSendingReport.setSenderPartyID (sMyPeppolSeatID);
 
     EAS4UserMessageSendResult eResult = null;
@@ -302,7 +302,7 @@ final class PeppolSender
                                    .httpClientFactory (aHCS)
                                    .payloadAndMetadata (aData)
                                    .senderPartyID (sMyPeppolSeatID)
-                                   .peppolAP_CAChecker (apCAChecker)
+                                   .peppolAP_CAChecker (aAPCAChecker)
                                    .smpClient (aSMPClient)
                                    .rawResponseConsumer (aRRC)
                                    .endpointURLConsumer (sEndpointUrl -> {

@@ -26,19 +26,18 @@ Since 2025-01-31 all the sending APIs mentioned below also require the HTTP Head
 What value that is, depends on the configuration property `phase4.api.requiredtoken`.
 The pre-configured value is `NjIh9tIx3Rgzme19mGIy` and should be changed in your own setup.
 
-To send to a production endpoint (using SML) use this URL (the SBDH is built inside):
+Since 2025-03-04 instead of providing two different APIs (`/sendtest` and `/sendprod`) only one URL (`/sendas4`)
+is provided, and the actual Peppol Network choice is done based on the `peppol.stage` configuration parameter.
+The same applies to sending the prebuild SBDH - the API changed from `/sendsbdhtest` to `/sendsbdh`.
+
+To send to an AS4 endpoint use this URL (the SBDH is built inside):
 ```
-/sendprod/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}
+/sendas4/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}
 ```
 
-To send to a test endpoint (using SMK) use this URL (the SBDH is built inside):
+To send to an AS4 endpoint use this URL when the SBDH is already available (especially for Peppol Testbed):
 ```
-/sendtest/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}
-```
-
-To send to a test endpoint (using SMK) use this URL when the SBDH is already available (especially for Peppol Testbed):
-```
-/sendsbdhtest
+/sendsbdh
 ```
 
 In both cases, the payload to send must be the XML business document (like the UBL Invoice).
@@ -84,6 +83,13 @@ An example Docker file is also present - see `docker-build.cmd` and `docker-run.
 
 The main configuration is done via the file `src/main/resources/application.properties`.
 You may need to rebuild the application to have an effect.
+
+The following configuration properties are contained by default:
+* **`peppol.stage`** - defines the stage of the Peppol Network that should be used. Allowed values are `test` 
+   (for the test/pilot Peppol Network) and `prod` (for the production Peppol Network). It defines e.g.
+   the SML to be used and the CAs against which checks are performed
+* **`peppol.seatid`** - defines your Peppol Seat ID. It could be taken from your AP certificate as well,
+   but this way it is a bit easier.
 
 ## Running
 

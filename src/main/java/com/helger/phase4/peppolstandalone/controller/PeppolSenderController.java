@@ -32,7 +32,9 @@ import com.helger.commons.string.StringHelper;
 import com.helger.peppol.sbdh.PeppolSBDHData;
 import com.helger.peppol.sbdh.PeppolSBDHDataReadException;
 import com.helger.peppol.sbdh.PeppolSBDHDataReader;
+import com.helger.peppol.servicedomain.EPeppolNetwork;
 import com.helger.peppol.sml.ESML;
+import com.helger.peppol.utils.PeppolCAChecker;
 import com.helger.peppol.utils.PeppolCertificateChecker;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.phase4.peppolstandalone.APConfig;
@@ -53,14 +55,15 @@ public class PeppolSenderController
   private static final Logger LOGGER = LoggerFactory.getLogger (PeppolSenderController.class);
   private static final String HEADER_X_TOKEN = "X-Token";
 
-  @PostMapping (path = "/sendtest/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public String sendPeppolTestMessage (@RequestHeader (name = HEADER_X_TOKEN, required = true) final String xtoken,
-                                       @RequestBody final byte [] aPayloadBytes,
-                                       @PathVariable final String senderId,
-                                       @PathVariable final String receiverId,
-                                       @PathVariable final String docTypeId,
-                                       @PathVariable final String processId,
-                                       @PathVariable final String countryC1)
+  @PostMapping (path = "/sendas4/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}",
+                produces = MediaType.APPLICATION_JSON_VALUE)
+  public String sendPeppolMessage (@RequestHeader (name = HEADER_X_TOKEN, required = true) final String xtoken,
+                                   @RequestBody final byte [] aPayloadBytes,
+                                   @PathVariable final String senderId,
+                                   @PathVariable final String receiverId,
+                                   @PathVariable final String docTypeId,
+                                   @PathVariable final String processId,
+                                   @PathVariable final String countryC1)
   {
     if (StringHelper.hasNoText (xtoken))
     {
@@ -73,7 +76,13 @@ public class PeppolSenderController
       throw new ForbiddenException ();
     }
 
-    LOGGER.info ("Trying to send Peppol Test message from '" +
+    final EPeppolNetwork eStage = APConfig.getPeppolStage ();
+    final ESML eSML = eStage.isProduction () ? ESML.DIGIT_PRODUCTION : ESML.DIGIT_TEST;
+    final PeppolCAChecker aAPCA = eStage.isProduction () ? PeppolCertificateChecker.peppolProductionAP ()
+                                                         : PeppolCertificateChecker.peppolTestAP ();
+    LOGGER.info ("Trying to send Peppol " +
+                 eStage.name () +
+                 " message from '" +
                  senderId +
                  "' to '" +
                  receiverId +
@@ -84,8 +93,8 @@ public class PeppolSenderController
                  "' for '" +
                  countryC1 +
                  "'");
-    final Phase4PeppolSendingReport aSendingReport = PeppolSender.sendPeppolMessageCreatingSbdh (ESML.DIGIT_TEST,
-                                                                                                 PeppolCertificateChecker.peppolTestAP (),
+    final Phase4PeppolSendingReport aSendingReport = PeppolSender.sendPeppolMessageCreatingSbdh (eSML,
+                                                                                                 aAPCA,
                                                                                                  aPayloadBytes,
                                                                                                  senderId,
                                                                                                  receiverId,
@@ -97,14 +106,9 @@ public class PeppolSenderController
     return aSendingReport.getAsJsonString ();
   }
 
-  @PostMapping (path = "/sendprod/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public String sendPeppolProdMessage (@RequestHeader (name = HEADER_X_TOKEN, required = true) final String xtoken,
-                                       @RequestBody final byte [] aPayloadBytes,
-                                       @PathVariable final String senderId,
-                                       @PathVariable final String receiverId,
-                                       @PathVariable final String docTypeId,
-                                       @PathVariable final String processId,
-                                       @PathVariable final String countryC1)
+  @PostMapping (path = "/sendsbdh", produces = MediaType.APPLICATION_JSON_VALUE)
+  public String sendPeppolSbdhMessage (@RequestHeader (name = HEADER_X_TOKEN, required = true) final String xtoken,
+                                       @RequestBody final byte [] aPayloadBytes)
   {
     if (StringHelper.hasNoText (xtoken))
     {
@@ -117,46 +121,10 @@ public class PeppolSenderController
       throw new ForbiddenException ();
     }
 
-    LOGGER.info ("Trying to send Peppol Prod message from '" +
-                 senderId +
-                 "' to '" +
-                 receiverId +
-                 "' using '" +
-                 docTypeId +
-                 "' and '" +
-                 processId +
-                 "' for '" +
-                 countryC1 +
-                 "'");
-    final Phase4PeppolSendingReport aSendingReport = PeppolSender.sendPeppolMessageCreatingSbdh (ESML.DIGIT_PRODUCTION,
-                                                                                                 PeppolCertificateChecker.peppolProductionAP (),
-                                                                                                 aPayloadBytes,
-                                                                                                 senderId,
-                                                                                                 receiverId,
-                                                                                                 docTypeId,
-                                                                                                 processId,
-                                                                                                 countryC1);
-
-    // Return as JSON
-    return aSendingReport.getAsJsonString ();
-  }
-
-  @PostMapping (path = "/sendsbdhtest", produces = MediaType.APPLICATION_JSON_VALUE)
-  public String sendPeppolTestSbdhMessage (@RequestHeader (name = HEADER_X_TOKEN, required = true) final String xtoken,
-                                           @RequestBody final byte [] aPayloadBytes)
-  {
-    if (StringHelper.hasNoText (xtoken))
-    {
-      LOGGER.error ("The specific token header is missing");
-      throw new ForbiddenException ();
-    }
-    if (!xtoken.equals (APConfig.getPhase4ApiRequiredToken ()))
-    {
-      LOGGER.error ("The specified token value does not match the configured required token");
-      throw new ForbiddenException ();
-    }
-
-    final ESML eSML = ESML.DIGIT_TEST;
+    final EPeppolNetwork eStage = APConfig.getPeppolStage ();
+    final ESML eSML = eStage.isProduction () ? ESML.DIGIT_PRODUCTION : ESML.DIGIT_TEST;
+    final PeppolCAChecker aAPCA = eStage.isProduction () ? PeppolCertificateChecker.peppolProductionAP ()
+                                                         : PeppolCertificateChecker.peppolTestAP ();
     final Phase4PeppolSendingReport aSendingReport = new Phase4PeppolSendingReport (eSML);
 
     final PeppolSBDHData aData;
@@ -198,10 +166,7 @@ public class PeppolSenderController
                  sCountryCodeC1 +
                  "'");
 
-    PeppolSender.sendPeppolMessagePredefinedSbdh (aData,
-                                                  eSML,
-                                                  PeppolCertificateChecker.peppolTestAP (),
-                                                  aSendingReport);
+    PeppolSender.sendPeppolMessagePredefinedSbdh (aData, eSML, aAPCA, aSendingReport);
 
     // Return result JSON
     return aSendingReport.getAsJsonString ();

@@ -28,14 +28,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.helger.commons.io.stream.NonBlockingByteArrayInputStream;
-import com.helger.commons.lang.StackTraceHelper;
 import com.helger.commons.string.StringHelper;
-import com.helger.json.IJsonObject;
-import com.helger.json.JsonObject;
-import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.peppol.sbdh.PeppolSBDHData;
-import com.helger.peppol.sbdh.read.PeppolSBDHDocumentReadException;
-import com.helger.peppol.sbdh.read.PeppolSBDHDocumentReader;
+import com.helger.peppol.sbdh.PeppolSBDHDataReadException;
+import com.helger.peppol.sbdh.PeppolSBDHDataReader;
 import com.helger.peppol.sml.ESML;
 import com.helger.peppol.utils.PeppolCertificateChecker;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
@@ -57,8 +53,7 @@ public class PeppolSenderController
   private static final Logger LOGGER = LoggerFactory.getLogger (PeppolSenderController.class);
   private static final String HEADER_X_TOKEN = "X-Token";
 
-  @PostMapping (path = "/sendtest/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}",
-                produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping (path = "/sendtest/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}", produces = MediaType.APPLICATION_JSON_VALUE)
   public String sendPeppolTestMessage (@RequestHeader (name = HEADER_X_TOKEN, required = true) final String xtoken,
                                        @RequestBody final byte [] aPayloadBytes,
                                        @PathVariable final String senderId,
@@ -89,18 +84,20 @@ public class PeppolSenderController
                  "' for '" +
                  countryC1 +
                  "'");
-    return PeppolSender.sendPeppolMessageCreatingSbdh (ESML.DIGIT_TEST,
-                                                       PeppolCertificateChecker.peppolTestAP (),
-                                                       aPayloadBytes,
-                                                       senderId,
-                                                       receiverId,
-                                                       docTypeId,
-                                                       processId,
-                                                       countryC1);
+    final PeppolSendingReport aSendingReport = PeppolSender.sendPeppolMessageCreatingSbdh (ESML.DIGIT_TEST,
+                                                                                           PeppolCertificateChecker.peppolTestAP (),
+                                                                                           aPayloadBytes,
+                                                                                           senderId,
+                                                                                           receiverId,
+                                                                                           docTypeId,
+                                                                                           processId,
+                                                                                           countryC1);
+
+    // Return as JSON
+    return aSendingReport.getAsJsonString ();
   }
 
-  @PostMapping (path = "/sendprod/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}",
-                produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping (path = "/sendprod/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}", produces = MediaType.APPLICATION_JSON_VALUE)
   public String sendPeppolProdMessage (@RequestHeader (name = HEADER_X_TOKEN, required = true) final String xtoken,
                                        @RequestBody final byte [] aPayloadBytes,
                                        @PathVariable final String senderId,
@@ -131,14 +128,17 @@ public class PeppolSenderController
                  "' for '" +
                  countryC1 +
                  "'");
-    return PeppolSender.sendPeppolMessageCreatingSbdh (ESML.DIGIT_PRODUCTION,
-                                                       PeppolCertificateChecker.peppolProductionAP (),
-                                                       aPayloadBytes,
-                                                       senderId,
-                                                       receiverId,
-                                                       docTypeId,
-                                                       processId,
-                                                       countryC1);
+    final PeppolSendingReport aSendingReport = PeppolSender.sendPeppolMessageCreatingSbdh (ESML.DIGIT_PRODUCTION,
+                                                                                           PeppolCertificateChecker.peppolProductionAP (),
+                                                                                           aPayloadBytes,
+                                                                                           senderId,
+                                                                                           receiverId,
+                                                                                           docTypeId,
+                                                                                           processId,
+                                                                                           countryC1);
+
+    // Return as JSON
+    return aSendingReport.getAsJsonString ();
   }
 
   @PostMapping (path = "/sendsbdhtest", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -156,24 +156,29 @@ public class PeppolSenderController
       throw new ForbiddenException ();
     }
 
+    final ESML eSML = ESML.DIGIT_TEST;
+    final PeppolSendingReport aSendingReport = new PeppolSendingReport (eSML);
+
     final PeppolSBDHData aData;
     try
     {
-      aData = new PeppolSBDHDocumentReader (PeppolIdentifierFactory.INSTANCE).extractData (new NonBlockingByteArrayInputStream (aPayloadBytes));
+      aData = new PeppolSBDHDataReader (PeppolIdentifierFactory.INSTANCE).extractData (new NonBlockingByteArrayInputStream (aPayloadBytes));
     }
-    catch (final PeppolSBDHDocumentReadException ex)
+    catch (final PeppolSBDHDataReadException ex)
     {
       // TODO This error handling might be improved to return a status error
       // instead
-      final IJsonObject aJson = new JsonObject ();
-      aJson.add ("sbdhParsingException",
-                 new JsonObject ().add ("class", ex.getClass ().getName ())
-                                  .add ("message", ex.getMessage ())
-                                  .add ("stackTrace", StackTraceHelper.getStackAsString (ex)));
-      aJson.add ("sendingSuccess", false);
-      aJson.add ("overallSuccess", false);
-      return aJson.getAsJsonString (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);
+      aSendingReport.setSBDHParseException (ex);
+      aSendingReport.setSendingSuccess (false);
+      aSendingReport.setOverallSuccess (false);
+      return aSendingReport.getAsJsonString ();
     }
+
+    aSendingReport.setSenderID (aData.getSenderAsIdentifier ());
+    aSendingReport.setReceiverID (aData.getReceiverAsIdentifier ());
+    aSendingReport.setDocTypeID (aData.getDocumentTypeAsIdentifier ());
+    aSendingReport.setProcessID (aData.getProcessAsIdentifier ());
+    aSendingReport.setCountryC1 (aData.getCountryC1 ());
 
     final String sSenderID = aData.getSenderAsIdentifier ().getURIEncoded ();
     final String sReceiverID = aData.getReceiverAsIdentifier ().getURIEncoded ();
@@ -192,8 +197,12 @@ public class PeppolSenderController
                  sCountryCodeC1 +
                  "'");
 
-    return PeppolSender.sendPeppolMessagePredefinedSbdh (aData,
-                                                         ESML.DIGIT_TEST,
-                                                         PeppolCertificateChecker.peppolTestAP ());
+    PeppolSender.sendPeppolMessagePredefinedSbdh (aData,
+                                                  eSML,
+                                                  PeppolCertificateChecker.peppolTestAP (),
+                                                  aSendingReport);
+
+    // Return result JSON
+    return aSendingReport.getAsJsonString ();
   }
 }

@@ -86,7 +86,7 @@ final class PeppolSender
    * @return The created sending report and never <code>null</code>.
    */
   @Nonnull
-  static PeppolSendingReport sendPeppolMessageCreatingSbdh (@Nonnull final ISMLInfo aSmlInfo,
+  static Phase4PeppolSendingReport sendPeppolMessageCreatingSbdh (@Nonnull final ISMLInfo aSmlInfo,
                                                             @Nonnull final PeppolCAChecker aAPCAChecker,
                                                             @Nonnull final byte [] aPayloadBytes,
                                                             @Nonnull @Nonempty final String sSenderID,
@@ -97,7 +97,7 @@ final class PeppolSender
   {
     final String sMyPeppolSeatID = APConfig.getMyPeppolSeatID ();
 
-    final PeppolSendingReport aSendingReport = new PeppolSendingReport (aSmlInfo);
+    final Phase4PeppolSendingReport aSendingReport = new Phase4PeppolSendingReport (aSmlInfo);
     aSendingReport.setCountryC1 (sCountryCodeC1);
     aSendingReport.setSenderPartyID (sMyPeppolSeatID);
 
@@ -252,7 +252,7 @@ final class PeppolSender
   static void sendPeppolMessagePredefinedSbdh (@Nonnull final PeppolSBDHData aData,
                                                @Nonnull final ISMLInfo aSmlInfo,
                                                @Nonnull final PeppolCAChecker apCAChecker,
-                                               @Nonnull final PeppolSendingReport aSendingReport)
+                                               @Nonnull final Phase4PeppolSendingReport aSendingReport)
   {
     final String sMyPeppolSeatID = APConfig.getMyPeppolSeatID ();
 

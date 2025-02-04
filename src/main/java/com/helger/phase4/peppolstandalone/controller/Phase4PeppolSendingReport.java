@@ -43,7 +43,8 @@ import com.helger.xml.serialize.write.XMLWriterSettings;
  *
  * @author Philip Helger
  */
-public final class PeppolSendingReport
+// TODO use bundled version from 3.0.5 on
+public final class Phase4PeppolSendingReport
 {
   // State params
   private final OffsetDateTime m_aCurrentDateTimeUTC;
@@ -82,7 +83,7 @@ public final class PeppolSendingReport
   private boolean m_bSendingSuccess = false;
   private boolean m_bOverallSuccess = false;
 
-  public PeppolSendingReport (@Nonnull final ISMLInfo aSMLInfo)
+  public Phase4PeppolSendingReport (@Nonnull final ISMLInfo aSMLInfo)
   {
     m_aCurrentDateTimeUTC = PDTFactory.getCurrentOffsetDateTimeUTC ();
     m_sSMLDNSZone = aSMLInfo.getDNSZone ();

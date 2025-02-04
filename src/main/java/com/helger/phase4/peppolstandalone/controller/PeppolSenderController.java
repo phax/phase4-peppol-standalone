@@ -84,7 +84,7 @@ public class PeppolSenderController
                  "' for '" +
                  countryC1 +
                  "'");
-    final PeppolSendingReport aSendingReport = PeppolSender.sendPeppolMessageCreatingSbdh (ESML.DIGIT_TEST,
+    final Phase4PeppolSendingReport aSendingReport = PeppolSender.sendPeppolMessageCreatingSbdh (ESML.DIGIT_TEST,
                                                                                            PeppolCertificateChecker.peppolTestAP (),
                                                                                            aPayloadBytes,
                                                                                            senderId,
@@ -128,7 +128,7 @@ public class PeppolSenderController
                  "' for '" +
                  countryC1 +
                  "'");
-    final PeppolSendingReport aSendingReport = PeppolSender.sendPeppolMessageCreatingSbdh (ESML.DIGIT_PRODUCTION,
+    final Phase4PeppolSendingReport aSendingReport = PeppolSender.sendPeppolMessageCreatingSbdh (ESML.DIGIT_PRODUCTION,
                                                                                            PeppolCertificateChecker.peppolProductionAP (),
                                                                                            aPayloadBytes,
                                                                                            senderId,
@@ -157,7 +157,7 @@ public class PeppolSenderController
     }
 
     final ESML eSML = ESML.DIGIT_TEST;
-    final PeppolSendingReport aSendingReport = new PeppolSendingReport (eSML);
+    final Phase4PeppolSendingReport aSendingReport = new Phase4PeppolSendingReport (eSML);
 
     final PeppolSBDHData aData;
     try

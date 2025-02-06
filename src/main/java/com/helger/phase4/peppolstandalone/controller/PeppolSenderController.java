@@ -37,6 +37,7 @@ import com.helger.peppol.sml.ESML;
 import com.helger.peppol.utils.PeppolCAChecker;
 import com.helger.peppol.utils.PeppolCertificateChecker;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
+import com.helger.phase4.peppol.Phase4PeppolSendingReport;
 import com.helger.phase4.peppolstandalone.APConfig;
 
 /**

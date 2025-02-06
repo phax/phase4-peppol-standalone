@@ -42,6 +42,7 @@ import com.helger.phase4.model.message.AbstractAS4Message;
 import com.helger.phase4.peppol.Phase4PeppolSender;
 import com.helger.phase4.peppol.Phase4PeppolSender.PeppolUserMessageBuilder;
 import com.helger.phase4.peppol.Phase4PeppolSender.PeppolUserMessageSBDHBuilder;
+import com.helger.phase4.peppol.Phase4PeppolSendingReport;
 import com.helger.phase4.peppolstandalone.APConfig;
 import com.helger.phase4.profile.peppol.Phase4PeppolHttpClientSettings;
 import com.helger.phase4.sender.EAS4UserMessageSendResult;

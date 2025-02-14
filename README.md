@@ -2,7 +2,7 @@
 
 This an example standalone implementation of [phase4](https://github.com/phax/phase4) for the Peppol Network.
 
-This is a demo application and NOT ready for production use.
+This is a demo application and NOT ready for production use (of course phase4 itself is ready for production use).
 Use it as a template to add your own code.
 
 **Note:** because it is demo code, no releases are created - you have to modify it anyway.
@@ -15,8 +15,9 @@ This project is part of my Peppol solution stack. See https://github.com/phax/pe
 
 Based on the Servlet technology, the application takes AS4 messages via HTTP POST to `/as4`.
 
-By default, all valid incoming messages are handled by class `CustomPeppolIncomingSBDHandlerSPI`.
+By default, all valid incoming messages are handled by class `com.helger.phase4.peppolstandalone.spi.CustomPeppolIncomingSBDHandlerSPI`.
 This class contains a `TODO` where you need to implement the stuff you want to do with incoming messages.
+It also contains a lot of boilerplate code to show how certain things can be achieved (e.g. intergration with `peppol-reporting`).
 
 ## Functionality Sending
 
@@ -41,7 +42,7 @@ To send to an AS4 endpoint use this URL when the SBDH is already available (espe
 ```
 
 In both cases, the payload to send must be the XML business document (like the UBL Invoice).
-The outcome is a simple JSON document that contains most of the relevant details on sending.
+The outcome is a JSON document that contains most of the relevant details on sending.
 
 Test call using the file `src\test\resources\external\example-invoice.xml` as the request body (note the URL escaping of special chars via the `%` sign):
 `http://localhost:8080/sendtest/9915:phase4-test-sender/9915:helger/urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice%23%23urn:cen.eu:en16931:2017%23compliant%23urn:fdc:peppol.eu:2017:poacc:billing:3.0::2.1/urn:fdc:peppol.eu:2017:poacc:billing:01:1.0/GB`

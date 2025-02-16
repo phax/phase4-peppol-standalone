@@ -84,7 +84,7 @@ public class PeppolReportingController
     // Check parameters
     if (nYear < 2024)
       throw new HttpForbiddenException ("The year value " + nYear + " is invalid");
-    if (nMonth < 1 || nMonth > 10)
+    if (nMonth < 1 || nMonth > 12)
       throw new HttpForbiddenException ("The month value " + nMonth + " is invalid");
     final YearMonth aYearMonth = YearMonth.of (nYear, nMonth);
 
@@ -146,7 +146,7 @@ public class PeppolReportingController
     // Check parameters
     if (nYear < 2024)
       throw new HttpForbiddenException ("The year value " + nYear + " is invalid");
-    if (nMonth < 1 || nMonth > 10)
+    if (nMonth < 1 || nMonth > 12)
       throw new HttpForbiddenException ("The month value " + nMonth + " is invalid");
     final YearMonth aYearMonth = YearMonth.of (nYear, nMonth);
 

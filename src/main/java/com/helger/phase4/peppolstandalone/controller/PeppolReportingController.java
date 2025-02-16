@@ -88,6 +88,8 @@ public class PeppolReportingController
       throw new HttpForbiddenException ("The month value " + nMonth + " is invalid");
     final YearMonth aYearMonth = YearMonth.of (nYear, nMonth);
 
+    LOGGER.info ("Trying to create Peppol Reporting TSR for " + aYearMonth);
+
     try
     {
       // Now get all items from data storage and store them in a list (we start
@@ -149,6 +151,8 @@ public class PeppolReportingController
     if (nMonth < 1 || nMonth > 12)
       throw new HttpForbiddenException ("The month value " + nMonth + " is invalid");
     final YearMonth aYearMonth = YearMonth.of (nYear, nMonth);
+
+    LOGGER.info ("Trying to create Peppol Reporting EUSR for " + aYearMonth);
 
     try
     {

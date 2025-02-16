@@ -49,6 +49,18 @@ Test call using the file `src\test\resources\external\example-invoice.xml` as th
 
 **Note:** Documents are NOT validated internally. They need to be validated externally. See https://github.com/phax/phive and https://github.com/phax/phive-rules for this.
 
+## Peppol Reporting API
+
+Was added on 2025-02-16 as an example.
+
+Via `GET` on `/create-tsr/{year}/{month}` a Peppol Reporting Transaction Statistics Report (TSR) can be created.
+The `year` parameter must be &ge; 2024 and the `month` parameter must be between `1` and `12`.
+The response is a TSR XML in UTF-8 encoding. 
+
+Via `GET` on `/create-eusr/{year}/{month}` a Peppol Reporting End User Statistics Report (EUSR) can be created.
+The `year` parameter must be &ge; 2024 and the `month` parameter must be between `1` and `12`.
+The response is an EUSR XML in UTF-8 encoding. 
+
 ## What is not included
 
 The following list contains the elements not considered for this demo application:

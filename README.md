@@ -67,22 +67,27 @@ The following list contains the elements not considered for this demo applicatio
 
 * You need your own Peppol certificate to make it work - the contained keystore is a dummy one only
 * Document validation is not included
-* Peppol Reporting is not included, as no backend connection is available
+    * See https://github.com/phax/phive and https://github.com/phax/phive-rules for this.
+* Peppol Reporting is not included, as no reporting backend is present.
+    * You can pick one from https://github.com/phax/peppol-reporting to add to your `pom.xml`
+    * The calls for storing Peppol Reporting information is part of the code, but disabled by default, as relevant parameters cannot automatically be determined
 
 # Get it up and running
 
 ## Tasks
 
 1. Prepare your Peppol Access Point Key Store according to the rules described at https://github.com/phax/phoss-smp/wiki/Certificate-setup
-1. Configure your Key Store in the `application.properties` file - don't touch the Trust Store - it is part of the deployment.
+1. Set the correct value of `peppol.stage` in the `application.properties` file
+1. Configure your Key Store in the `application.properties` file
+1. Choose the correct Trust Store based on the Peppol Network stage (see above). Don't touch the Trust Store contents - they are part of the deployment.
 1. Set the correct value of `peppol.seatid` in the `application.properties` file
-1. Once the Peppol Certificate is configured, change the code snippet with `TODO` in file `ServletConfig` according to the comment (approx. line 192)
+1. Once the Peppol Certificate is configured, change the code snippet with `TODO` in file `ServletConfig` according to the comment (approx. line 215)
 1. Note that incoming Peppol messages are only logged and discarded. Edit the code in class `CustomPeppolIncomingSBDHandlerSPI` to fix it.
-1. Build and start the application (see below)  
+1. Build and start the application (see below)
 
 ## Building
 
-This application is based on Spring Boot 3.x and uses Apache 3.x and Java 17 to build.
+This application is based on Spring Boot 3.x and uses Apache 3.x and Java 17 (or higher) to build.
 
 ```
 mvn clean install
@@ -111,7 +116,7 @@ It should show a small introduction page. The `/as4` servlet itself has no user 
 
 In case you run the application behind an HTTP proxy, modify the settings in the configuration file (`http.proxy.*`).
 
-In case you don't like port 8080, also check the configuration file.
+In case you don't like port 8080, also change it in the configuration file.
 
 ---
 

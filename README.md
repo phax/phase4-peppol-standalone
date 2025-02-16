@@ -26,7 +26,7 @@ Since 2025-01-31 all the sending APIs mentioned below also require the HTTP Head
 What value that is, depends on the configuration property `phase4.api.requiredtoken`.
 The pre-configured value is `NjIh9tIx3Rgzme19mGIy` and should be changed in your own setup.
 
-Since 2025-03-04 instead of providing two different APIs (`/sendtest` and `/sendprod`) only one URL (`/sendas4`)
+Since 2025-02-04 instead of providing two different APIs (`/sendtest` and `/sendprod`) only one URL (`/sendas4`)
 is provided, and the actual Peppol Network choice is done based on the `peppol.stage` configuration parameter.
 The same applies to sending the prebuild SBDH - the API changed from `/sendsbdhtest` to `/sendsbdh`.
 

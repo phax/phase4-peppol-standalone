@@ -59,7 +59,7 @@
   <properties>
     <junit5.version>5.11.4</junit5.version>
     <peppol-reporting.version>3.0.3</peppol-reporting.version>
-    <spring-boot.version>3.4.3</spring-boot.version>
+    <spring-boot.version>3.4.4</spring-boot.version>
   </properties>
 
   <!-- Include here to not bloat the global scope -->

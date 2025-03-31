@@ -6,7 +6,7 @@ bin/
 target/
 generated/
 
-private-*.properties
+*.properties
 *.p12
 *.jks
 .idea/

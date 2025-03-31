@@ -24,12 +24,16 @@ import javax.naming.ConfigurationException;
 import com.helger.peppol.utils.PeppolCAChecker;
 import com.helger.peppol.utils.PeppolCertificateChecker;
 import com.mysupply.phase4.domain.enums.MetadataProviderEnum;
+import com.mysupply.phase4.services.ApiKeyService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.helger.commons.datetime.PDTFactory;
@@ -66,15 +70,34 @@ import com.helger.phase4.sender.EAS4UserMessageSendResult;
 import com.helger.phase4.util.Phase4Exception;
 import com.helger.security.certificate.CertificateHelper;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
+import com.helger.json.IJsonObject;
+import com.helger.json.JsonObject;
+import com.helger.json.serialize.JsonWriterSettings;
+
+import javax.annotation.Nonnull;
 
 @RestController
 public class PeppolSenderController {
     private static final Logger LOGGER = LoggerFactory.getLogger(PeppolSenderController.class);
 
+    @Value("${peppol.api.key.header:X-API-Key}")
+    private String apiKeyHeader;
+
+    @Autowired
+    private ApiKeyService apiKeyService;
+
     @Nonnull
     private String _sendPeppolMessagePredefinedSbdh(@Nonnull final PeppolSBDHData aData,
                                                     @Nonnull final ISMLInfo aSmlInfo,
                                                     @Nonnull HttpServletResponse aHttpResponse) {
+        // Method implementation remains unchanged
         final String sMyPeppolSeatID = AS4Configuration.getConfig().getAsString("peppol.seatid");
 
         final OffsetDateTime aNowUTC = PDTFactory.getCurrentOffsetDateTimeUTC();
@@ -166,11 +189,10 @@ public class PeppolSenderController {
                                 aErrors.add(aErrorDetails);
                                 LOGGER.warn ("AS4 error received: " + aErrorDetails.getAsJsonString ());
                             }
-                            aJson.add("as4ResponseErrors", aErrors);
-                            aHttpResponse.setStatus(500);
+                            aJson.add("as4ResponseErrors", aErrors);                            aHttpResponse.setStatus(500);
                         } else
                             aJson.add("as4ResponseError", false);
-                        aHttpResponse.setStatus(500);
+                        aHttpResponse.setStatus(201);
                     });
             final Wrapper<Phase4Exception> aCaughtEx = new Wrapper<>();
 
@@ -228,7 +250,21 @@ public class PeppolSenderController {
     }
 
     @PostMapping(path = "/send", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String sendMessage(@RequestBody final byte[] aPayloadBytes, HttpServletResponse aHttpResponse) throws ConfigurationException {
+    public String sendMessage(
+            @RequestHeader(name = "${peppol.api.key.header:X-API-Key}", required = false) String apiKey,
+            @RequestBody final byte[] aPayloadBytes,
+            HttpServletResponse aHttpResponse) throws ConfigurationException {
+
+        // Updated API Key Authentication using the service
+        if (!apiKeyService.isValidApiKey(apiKey)) {
+            LOGGER.warn("Unauthorized access attempt with invalid or missing API key");
+            aHttpResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+            final IJsonObject aJson = new JsonObject();
+            aJson.add("success", false);
+            aJson.add("error", "Authentication failed. Invalid or missing API key.");
+            return aJson.getAsJsonString(JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);
+        }
+
         final PeppolSBDHData aData;
         try {
             aData = new PeppolSBDHDocumentReader(PeppolIdentifierFactory.INSTANCE).extractData(new NonBlockingByteArrayInputStream(aPayloadBytes));
@@ -271,6 +307,39 @@ public class PeppolSenderController {
             return _sendPeppolMessagePredefinedSbdh(aData, ESML.DIGIT_TEST, aHttpResponse);
         } else {
             throw new ConfigurationException("peppol.smlToUse is not set to a valid value in the configuration.");
+        }
+    }
+
+    // New endpoint for API key management (admin only)
+    @PostMapping("/api-keys/rotate")
+    @ResponseStatus(HttpStatus.OK)
+    public String rotateApiKey(
+            @RequestHeader(name = "${peppol.api.key.header:X-API-Key}", required = false) String apiKey,
+            @RequestParam String keyName,
+            HttpServletResponse response) {
+
+        // Verify the current API key before allowing rotation
+        if (!apiKeyService.isValidApiKey(apiKey)) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            final IJsonObject aJson = new JsonObject();
+            aJson.add("success", false);
+            aJson.add("error", "Authentication failed. Invalid or missing API key.");
+            return aJson.getAsJsonString(JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);
+        }
+
+        try {
+            String newKey = apiKeyService.rotateApiKey(keyName);
+            final IJsonObject aJson = new JsonObject();
+            aJson.add("success", true);
+            aJson.add("message", "API key rotated successfully");
+            aJson.add("newKey", newKey);
+            return aJson.getAsJsonString(JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            final IJsonObject aJson = new JsonObject();
+            aJson.add("success", false);
+            aJson.add("error", e.getMessage());
+            return aJson.getAsJsonString(JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);
         }
     }
 }

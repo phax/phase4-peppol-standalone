@@ -118,6 +118,12 @@
       <artifactId>peppol-reporting</artifactId>
       <version>${peppol-reporting.version}</version>
     </dependency>
+    <!-- TODO Choose any other backend implementation -->
+    <dependency>
+      <groupId>com.helger.peppol</groupId>
+      <artifactId>peppol-reporting-backend-inmemory</artifactId>
+      <version>${peppol-reporting.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>com.sun.xml.bind</groupId>

@@ -36,7 +36,6 @@ import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.phase4.client.IAS4ClientBuildMessageCallback;
-import com.helger.phase4.dump.AS4RawResponseConsumerWriteToFile;
 import com.helger.phase4.model.message.AS4UserMessage;
 import com.helger.phase4.model.message.AbstractAS4Message;
 import com.helger.phase4.peppol.Phase4PeppolSender;
@@ -46,7 +45,6 @@ import com.helger.phase4.peppol.Phase4PeppolSendingReport;
 import com.helger.phase4.peppolstandalone.APConfig;
 import com.helger.phase4.profile.peppol.Phase4PeppolHttpClientSettings;
 import com.helger.phase4.sender.EAS4UserMessageSendResult;
-import com.helger.phase4.sender.IAS4RawResponseConsumer;
 import com.helger.phase4.util.Phase4Exception;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.xml.serialize.read.DOMReader;
@@ -153,9 +151,6 @@ final class PeppolSender
       final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
       // TODO Add AP outbound proxy settings here
 
-      // TODO set to null if your using the dumping
-      final IAS4RawResponseConsumer aRRC = new AS4RawResponseConsumerWriteToFile ();
-
       final PeppolUserMessageBuilder aBuilder = Phase4PeppolSender.builder ()
                                                                   .httpClientFactory (aHCS)
                                                                   .documentTypeID (aDocTypeID)
@@ -167,7 +162,6 @@ final class PeppolSender
                                                                   .payload (aDoc.getDocumentElement ())
                                                                   .peppolAP_CAChecker (aAPCAChecker)
                                                                   .smpClient (aSMPClient)
-                                                                  .rawResponseConsumer (aRRC)
                                                                   .sbdDocumentConsumer (sbd -> {
                                                                     // Remember SBDH Instance
                                                                     // Identifier
@@ -299,16 +293,12 @@ final class PeppolSender
       final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
       // TODO Add AP outbound proxy settings here
 
-      // set to null if your using the dumping
-      final IAS4RawResponseConsumer aRRC = null;
-
       final PeppolUserMessageSBDHBuilder aBuilder = Phase4PeppolSender.sbdhBuilder ()
                                                                       .httpClientFactory (aHCS)
                                                                       .payloadAndMetadata (aData)
                                                                       .senderPartyID (sMyPeppolSeatID)
                                                                       .peppolAP_CAChecker (aAPCAChecker)
                                                                       .smpClient (aSMPClient)
-                                                                      .rawResponseConsumer (aRRC)
                                                                       .endpointURLConsumer (sEndpointUrl -> {
                                                                         // Determined by SMP lookup
                                                                         aSendingReport.setC3EndpointURL (sEndpointUrl);

@@ -255,10 +255,15 @@ public class ServletConfig
   @Scheduled (cron = "0 0 5 2 * *")
   public void sendPeppolReportingMessages ()
   {
-    LOGGER.info ("Running scheduled creation and sending of Peppol Reporting messages");
-    // Use the previous month
-    final YearMonth aYearMonth = YearMonth.now ().minusMonths (1);
-    AppReportingHelper.createAndSendPeppolReports (aYearMonth);
+    if (APConfig.isSchedulePeppolReporting ())
+    {
+      LOGGER.info ("Running scheduled creation and sending of Peppol Reporting messages");
+      // Use the previous month
+      final YearMonth aYearMonth = YearMonth.now ().minusMonths (1);
+      AppReportingHelper.createAndSendPeppolReports (aYearMonth);
+    }
+    else
+      LOGGER.warn ("Creating and sending Peppol Reports is disabled in the configuration");
   }
 
   /**

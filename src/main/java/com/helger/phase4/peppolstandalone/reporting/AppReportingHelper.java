@@ -19,6 +19,7 @@ import com.helger.commons.string.StringHelper;
 import com.helger.commons.timing.StopWatch;
 import com.helger.commons.wrapper.Wrapper;
 import com.helger.peppol.reporting.api.CPeppolReporting;
+import com.helger.peppol.reporting.api.PeppolReportingHelper;
 import com.helger.peppol.reporting.api.PeppolReportingItem;
 import com.helger.peppol.reporting.api.backend.PeppolReportingBackend;
 import com.helger.peppol.reporting.api.backend.PeppolReportingBackendException;
@@ -138,9 +139,14 @@ public final class AppReportingHelper
       final String sSenderID = APConfig.getMyPeppolReportingSenderID ();
       if (StringHelper.hasNoText (sSenderID))
         throw new IllegalStateException ("No Peppol Reporting Sender ID is configured");
+
       // Receiver: production OpenPeppol; test Helger
+      // OpenPeppol doesn't offer this participant ID on test :-/
       final String sReceiverID = eStage.isProduction () ? CPeppolReporting.OPENPEPPOL_PARTICIPANT_ID : "9915:helger";
-      final String sCountryC1 = "DE";
+
+      final String sCountryC1 = APConfig.getMyPeppolCountryCode ();
+      if (!PeppolReportingHelper.isValidCountryCode (sCountryC1))
+        throw new IllegalStateException ("Invalid country code of Peppol owner is defined: '" + sCountryC1 + "'");
 
       // Returns the sending report
       final Phase4PeppolSendingReport aSendingReport = PeppolSender.sendPeppolMessageCreatingSbdh (eSML,

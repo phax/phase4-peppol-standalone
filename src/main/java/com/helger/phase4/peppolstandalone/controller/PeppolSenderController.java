@@ -30,17 +30,16 @@ import com.helger.commons.string.StringHelper;
 import com.helger.peppol.sbdh.PeppolSBDHData;
 import com.helger.peppol.sbdh.PeppolSBDHDataReadException;
 import com.helger.peppol.sbdh.PeppolSBDHDataReader;
+import com.helger.peppol.security.PeppolTrustedCA;
 import com.helger.peppol.servicedomain.EPeppolNetwork;
 import com.helger.peppol.sml.ESML;
-import com.helger.peppol.utils.PeppolCAChecker;
-import com.helger.peppol.utils.PeppolCertificateChecker;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.phase4.peppol.Phase4PeppolSendingReport;
 import com.helger.phase4.peppolstandalone.APConfig;
+import com.helger.security.certificate.TrustedCAChecker;
 
 /**
- * This is the primary REST controller for the APIs to send messages over
- * Peppol.
+ * This is the primary REST controller for the APIs to send messages over Peppol.
  *
  * @author Philip Helger
  */
@@ -73,8 +72,8 @@ public class PeppolSenderController
 
     final EPeppolNetwork eStage = APConfig.getPeppolStage ();
     final ESML eSML = eStage.isProduction () ? ESML.DIGIT_PRODUCTION : ESML.DIGIT_TEST;
-    final PeppolCAChecker aAPCA = eStage.isProduction () ? PeppolCertificateChecker.peppolProductionAP ()
-                                                         : PeppolCertificateChecker.peppolTestAP ();
+    final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP () : PeppolTrustedCA
+                                                                                                                   .peppolTestAP ();
     LOGGER.info ("Trying to send Peppol " +
                  eStage.name () +
                  " message from '" +
@@ -118,8 +117,8 @@ public class PeppolSenderController
 
     final EPeppolNetwork eStage = APConfig.getPeppolStage ();
     final ESML eSML = eStage.isProduction () ? ESML.DIGIT_PRODUCTION : ESML.DIGIT_TEST;
-    final PeppolCAChecker aAPCA = eStage.isProduction () ? PeppolCertificateChecker.peppolProductionAP ()
-                                                         : PeppolCertificateChecker.peppolTestAP ();
+    final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP () : PeppolTrustedCA
+                                                                                                                   .peppolTestAP ();
     final Phase4PeppolSendingReport aSendingReport = new Phase4PeppolSendingReport (eSML);
 
     final PeppolSBDHData aData;

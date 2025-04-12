@@ -36,10 +36,8 @@ import com.helger.commons.state.ETriState;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.URLHelper;
 import com.helger.httpclient.HttpDebugger;
+import com.helger.peppol.security.PeppolTrustedCA;
 import com.helger.peppol.servicedomain.EPeppolNetwork;
-import com.helger.peppol.utils.EPeppolCertificateCheckResult;
-import com.helger.peppol.utils.PeppolCAChecker;
-import com.helger.peppol.utils.PeppolCertificateChecker;
 import com.helger.phase4.config.AS4Configuration;
 import com.helger.phase4.crypto.AS4CryptoFactoryConfiguration;
 import com.helger.phase4.crypto.AS4CryptoFactoryInMemoryKeyStore;
@@ -56,6 +54,8 @@ import com.helger.phase4.profile.peppol.AS4PeppolProfileRegistarSPI;
 import com.helger.phase4.profile.peppol.PeppolCRLDownloader;
 import com.helger.phase4.profile.peppol.Phase4PeppolHttpClientSettings;
 import com.helger.photon.io.WebFileIO;
+import com.helger.security.certificate.ECertificateCheckResult;
+import com.helger.security.certificate.TrustedCAChecker;
 import com.helger.servlet.ServletHelper;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.web.scope.mgr.WebScopeManager;
@@ -71,8 +71,7 @@ public class ServletConfig
   private static final Logger LOGGER = LoggerFactory.getLogger (ServletConfig.class);
 
   /**
-   * This method is a placeholder for retrieving a custom
-   * {@link IAS4CryptoFactory}.
+   * This method is a placeholder for retrieving a custom {@link IAS4CryptoFactory}.
    *
    * @return the {@link IAS4CryptoFactory} to use. May not be <code>null</code>.
    */
@@ -125,8 +124,8 @@ public class ServletConfig
     HttpDebugger.setEnabled (false);
 
     // Sanity check
-    if (CommandMap.getDefaultCommandMap ()
-                  .createDataContentHandler (CMimeType.MULTIPART_RELATED.getAsString ()) == null)
+    if (CommandMap.getDefaultCommandMap ().createDataContentHandler (CMimeType.MULTIPART_RELATED.getAsString ()) ==
+        null)
     {
       throw new IllegalStateException ("No DataContentHandler for MIME Type '" +
                                        CMimeType.MULTIPART_RELATED.getAsString () +
@@ -197,17 +196,17 @@ public class ServletConfig
     final X509Certificate aAPCert = (X509Certificate) aPKE.getCertificate ();
 
     // Note: For eB2B you want to check against the eB2B CA instead
-    final PeppolCAChecker aAPCAChecker = eStage.isProduction () ? PeppolCertificateChecker.peppolProductionAP ()
-                                                                : PeppolCertificateChecker.peppolTestAP ();
+    final TrustedCAChecker aAPCAChecker = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP ()
+                                                                 : PeppolTrustedCA.peppolTestAP ();
 
     // Check the configured Peppol AP certificate
     // * No caching
     // * Use global certificate check mode
-    final EPeppolCertificateCheckResult eCheckResult = aAPCAChecker.checkCertificate (aAPCert,
-                                                                                      MetaAS4Manager.getTimestampMgr ()
-                                                                                                    .getCurrentDateTime (),
-                                                                                      ETriState.FALSE,
-                                                                                      null);
+    final ECertificateCheckResult eCheckResult = aAPCAChecker.checkCertificate (aAPCert,
+                                                                                MetaAS4Manager.getTimestampMgr ()
+                                                                                              .getCurrentDateTime (),
+                                                                                ETriState.FALSE,
+                                                                                null);
     if (eCheckResult.isInvalid ())
     {
       // TODO Change from "true" to "false" once you have a Peppol
@@ -250,8 +249,7 @@ public class ServletConfig
   }
 
   /**
-   * Special class that is only present to have a graceful shutdown. The the
-   * bean method below.
+   * Special class that is only present to have a graceful shutdown. The the bean method below.
    *
    * @author Philip Helger
    */

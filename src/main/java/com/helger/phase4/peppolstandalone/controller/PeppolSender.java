@@ -29,7 +29,6 @@ import com.helger.commons.timing.StopWatch;
 import com.helger.commons.wrapper.Wrapper;
 import com.helger.peppol.sbdh.PeppolSBDHData;
 import com.helger.peppol.sml.ISMLInfo;
-import com.helger.peppol.utils.PeppolCAChecker;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
@@ -47,6 +46,7 @@ import com.helger.phase4.peppolstandalone.APConfig;
 import com.helger.phase4.profile.peppol.Phase4PeppolHttpClientSettings;
 import com.helger.phase4.sender.EAS4UserMessageSendResult;
 import com.helger.phase4.util.Phase4Exception;
+import com.helger.security.certificate.TrustedCAChecker;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.xml.serialize.read.DOMReader;
 
@@ -87,7 +87,7 @@ final class PeppolSender
    */
   @Nonnull
   static Phase4PeppolSendingReport sendPeppolMessageCreatingSbdh (@Nonnull final ISMLInfo aSmlInfo,
-                                                                  @Nonnull final PeppolCAChecker aAPCAChecker,
+                                                                  @Nonnull final TrustedCAChecker aAPCAChecker,
                                                                   @Nonnull final byte [] aPayloadBytes,
                                                                   @Nonnull @Nonempty final String sSenderID,
                                                                   @Nonnull @Nonempty final String sReceiverID,
@@ -263,7 +263,7 @@ final class PeppolSender
    */
   static void sendPeppolMessagePredefinedSbdh (@Nonnull final PeppolSBDHData aData,
                                                @Nonnull final ISMLInfo aSmlInfo,
-                                               @Nonnull final PeppolCAChecker aAPCAChecker,
+                                               @Nonnull final TrustedCAChecker aAPCAChecker,
                                                @Nonnull final Phase4PeppolSendingReport aSendingReport)
   {
     final String sMyPeppolSeatID = APConfig.getMyPeppolSeatID ();

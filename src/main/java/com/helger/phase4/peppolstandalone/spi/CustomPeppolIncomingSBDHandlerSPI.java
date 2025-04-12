@@ -29,7 +29,6 @@ import com.helger.peppol.reporting.api.PeppolReportingItem;
 import com.helger.peppol.reporting.api.backend.PeppolReportingBackend;
 import com.helger.peppol.reporting.api.backend.PeppolReportingBackendException;
 import com.helger.peppol.sbdh.PeppolSBDHData;
-import com.helger.peppol.utils.PeppolCertificateHelper;
 import com.helger.phase4.ebms3header.Ebms3Error;
 import com.helger.phase4.ebms3header.Ebms3UserMessage;
 import com.helger.phase4.incoming.IAS4IncomingMessageMetadata;
@@ -37,6 +36,7 @@ import com.helger.phase4.incoming.IAS4IncomingMessageState;
 import com.helger.phase4.peppol.servlet.IPhase4PeppolIncomingSBDHandlerSPI;
 import com.helger.phase4.peppol.servlet.Phase4PeppolServletMessageProcessorSPI;
 import com.helger.phase4.peppolstandalone.APConfig;
+import com.helger.security.certificate.CertificateHelper;
 
 /**
  * This is a way of handling incoming Peppol messages
@@ -62,7 +62,7 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
     // Example code snippets how to get data
     LOGGER.info ("Received a new Peppol Message");
     LOGGER.info ("  C1 = " + aPeppolSBD.getSenderAsIdentifier ().getURIEncoded ());
-    LOGGER.info ("  C2 = " + PeppolCertificateHelper.getSubjectCN (aIncomingState.getSigningCertificate ()));
+    LOGGER.info ("  C2 = " + CertificateHelper.getSubjectCN (aIncomingState.getSigningCertificate ()));
     LOGGER.info ("  C3 = " + sMyPeppolSeatID);
     LOGGER.info ("  C4 = " + aPeppolSBD.getReceiverAsIdentifier ().getURIEncoded ());
     LOGGER.info ("  DocType = " + aPeppolSBD.getDocumentTypeAsIdentifier ().getURIEncoded ());

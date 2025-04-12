@@ -19,6 +19,7 @@ package com.helger.phase4.peppolstandalone.servlet;
 import java.io.File;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
+import java.time.YearMonth;
 
 import javax.annotation.Nonnull;
 
@@ -28,6 +29,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.exception.InitializationException;
@@ -50,6 +52,7 @@ import com.helger.phase4.incoming.mgr.AS4ProfileSelector;
 import com.helger.phase4.mgr.MetaAS4Manager;
 import com.helger.phase4.peppol.servlet.Phase4PeppolDefaultReceiverConfiguration;
 import com.helger.phase4.peppolstandalone.APConfig;
+import com.helger.phase4.peppolstandalone.reporting.AppReportingHelper;
 import com.helger.phase4.profile.peppol.AS4PeppolProfileRegistarSPI;
 import com.helger.phase4.profile.peppol.PeppolCRLDownloader;
 import com.helger.phase4.profile.peppol.Phase4PeppolHttpClientSettings;
@@ -246,6 +249,16 @@ public class ServletConfig
       Phase4PeppolDefaultReceiverConfiguration.setReceiverCheckEnabled (false);
       LOGGER.warn ("phase4 Peppol receiver checks are disabled");
     }
+  }
+
+  // At 05:00 AM, on day 2 of the month
+  @Scheduled (cron = "0 0 5 2 * *")
+  public void sendPeppolReportingMessages ()
+  {
+    LOGGER.info ("Running scheduled creation and sending of Peppol Reporting messages");
+    // Use the previous month
+    final YearMonth aYearMonth = YearMonth.now ().minusMonths (1);
+    AppReportingHelper.createAndSendPeppolReports (aYearMonth);
   }
 
   /**

@@ -57,7 +57,7 @@ import com.helger.xml.serialize.read.DOMReader;
  * @author Philip Helger
  */
 @Immutable
-final class PeppolSender
+public final class PeppolSender
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (PeppolSender.class);
 
@@ -86,14 +86,14 @@ final class PeppolSender
    * @return The created sending report and never <code>null</code>.
    */
   @Nonnull
-  static Phase4PeppolSendingReport sendPeppolMessageCreatingSbdh (@Nonnull final ISMLInfo aSmlInfo,
-                                                                  @Nonnull final TrustedCAChecker aAPCAChecker,
-                                                                  @Nonnull final byte [] aPayloadBytes,
-                                                                  @Nonnull @Nonempty final String sSenderID,
-                                                                  @Nonnull @Nonempty final String sReceiverID,
-                                                                  @Nonnull @Nonempty final String sDocTypeID,
-                                                                  @Nonnull @Nonempty final String sProcessID,
-                                                                  @Nonnull @Nonempty final String sCountryCodeC1)
+  public static Phase4PeppolSendingReport sendPeppolMessageCreatingSbdh (@Nonnull final ISMLInfo aSmlInfo,
+                                                                         @Nonnull final TrustedCAChecker aAPCAChecker,
+                                                                         @Nonnull final byte [] aPayloadBytes,
+                                                                         @Nonnull @Nonempty final String sSenderID,
+                                                                         @Nonnull @Nonempty final String sReceiverID,
+                                                                         @Nonnull @Nonempty final String sDocTypeID,
+                                                                         @Nonnull @Nonempty final String sProcessID,
+                                                                         @Nonnull @Nonempty final String sCountryCodeC1)
   {
     final IIdentifierFactory aIF = PeppolIdentifierFactory.INSTANCE;
     final String sMyPeppolSeatID = APConfig.getMyPeppolSeatID ();

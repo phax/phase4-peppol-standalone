@@ -49,17 +49,24 @@ Test call using the file `src\test\resources\external\example-invoice.xml` as th
 
 **Note:** Documents are NOT validated internally. They need to be validated externally. See https://github.com/phax/phive and https://github.com/phax/phive-rules for this.
 
-## Peppol Reporting API
+## Peppol Reporting
 
-Was added on 2025-02-16 as an example.
+Was added on 2025-02-16 as an example. On 2025-04-12 extended with the `do-peppol-reporting` API and the automatic scheduling.
 
-Via `GET` on `/create-tsr/{year}/{month}` a Peppol Reporting Transaction Statistics Report (TSR) can be created.
+By default every 2nd of the month, at 5:00am the scheduled job to create, validate, store and send the Peppol Reports is executed. The 2nd was chosen to definitively not run in timezone issues. 
+
+Via `GET` on `/create-tsr/{year}/{month}` a Peppol Reporting Transaction Statistics Report (TSR) will be created. This does not validate or send the report.
 The `year` parameter must be &ge; 2024 and the `month` parameter must be between `1` and `12`.
 The response is a TSR XML in UTF-8 encoding. 
 
-Via `GET` on `/create-eusr/{year}/{month}` a Peppol Reporting End User Statistics Report (EUSR) can be created.
+Via `GET` on `/create-eusr/{year}/{month}` a Peppol Reporting End User Statistics Report (EUSR) will be created. This does not validate or send the report.
 The `year` parameter must be &ge; 2024 and the `month` parameter must be between `1` and `12`.
 The response is an EUSR XML in UTF-8 encoding. 
+
+Via `GET` on `/do-peppol-reporting/{year}/{month}` it will create TSR and EUSR reports, validate them, store them, send them to OpenPeppol and stores the sending reports of those.
+The `year` parameter must be &ge; 2024 and the `month` parameter must be between `1` and `12`.
+The response is a constant text showing that it was done.
+
 
 ## What is not included
 
@@ -71,6 +78,7 @@ The following list contains the elements not considered for this demo applicatio
 * Peppol Reporting is not included, as no reporting backend is present.
     * You can pick one from https://github.com/phax/peppol-reporting to add to your `pom.xml`
     * The calls for storing Peppol Reporting information is part of the code, but disabled by default, as relevant parameters cannot automatically be determined
+    * The default storage of Peppol Reports is the file system - you may choose something else here as well (SQL, MongoDB etc.)
 
 # Get it up and running
 

@@ -77,4 +77,10 @@ public final class APConfig
     return getConfig ().getAsBoolean ("peppol.pfuoi430",
                                       PDTFactory.getCurrentLocalDate ().isAfter (LAST_DATE_PFUOI420));
   }
+
+  @Nullable
+  public static String getMyPeppolReportingSenderID ()
+  {
+    return getConfig ().getAsString ("peppol.reporting.senderid");
+  }
 }

@@ -58,7 +58,8 @@
 
   <properties>
     <junit5.version>5.11.4</junit5.version>
-    <peppol-reporting.version>3.0.3</peppol-reporting.version>
+    <peppol-ap-support.version>1.0.1</peppol-ap-support.version>
+    <peppol-reporting.version>3.1.0</peppol-reporting.version>
     <spring-boot.version>3.4.4</spring-boot.version>
   </properties>
 
@@ -123,6 +124,11 @@
       <groupId>com.helger.peppol</groupId>
       <artifactId>peppol-reporting-backend-inmemory</artifactId>
       <version>${peppol-reporting.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.helger.peppol</groupId>
+      <artifactId>peppol-reporting-support</artifactId>
+      <version>${peppol-ap-support.version}</version>
     </dependency>
 
     <dependency>

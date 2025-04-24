@@ -16,9 +16,6 @@
  */
 package com.helger.phase4.peppolstandalone;
 
-import java.time.LocalDate;
-import java.time.Month;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
@@ -27,13 +24,11 @@ import com.helger.commons.datetime.PDTFactory;
 import com.helger.config.fallback.IConfigWithFallback;
 import com.helger.peppol.servicedomain.EPeppolNetwork;
 import com.helger.phase4.config.AS4Configuration;
+import com.helger.smpclient.peppol.Pfuoi420;
 
 @Immutable
 public final class APConfig
 {
-  // TODO use Pfuoi420 date from 3.0.7 on
-  private static final LocalDate LAST_DATE_PFUOI420 = PDTFactory.createLocalDate (2025, Month.MAY, 14);
-
   private APConfig ()
   {}
 
@@ -73,9 +68,9 @@ public final class APConfig
 
   public static boolean isUsePFUOI430 ()
   {
-    // Mandatory per May 15th only
+    // Mandatory per May 15th 2025 only
     return getConfig ().getAsBoolean ("peppol.pfuoi430",
-                                      PDTFactory.getCurrentLocalDate ().isAfter (LAST_DATE_PFUOI420));
+                                      PDTFactory.getCurrentLocalDate ().isAfter (Pfuoi420.VALID_UNTIL));
   }
 
   @Nullable

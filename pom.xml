@@ -60,7 +60,7 @@
     <junit5.version>5.11.4</junit5.version>
     <peppol-ap-support.version>1.0.1</peppol-ap-support.version>
     <peppol-reporting.version>3.1.0</peppol-reporting.version>
-    <spring-boot.version>3.4.4</spring-boot.version>
+    <spring-boot.version>3.4.5</spring-boot.version>
   </properties>
 
   <!-- Include here to not bloat the global scope -->

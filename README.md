@@ -84,3 +84,87 @@ In case you don't like port 8080, also check the configuration file.
 
 My personal [Coding Styleguide](https://github.com/phax/meta/blob/master/CodingStyleguide.md) |
 It is appreciated if you star the GitHub project if you like it.
+
+# API Key Authentication and Rotation Documentation (mySupply custom logic)
+
+## Overview
+This document outlines the modifications made to implement API key authentication and rotation for the `/send` endpoint. These changes enhance security by requiring valid API keys for access and providing a mechanism to rotate keys if compromised.
+
+## Key Features
+1. **API Key Authentication**: All requests to `/send` must include a valid API key.
+2. **Key Rotation**: Admins can generate new API keys via `/api-keys/rotate` to revoke compromised keys.
+3. **Secure Key Generation**: Keys are cryptographically secure and stored hashed (assumed; code shows plain storage).
+
+## Authentication Header Configuration
+* **Header Name**: Configurable via `peppol.api.key.header` (default: `X-API-Key`).
+* **Example Request**:
+```http
+POST /send HTTP/1.1
+X-API-Key: YOUR_API_KEY_HERE
+Content-Type: application/json
+
+[Binary Payload]
+```
+
+## Endpoints
+
+### 1. Send Message (`POST /send`)
+**Authentication**: Requires valid API key in header.
+**Response**:
+* `401 Unauthorized` if key is invalid/missing.
+* `200 OK` with success/failure details.
+
+**Example Error**:
+```json
+{
+  "success": false,
+  "error": "Authentication failed. Invalid or missing API key."
+}
+```
+
+### 2. Rotate API Key (`POST /api-keys/rotate`) *Admin Only*
+Generates a new API key, invalidating the old one.
+
+**Parameters**:
+* `keyName`: Name of the key to rotate (e.g., `peppol.api.key`).
+* Requires valid API key in header for authorization.
+
+**Example Request**:
+```http
+POST /api-keys/rotate?keyName=peppol.api.key HTTP/1.1
+X-API-Key: CURRENT_ADMIN_KEY
+```
+
+**Success Response**:
+```json
+{
+  "success": true,
+  "message": "API key rotated successfully",
+  "newKey": "NEW_SECURE_KEY_VALUE"
+}
+```
+
+**Failure Cases**:
+* `401 Unauthorized`: Invalid/missing API key.
+* `400 Bad Request`: Key not found or rotation error.
+
+## Security Details
+
+### Key Generation
+* **Method**: Uses `SecureRandom` with 512-bit entropy, Base64URL-encoded.
+* **Storage**: Keys are stored in the `api_keys` table with timestamps (`created_at`, `last_used`).
+
+### Validation Flow
+1. Extract API key from the header.
+2. Check against the database; update `last_used` on success.
+3. Reject requests with invalid/missing keys.
+
+## Database Schema (`api_keys` Table)
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | BIGINT (PK) | Auto-incremented ID |
+| `key_name` | VARCHAR | Key identifier (e.g., `peppol.api.key`) |
+| `key_value` | VARCHAR | API key value |
+| `created_at` | DATETIME | Creation timestamp |
+| `last_used` | DATETIME | Last successful usage timestamp |

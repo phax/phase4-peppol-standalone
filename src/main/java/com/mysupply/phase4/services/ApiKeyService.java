@@ -33,7 +33,7 @@ public class ApiKeyService {
             return false;
         }
 
-        Optional<ApiKey> storedKey = apiKeyRepository.findByKeyNameAndKeyValue("peppol.api.key", apiKey);
+        Optional<ApiKey> storedKey = apiKeyRepository.findByKeyValue(apiKey);
 
         if (storedKey.isPresent()) {
             // Update last used timestamp

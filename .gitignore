@@ -10,3 +10,4 @@ generated/
 *.p12
 *.jks
 .idea/
+/src/main/java/com/helger/phase4/peppolstandalone/

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-204 Philip Helger (www.helger.com)
+ * Copyright (C) 2023-2025 Philip Helger (www.helger.com)
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,15 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mysupply.phase4.domain.enums;
+package com.mysupply.phase4.peppolstandalone.controller;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- * Defines the stage of the application.
+ * REST Controller exception mapping to HTTP 500 (Internal Server Error)
  *
  * @author Philip Helger
  */
-public enum EStageType
+@ResponseStatus (HttpStatus.INTERNAL_SERVER_ERROR)
+public class HttpInternalServerErrorException extends RuntimeException
 {
-  TEST,
-  PRODUCTION;
+  public HttpInternalServerErrorException (final String sMsg)
+  {
+    super (sMsg);
+  }
 }

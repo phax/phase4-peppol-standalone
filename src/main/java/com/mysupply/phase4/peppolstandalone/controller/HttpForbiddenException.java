@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-204 Philip Helger (www.helger.com)
+ * Copyright (C) 2023-2025 Philip Helger (www.helger.com)
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,21 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mysupply.phase4.peppolstandalone;
+package com.mysupply.phase4.peppolstandalone.controller;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Import(TestDataSourceConfiguration.class) // Import the test configuration
-class Phase4PeppolStandaloneApplicationTests
+/**
+ * REST Controller exception mapping to HTTP 403 (Forbidden)
+ *
+ * @author Philip Helger
+ */
+@ResponseStatus (HttpStatus.FORBIDDEN)
+public class HttpForbiddenException extends RuntimeException
 {
-  @Test
-  void testContextLoads ()
+  public HttpForbiddenException ()
+  {}
+
+  public HttpForbiddenException (final String sMsg)
   {
-    // Just test if the application context starts
+    super (sMsg);
   }
 }

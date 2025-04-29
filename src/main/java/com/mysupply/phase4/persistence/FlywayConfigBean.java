@@ -3,6 +3,7 @@ package com.mysupply.phase4.persistence;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.MigrationInfo;
 import org.flywaydb.core.api.MigrationInfoService;
+import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,31 +17,31 @@ public class FlywayConfigBean {
     @Autowired
     private Environment env;
 
-    @Autowired
-    private ApplicationArguments args;
+//    @Autowired
+//    private ApplicationArguments args;
     private static final Logger LOGGER = LoggerFactory.getLogger(FlywayConfigBean.class);
+    private static final String baseConfigurationPath = "peppol.documents.jdbc.";
 
     @Bean
     public Flyway flyway() {
-        String dbUrl = this.env.getProperty("spring.datasource.url");
-        String dbUsername = this.env.getProperty("spring.datasource.username");
-        String password = this.env.getProperty("spring.datasource.password");
-        String locations = this.env.getProperty("spring.flyway.locations");
+        String dbUrl = this.env.getRequiredProperty(baseConfigurationPath + "url");
+        String dbUsername = this.env.getRequiredProperty(baseConfigurationPath + "username");
+        String dbPassword = this.env.getRequiredProperty(baseConfigurationPath + "password");
+        String locations = this.env.getRequiredProperty(baseConfigurationPath + "locations");
+        String driver = this.env.getRequiredProperty(baseConfigurationPath + "driver");
 
-        Flyway flyway = Flyway.configure()
-                .dataSource(dbUrl, dbUsername, password)
+        FluentConfiguration flywayConfiguration = Flyway.configure();
+        flywayConfiguration
+                .dataSource(dbUrl, dbUsername, dbPassword)
+                .driver(driver)
                 .locations(locations)
-                .load();
+                .schemas(DocumentConstants.DOCUMENT_SCHEMA_NAME)
+                .createSchemas(true); //we have to create the custom schema or the DocumentRepository entities will break
 
-        String[] args = this.args.getSourceArgs();
-        for(String arg : args) {
-            if(arg.equalsIgnoreCase("migrate")) {
+        Flyway flyway = flywayConfiguration.load();
                 this.printMigrationInfo(flyway);
                 flyway.migrate();
                 LOGGER.info("Migrations applied (if any), exiting application.");
-                System.exit(0);
-            }
-        }
 
         return flyway;
     }

@@ -21,17 +21,19 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @ComponentScan(basePackages = "com.mysupply.phase4")
 @ComponentScan("com.helger")
 @ComponentScan("com.mysupply.phase4.peppolstandalone.spi")
-@EnableJpaRepositories(basePackages = "com.mysupply.phase4.persistence")
-@EntityScan(basePackages = {"com.mysupply.phase4.domain", "com.mysupply.phase4.models"})
+@EnableJpaRepositories(basePackages = {"com.mysupply.phase4.persistence"})
+@EntityScan(basePackages = {"com.mysupply.phase4.domain"})
 @SpringBootApplication
+@EnableScheduling
 public class Phase4PeppolStandaloneApplication
 {
-  public static void main(final String [] args)
+  public static void main (final String [] args)
   {
-    SpringApplication.run(Phase4PeppolStandaloneApplication.class, args);
+    SpringApplication.run (Phase4PeppolStandaloneApplication.class, args);
   }
 }

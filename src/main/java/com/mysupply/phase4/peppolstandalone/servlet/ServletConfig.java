@@ -22,7 +22,13 @@ import java.security.cert.X509Certificate;
 
 import javax.annotation.Nonnull;
 
-import com.helger.peppol.utils.PeppolCAChecker;
+//import com.helger.peppol.utils.PeppolCAChecker;
+//import com.helger.peppol.utils.EPeppolCertificateCheckResult;
+import com.helger.peppol.security.PeppolTrustedCA;
+//import com.helger.peppol.utils.PeppolCAChecker;
+//import com.helger.peppol.utils.PeppolCertificateChecker;
+import com.helger.security.certificate.ECertificateCheckResult;
+import com.helger.security.certificate.TrustedCAChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -37,8 +43,8 @@ import com.helger.commons.state.ETriState;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.URLHelper;
 import com.helger.httpclient.HttpDebugger;
-import com.helger.peppol.utils.EPeppolCertificateCheckResult;
-import com.helger.peppol.utils.PeppolCertificateChecker;
+//import com.helger.peppol.utils.EPeppolCertificateCheckResult;
+//import com.helger.peppol.utils.PeppolCertificateChecker;
 import com.helger.phase4.config.AS4Configuration;
 import com.helger.phase4.crypto.AS4CryptoFactoryConfiguration;
 import com.helger.phase4.crypto.IAS4CryptoFactory;
@@ -218,32 +224,32 @@ public class ServletConfig {
     }
 
     private static void performCertificateValidation(X509Certificate aAPCert) throws InitializationException {
-        PeppolCAChecker testAPChecker = PeppolCertificateChecker.peppolTestAP();
-        EPeppolCertificateCheckResult testCertificateCheckResult = testAPChecker
+        TrustedCAChecker testAPChecker = PeppolTrustedCA.peppolTestAP();
+        ECertificateCheckResult testCertificateCheckResult = testAPChecker
                 .checkCertificate(aAPCert,
                         MetaAS4Manager.getTimestampMgr()
                                 .getCurrentDateTime(),
                         ETriState.FALSE,
                         null);
 
-        PeppolCAChecker testEb2bAPChecker = PeppolCertificateChecker.peppolTestEb2bAP();
-        EPeppolCertificateCheckResult eB2BCertificateCheckResult = testEb2bAPChecker
+        TrustedCAChecker testEb2bAPChecker = PeppolTrustedCA.peppolTestEb2bAP();
+        ECertificateCheckResult eB2BCertificateCheckResult = testEb2bAPChecker
                 .checkCertificate(aAPCert,
                         MetaAS4Manager.getTimestampMgr()
                                 .getCurrentDateTime(),
                         ETriState.FALSE,
                         null);
 
-        PeppolCAChecker prodAPChecker = PeppolCertificateChecker.peppolProductionAP();
-        EPeppolCertificateCheckResult prodCertificateCheckResult = prodAPChecker
+        TrustedCAChecker prodAPChecker = PeppolTrustedCA.peppolProductionAP();
+        ECertificateCheckResult prodCertificateCheckResult = prodAPChecker
                 .checkCertificate(aAPCert,
                         MetaAS4Manager.getTimestampMgr()
                                 .getCurrentDateTime(),
                         ETriState.FALSE,
                         null);
 
-        PeppolCAChecker allAPChecker = PeppolCertificateChecker.peppolAllAP();
-        EPeppolCertificateCheckResult allAPCertificateCheckResult = allAPChecker
+        TrustedCAChecker allAPChecker = PeppolTrustedCA.peppolAllAP();
+        ECertificateCheckResult allAPCertificateCheckResult = allAPChecker
                 .checkCertificate(aAPCert,
                         MetaAS4Manager.getTimestampMgr()
                                 .getCurrentDateTime(),

@@ -21,10 +21,17 @@ import java.time.OffsetDateTime;
 import javax.annotation.Nonnull;
 import javax.naming.ConfigurationException;
 
-import com.helger.peppol.utils.PeppolCAChecker;
-import com.helger.peppol.utils.PeppolCertificateChecker;
-import com.mysupply.phase4.domain.enums.MetadataProviderEnum;
-import com.mysupply.phase4.services.ApiKeyService;
+import com.helger.commons.string.StringHelper;
+import com.helger.peppol.sbdh.PeppolSBDHDataReadException;
+import com.helger.peppol.sbdh.PeppolSBDHDataReader;
+import com.helger.peppol.security.PeppolTrustedCA;
+import com.helger.peppol.servicedomain.EPeppolNetwork;
+//import com.helger.peppol.utils.PeppolCAChecker;
+//import com.helger.peppol.utils.PeppolCertificateChecker;
+import com.helger.phase4.peppol.Phase4PeppolSendingReport;
+import com.helger.security.certificate.TrustedCAChecker;
+//import com.mysupply.phase4.domain.enums.MetadataProviderEnum;
+import com.mysupply.phase4.peppolstandalone.APConfig;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,11 +56,11 @@ import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
 import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.peppol.sbdh.PeppolSBDHData;
-import com.helger.peppol.sbdh.read.PeppolSBDHDocumentReadException;
-import com.helger.peppol.sbdh.read.PeppolSBDHDocumentReader;
+//import com.helger.peppol.sbdh.read.PeppolSBDHDocumentReadException;
+//import com.helger.peppol.sbdh.read.PeppolSBDHDocumentReader;
 import com.helger.peppol.sml.ESML;
 import com.helger.peppol.sml.ISMLInfo;
-import com.helger.peppol.utils.PeppolCertificateHelper;
+//import com.helger.peppol.utils.PeppolCertificateHelper;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.phase4.client.IAS4ClientBuildMessageCallback;
@@ -85,13 +92,9 @@ import javax.annotation.Nonnull;
 
 @RestController
 public class PeppolSenderController {
+    static final String HEADER_X_TOKEN = "X-Token";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(PeppolSenderController.class);
-
-    @Value("${peppol.api.key.header:X-API-Key}")
-    private String apiKeyHeader;
-
-    @Autowired
-    private ApiKeyService apiKeyService;
 
     @Nonnull
     private String _sendPeppolMessagePredefinedSbdh(@Nonnull final PeppolSBDHData aData,
@@ -145,7 +148,7 @@ public class PeppolSenderController {
                         // Determined by SMP lookup
                         aJson.add("c3Cert", CertificateHelper.getPEMEncodedCertificate(aAPCertificate));
                         aJson.add("c3CertSubjectCN",
-                                PeppolCertificateHelper.getSubjectCN(aAPCertificate));
+                                CertificateHelper.getSubjectCN(aAPCertificate));
                         aJson.add("c3CertCheckDT", PDTWebDateHelper.getAsStringXSD(aCheckDT));
                         aJson.add("c3CertCheckResult", eCertCheckResult);
                     })
@@ -196,15 +199,15 @@ public class PeppolSenderController {
                     });
             final Wrapper<Phase4Exception> aCaughtEx = new Wrapper<>();
 
-            boolean isEB2B = AS4Configuration.getConfig().getAsBoolean("peppol.isEB2B");
-            if(isEB2B) {
+//            boolean isEB2B = AS4Configuration.getConfig().getAsBoolean("peppol.isEB2B");
+//            if(isEB2B) {
+//                eResult = aBuilder
+//                        .peppolAP_CAChecker(PeppolCertificateChecker.peppolTestEb2bAP ()) // Needed for EB2B support
+//                        .sendMessageAndCheckForReceipt(aCaughtEx::set);
+//            } else {
                 eResult = aBuilder
-                        .peppolAP_CAChecker(PeppolCertificateChecker.peppolTestEb2bAP ()) // Needed for EB2B support
                         .sendMessageAndCheckForReceipt(aCaughtEx::set);
-            } else {
-                eResult = aBuilder
-                        .sendMessageAndCheckForReceipt(aCaughtEx::set);
-            }
+//            }
 
 
             LOGGER.info("Peppol client send result: " + eResult);
@@ -250,96 +253,118 @@ public class PeppolSenderController {
     }
 
     @PostMapping(path = "/send", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String sendMessage(
-            @RequestHeader(name = "${peppol.api.key.header:X-API-Key}", required = false) String apiKey,
-            @RequestBody final byte[] aPayloadBytes,
-            HttpServletResponse aHttpResponse) throws ConfigurationException {
-
-        // Updated API Key Authentication using the service
-        if (!apiKeyService.isValidApiKey(apiKey)) {
-            LOGGER.warn("Unauthorized access attempt with invalid or missing API key");
-            aHttpResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
-            final IJsonObject aJson = new JsonObject();
-            aJson.add("success", false);
-            aJson.add("error", "Authentication failed. Invalid or missing API key.");
-            return aJson.getAsJsonString(JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);
+    public String sendPeppolSbdhMessage (@RequestHeader (name = HEADER_X_TOKEN, required = true) final String xtoken,
+                                         @RequestBody final byte [] aPayloadBytes)
+    {
+        if (StringHelper.hasNoText (xtoken))
+        {
+            LOGGER.error ("The specific token header is missing");
+            throw new HttpForbiddenException ();
         }
+        if (!xtoken.equals (APConfig.getPhase4ApiRequiredToken ()))
+        {
+            LOGGER.error ("The specified token value does not match the configured required token");
+            throw new HttpForbiddenException ();
+        }
+
+        final EPeppolNetwork eStage = APConfig.getPeppolStage ();
+        final ESML eSML = eStage.isProduction () ? ESML.DIGIT_PRODUCTION : ESML.DIGIT_TEST;
+        final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP () : PeppolTrustedCA
+                .peppolTestAP ();
+        final Phase4PeppolSendingReport aSendingReport = new Phase4PeppolSendingReport (eSML);
 
         final PeppolSBDHData aData;
-        try {
-            aData = new PeppolSBDHDocumentReader(PeppolIdentifierFactory.INSTANCE).extractData(new NonBlockingByteArrayInputStream(aPayloadBytes));
-        } catch (final PeppolSBDHDocumentReadException ex) {
+        try
+        {
+            aData = new PeppolSBDHDataReader(PeppolIdentifierFactory.INSTANCE).extractData (new NonBlockingByteArrayInputStream (aPayloadBytes));
+        }
+        catch (final PeppolSBDHDataReadException ex)
+        {
             // TODO This error handling might be improved to return a status error
             // instead
-            final IJsonObject aJson = new JsonObject();
-            aJson.add("sbdhParsingException",
-                    new JsonObject().add("class", ex.getClass().getName())
-                            .add("message", ex.getMessage()));
-            LOGGER.error("An error occurred during receival of outgoing message.", ex);
-            aJson.add("success", false);
-            return aJson.getAsJsonString(JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);
+            aSendingReport.setSBDHParseException (ex);
+            aSendingReport.setSendingSuccess (false);
+            aSendingReport.setOverallSuccess (false);
+            return aSendingReport.getAsJsonString ();
         }
 
-        final String senderId = aData.getSenderAsIdentifier().getURIEncoded();
-        final String receiverId = aData.getReceiverAsIdentifier().getURIEncoded();
-        final String docTypeId = aData.getDocumentTypeAsIdentifier().getURIEncoded();
-        final String processId = aData.getProcessAsIdentifier().getURIEncoded();
-        final String countryC1 = aData.getCountryC1();
+        aSendingReport.setSenderID (aData.getSenderAsIdentifier ());
+        aSendingReport.setReceiverID (aData.getReceiverAsIdentifier ());
+        aSendingReport.setDocTypeID (aData.getDocumentTypeAsIdentifier ());
+        aSendingReport.setProcessID (aData.getProcessAsIdentifier ());
+        aSendingReport.setCountryC1 (aData.getCountryC1 ());
+        aSendingReport.setSBDHInstanceIdentifier (aData.getInstanceIdentifier ());
 
-        LOGGER.info("Trying to send Peppol SBDH message from '" +
-                senderId +
+        final String sSenderID = aData.getSenderAsIdentifier ().getURIEncoded ();
+        final String sReceiverID = aData.getReceiverAsIdentifier ().getURIEncoded ();
+        final String sDocTypeID = aData.getDocumentTypeAsIdentifier ().getURIEncoded ();
+        final String sProcessID = aData.getProcessAsIdentifier ().getURIEncoded ();
+        final String sCountryCodeC1 = aData.getCountryC1 ();
+        LOGGER.info ("Trying to send Peppol Test SBDH message from '" +
+                sSenderID +
                 "' to '" +
-                receiverId +
+                sReceiverID +
                 "' using '" +
-                docTypeId +
+                sDocTypeID +
                 "' and '" +
-                processId +
+                sProcessID +
                 "' for '" +
-                countryC1 +
+                sCountryCodeC1 +
                 "'");
 
-        String smlToUse = AS4Configuration.getConfig().getAsString("peppol.smlToUse");
-        if (smlToUse == null || smlToUse.isEmpty()) {
-            throw new ConfigurationException("peppol.smlToUse is not set in the configuration.");
-        } else if (smlToUse.equalsIgnoreCase(MetadataProviderEnum.SML.name())) {
-            return _sendPeppolMessagePredefinedSbdh(aData, ESML.DIGIT_PRODUCTION, aHttpResponse);
-        } else if (smlToUse.equalsIgnoreCase(MetadataProviderEnum.SMK.name())) {
-            return _sendPeppolMessagePredefinedSbdh(aData, ESML.DIGIT_TEST, aHttpResponse);
-        } else {
-            throw new ConfigurationException("peppol.smlToUse is not set to a valid value in the configuration.");
-        }
+        PeppolSender.sendPeppolMessagePredefinedSbdh (aData, eSML, aAPCA, aSendingReport);
+
+        // Return result JSON
+        return aSendingReport.getAsJsonString ();
     }
 
-    // New endpoint for API key management (admin only)
-    @PostMapping("/api-keys/rotate")
-    @ResponseStatus(HttpStatus.OK)
-    public String rotateApiKey(
-            @RequestHeader(name = "${peppol.api.key.header:X-API-Key}", required = false) String apiKey,
-            @RequestParam String keyName,
-            HttpServletResponse response) {
-
-        // Verify the current API key before allowing rotation
-        if (!apiKeyService.isValidApiKey(apiKey)) {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            final IJsonObject aJson = new JsonObject();
-            aJson.add("success", false);
-            aJson.add("error", "Authentication failed. Invalid or missing API key.");
-            return aJson.getAsJsonString(JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);
-        }
-
-        try {
-            String newKey = apiKeyService.rotateApiKey(keyName);
-            final IJsonObject aJson = new JsonObject();
-            aJson.add("success", true);
-            aJson.add("message", "API key rotated successfully");
-            aJson.add("newKey", newKey);
-            return aJson.getAsJsonString(JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);
-        } catch (Exception e) {
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            final IJsonObject aJson = new JsonObject();
-            aJson.add("success", false);
-            aJson.add("error", e.getMessage());
-            return aJson.getAsJsonString(JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);
-        }
-    }
+//    @PostMapping(path = "/send", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public String sendMessage(
+//            @RequestBody final byte[] aPayloadBytes,
+//            HttpServletResponse aHttpResponse) throws ConfigurationException {
+//
+//        final PeppolSBDHData aData;
+//        try {
+//            aData = new PeppolSBDHDocumentReader(PeppolIdentifierFactory.INSTANCE).extractData(new NonBlockingByteArrayInputStream(aPayloadBytes));
+//        } catch (final PeppolSBDHDocumentReadException ex) {
+//            // TODO This error handling might be improved to return a status error
+//            // instead
+//            final IJsonObject aJson = new JsonObject();
+//            aJson.add("sbdhParsingException",
+//                    new JsonObject().add("class", ex.getClass().getName())
+//                            .add("message", ex.getMessage()));
+//            LOGGER.error("An error occurred during receival of outgoing message.", ex);
+//            aJson.add("success", false);
+//            return aJson.getAsJsonString(JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);
+//        }
+//
+//        final String senderId = aData.getSenderAsIdentifier().getURIEncoded();
+//        final String receiverId = aData.getReceiverAsIdentifier().getURIEncoded();
+//        final String docTypeId = aData.getDocumentTypeAsIdentifier().getURIEncoded();
+//        final String processId = aData.getProcessAsIdentifier().getURIEncoded();
+//        final String countryC1 = aData.getCountryC1();
+//
+//        LOGGER.info("Trying to send Peppol SBDH message from '" +
+//                senderId +
+//                "' to '" +
+//                receiverId +
+//                "' using '" +
+//                docTypeId +
+//                "' and '" +
+//                processId +
+//                "' for '" +
+//                countryC1 +
+//                "'");
+//
+//        String smlToUse = AS4Configuration.getConfig().getAsString("peppol.smlToUse");
+//        if (smlToUse == null || smlToUse.isEmpty()) {
+//            throw new ConfigurationException("peppol.smlToUse is not set in the configuration.");
+//        } else if (smlToUse.equalsIgnoreCase(MetadataProviderEnum.SML.name())) {
+//            return _sendPeppolMessagePredefinedSbdh(aData, ESML.DIGIT_PRODUCTION, aHttpResponse);
+//        } else if (smlToUse.equalsIgnoreCase(MetadataProviderEnum.SMK.name())) {
+//            return _sendPeppolMessagePredefinedSbdh(aData, ESML.DIGIT_TEST, aHttpResponse);
+//        } else {
+//            throw new ConfigurationException("peppol.smlToUse is not set to a valid value in the configuration.");
+//        }
+//    }
 }

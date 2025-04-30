@@ -18,7 +18,9 @@ package com.mysupply.phase4.peppolstandalone.spi;
 
 import javax.annotation.Nonnull;
 
+import com.helger.security.certificate.CertificateHelper;
 import com.mysupply.phase4.domain.Document;
+import com.mysupply.phase4.peppolstandalone.APConfig;
 import com.mysupply.phase4.peppolstandalone.context.SpringContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +36,6 @@ import com.helger.peppol.reporting.api.PeppolReportingItem;
 import com.helger.peppol.reporting.api.backend.PeppolReportingBackend;
 import com.helger.peppol.reporting.api.backend.PeppolReportingBackendException;
 import com.helger.peppol.sbdh.PeppolSBDHData;
-import com.helger.peppol.utils.PeppolCertificateHelper;
 import com.helger.phase4.config.AS4Configuration;
 import com.helger.phase4.ebms3header.Ebms3Error;
 import com.helger.phase4.ebms3header.Ebms3UserMessage;
@@ -68,13 +69,15 @@ public class PeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingSBDHand
                                   @Nonnull final byte[] aSBDBytes,
                                   @Nonnull final StandardBusinessDocument aSBD,
                                   @Nonnull final PeppolSBDHData aPeppolSBD,
-                                  @Nonnull final IAS4IncomingMessageState aState,
+                                  @Nonnull final IAS4IncomingMessageState aIncomingState,
                                   @Nonnull final ICommonsList<Ebms3Error> aProcessingErrorMessages) throws Exception {
 
+        final String sMyPeppolSeatID = APConfig.getMyPeppolSeatID ();
         try {
             // Example code snippets how to get data
             String c1 = aPeppolSBD.getSenderAsIdentifier().getURIEncoded();
-            String c2 = PeppolCertificateHelper.getSubjectCN(aState.getUsedCertificate());
+            String c2 = CertificateHelper.getPEMEncodedCertificate (aIncomingState.getSigningCertificate ());
+
             String c4 = aPeppolSBD.getReceiverAsIdentifier().getURIEncoded();
             String docType = aPeppolSBD.getDocumentTypeAsIdentifier().getURIEncoded();
             String process = aPeppolSBD.getProcessAsIdentifier().getURIEncoded();
@@ -83,7 +86,7 @@ public class PeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingSBDHand
             LOGGER.info("Received a new Peppol Message");
             LOGGER.info("  C1 = " + c1);
             LOGGER.info("  C2 = " + c2);
-            // C3 is you
+            LOGGER.info("  C3 = " + sMyPeppolSeatID);
             LOGGER.info("  C4 = " + c4);
             LOGGER.info("  DocType = " + docType);
             LOGGER.info("  Process = " + process);
@@ -113,17 +116,17 @@ public class PeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingSBDHand
                     LOGGER.info("Creating Peppol Reporting Item and storing it");
 
                     // TODO determine correct values
-                    final String sC3ID = "DK"; //mySupply is located in Denmark, we hardcode DK
-                    final String sC4ID = aPeppolSBD.getReceiverAsIdentifier().getURIEncoded();
+                    final String sC3ID = aPeppolSBD.getReceiverAsIdentifier().getURIEncoded();
+                    final String sC4CountryCode = "DK"; // incorrect, we need to determine the country code like in VAX
                     final String sEndUserID = "EndUserID";
                     final PeppolReportingItem aReportingItem = Phase4PeppolServletMessageProcessorSPI.createPeppolReportingItemForReceivedMessage(aUserMessage,
                             aPeppolSBD,
-                            aState,
+                            aIncomingState,
                             sC3ID,
-                            sC4ID,
+                            sC4CountryCode,
                             sEndUserID);
 
-                    PeppolReportingBackend.withBackendDo(AS4Configuration.getConfig(),
+                    PeppolReportingBackend.withBackendDo(APConfig.getConfig(),
                             aBackend -> aBackend.storeReportingItem(aReportingItem));
                 } catch (final PeppolReportingBackendException ex) {
                     LOGGER.error("Failed to store Peppol Reporting Item", ex);

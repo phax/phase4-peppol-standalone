@@ -22,11 +22,11 @@
   <parent>
     <groupId>com.helger.phase4</groupId>
     <artifactId>phase4-parent-pom</artifactId>
-    <version>3.0.3</version>
+    <version>3.1.0-beta2</version>
   </parent>
   <artifactId>phase4-peppol-standalone</artifactId>
   <name>phase4-peppol-standalone</name>
-  <description>phase4 Peppol demo application</description>
+  <description>phase4 Peppol AS4 web application</description>
   <url>https://github.com/phax/phase4-peppol-standalone</url>
   <inceptionYear>2023</inceptionYear>
   
@@ -37,12 +37,31 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
+<!-- Enable when using a SNAPSHOT version: -->
+<!--
+  <repositories>
+    <repository>
+      <id>central-snapshots</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  -->
   
   <properties>
-    <spring-boot.version>3.4.1</spring-boot.version>
+    <junit5.version>5.11.4</junit5.version>
+    <peppol-ap-support.version>1.0.1</peppol-ap-support.version>
+    <peppol-reporting.version>3.1.0</peppol-reporting.version>
+    <spring-boot.version>3.4.5</spring-boot.version>
   </properties>
 
-  <!-- Include here to not bloat the global scope -->  
+  <!-- Include here to not bloat the global scope -->
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -103,32 +122,62 @@
       <groupId>com.helger.phase4</groupId>
       <artifactId>phase4-peppol-client</artifactId>
     </dependency>
-    
+    <dependency>
+      <groupId>com.helger.peppol</groupId>
+      <artifactId>peppol-reporting</artifactId>
+      <version>${peppol-reporting.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.helger.peppol</groupId>
+      <artifactId>peppol-reporting-backend-sql</artifactId>
+      <version>${peppol-reporting.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.helger.peppol</groupId>
+      <artifactId>peppol-reporting-backend-inmemory</artifactId>
+      <version>${peppol-reporting.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.helger.peppol</groupId>
+      <artifactId>peppol-reporting-support</artifactId>
+      <version>${peppol-ap-support.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-impl</artifactId>
     </dependency>
 
-      <dependency>
-        <groupId>org.hibernate.orm</groupId>
-        <artifactId>hibernate-core</artifactId>
-        <version>6.6.3.Final</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-        <version>42.7.4</version>
-      </dependency>
-
     <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-core</artifactId>
-      <version>11.1.0</version>
+      <version>11.8.0</version>
     </dependency>
     <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-database-postgresql</artifactId>
+      <version>11.8.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hibernate.orm</groupId>
+      <artifactId>hibernate-core</artifactId>
+      <version>6.6.3.Final</version>
+    </dependency>
+
+      <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>42.7.5</version>
+      </dependency>
+
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>2.3.232</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -136,17 +185,16 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <version>5.11.4</version>
+      <artifactId>junit-jupiter-api</artifactId><!--$NO-MVN-MAN-VER$-->
+      <version>${junit5.version}</version>  <!-- transitive version is 5.10.3 :( -->
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-api</artifactId>
-      <version>5.11.4</version>
+      <artifactId>junit-jupiter-engine</artifactId><!--$NO-MVN-MAN-VER$-->
+      <version>${junit5.version}</version>  <!-- transitive version is 5.10.9 :( -->
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -156,6 +204,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.14.0</version>
         <configuration>
           <release>21</release>
           <parameters>true</parameters>
@@ -164,7 +213,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.5.2</version>
+        <version>3.5.3</version>
       </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>

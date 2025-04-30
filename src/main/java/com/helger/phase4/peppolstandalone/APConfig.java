@@ -23,8 +23,8 @@ import javax.annotation.concurrent.Immutable;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.config.fallback.IConfigWithFallback;
 import com.helger.peppol.servicedomain.EPeppolNetwork;
+import com.helger.peppolid.peppol.Pfuoi430;
 import com.helger.phase4.config.AS4Configuration;
-import com.helger.smpclient.peppol.Pfuoi420;
 
 @Immutable
 public final class APConfig
@@ -70,7 +70,7 @@ public final class APConfig
   {
     // Mandatory per May 15th 2025 only
     return getConfig ().getAsBoolean ("peppol.pfuoi430",
-                                      PDTFactory.getCurrentLocalDate ().isAfter (Pfuoi420.VALID_UNTIL));
+                                      PDTFactory.getCurrentLocalDate ().compareTo (Pfuoi430.VALID_FROM) >= 0);
   }
 
   @Nullable

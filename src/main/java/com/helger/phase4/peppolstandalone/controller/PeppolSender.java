@@ -109,8 +109,10 @@ public final class PeppolSender
     {
       // Payload must be XML - even for Text and Binary content
       final Document aDoc = DOMReader.readXMLDOM (aPayloadBytes);
-      if (aDoc == null)
+      if (aDoc == null || aDoc.getDocumentElement () == null)
         throw new IllegalStateException ("Failed to read provided payload as XML");
+      if (aDoc.getDocumentElement ().getNamespaceURI () == null)
+        throw new IllegalStateException ("Only XML payloads with a namespace are supported");
 
       // Start configuring here
       final IParticipantIdentifier aSenderID = aIF.createParticipantIdentifierWithDefaultScheme (sSenderID);

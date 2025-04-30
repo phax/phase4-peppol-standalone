@@ -22,11 +22,7 @@ import java.security.cert.X509Certificate;
 
 import javax.annotation.Nonnull;
 
-//import com.helger.peppol.utils.PeppolCAChecker;
-//import com.helger.peppol.utils.EPeppolCertificateCheckResult;
 import com.helger.peppol.security.PeppolTrustedCA;
-//import com.helger.peppol.utils.PeppolCAChecker;
-//import com.helger.peppol.utils.PeppolCertificateChecker;
 import com.helger.security.certificate.ECertificateCheckResult;
 import com.helger.security.certificate.TrustedCAChecker;
 import org.slf4j.Logger;
@@ -43,8 +39,6 @@ import com.helger.commons.state.ETriState;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.URLHelper;
 import com.helger.httpclient.HttpDebugger;
-//import com.helger.peppol.utils.EPeppolCertificateCheckResult;
-//import com.helger.peppol.utils.PeppolCertificateChecker;
 import com.helger.phase4.config.AS4Configuration;
 import com.helger.phase4.crypto.AS4CryptoFactoryConfiguration;
 import com.helger.phase4.crypto.IAS4CryptoFactory;

@@ -36,7 +36,6 @@ import com.helger.peppol.reporting.api.PeppolReportingItem;
 import com.helger.peppol.reporting.api.backend.PeppolReportingBackend;
 import com.helger.peppol.reporting.api.backend.PeppolReportingBackendException;
 import com.helger.peppol.sbdh.PeppolSBDHData;
-//import com.helger.peppol.utils.PeppolCertificateHelper;
 import com.helger.phase4.config.AS4Configuration;
 import com.helger.phase4.ebms3header.Ebms3Error;
 import com.helger.phase4.ebms3header.Ebms3UserMessage;
@@ -117,8 +116,8 @@ public class PeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingSBDHand
                     LOGGER.info("Creating Peppol Reporting Item and storing it");
 
                     // TODO determine correct values
-                    final String sC3ID = aPeppolSBD.getReceiverAsIdentifier().getURIEncoded(); //mySupply is located in Denmark, we hardcode DK
-                    final String sC4CountryCode = "DK";
+                    final String sC3ID = aPeppolSBD.getReceiverAsIdentifier().getURIEncoded();
+                    final String sC4CountryCode = "DK"; // incorrect, we need to determine the country code like in VAX
                     final String sEndUserID = "EndUserID";
                     final PeppolReportingItem aReportingItem = Phase4PeppolServletMessageProcessorSPI.createPeppolReportingItemForReceivedMessage(aUserMessage,
                             aPeppolSBD,

@@ -19,24 +19,18 @@ package com.mysupply.phase4.peppolstandalone.controller;
 import java.time.OffsetDateTime;
 
 import javax.annotation.Nonnull;
-import javax.naming.ConfigurationException;
 
 import com.helger.commons.string.StringHelper;
 import com.helger.peppol.sbdh.PeppolSBDHDataReadException;
 import com.helger.peppol.sbdh.PeppolSBDHDataReader;
 import com.helger.peppol.security.PeppolTrustedCA;
 import com.helger.peppol.servicedomain.EPeppolNetwork;
-//import com.helger.peppol.utils.PeppolCAChecker;
-//import com.helger.peppol.utils.PeppolCertificateChecker;
 import com.helger.phase4.peppol.Phase4PeppolSendingReport;
 import com.helger.security.certificate.TrustedCAChecker;
-//import com.mysupply.phase4.domain.enums.MetadataProviderEnum;
 import com.mysupply.phase4.peppolstandalone.APConfig;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -56,11 +50,8 @@ import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
 import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.peppol.sbdh.PeppolSBDHData;
-//import com.helger.peppol.sbdh.read.PeppolSBDHDocumentReadException;
-//import com.helger.peppol.sbdh.read.PeppolSBDHDocumentReader;
 import com.helger.peppol.sml.ESML;
 import com.helger.peppol.sml.ISMLInfo;
-//import com.helger.peppol.utils.PeppolCertificateHelper;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.phase4.client.IAS4ClientBuildMessageCallback;
@@ -77,18 +68,6 @@ import com.helger.phase4.sender.EAS4UserMessageSendResult;
 import com.helger.phase4.util.Phase4Exception;
 import com.helger.security.certificate.CertificateHelper;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
-import com.helger.json.IJsonObject;
-import com.helger.json.JsonObject;
-import com.helger.json.serialize.JsonWriterSettings;
-
-import javax.annotation.Nonnull;
 
 @RestController
 public class PeppolSenderController {
@@ -199,15 +178,8 @@ public class PeppolSenderController {
                     });
             final Wrapper<Phase4Exception> aCaughtEx = new Wrapper<>();
 
-//            boolean isEB2B = AS4Configuration.getConfig().getAsBoolean("peppol.isEB2B");
-//            if(isEB2B) {
-//                eResult = aBuilder
-//                        .peppolAP_CAChecker(PeppolCertificateChecker.peppolTestEb2bAP ()) // Needed for EB2B support
-//                        .sendMessageAndCheckForReceipt(aCaughtEx::set);
-//            } else {
                 eResult = aBuilder
                         .sendMessageAndCheckForReceipt(aCaughtEx::set);
-//            }
 
 
             LOGGER.info("Peppol client send result: " + eResult);
@@ -317,54 +289,4 @@ public class PeppolSenderController {
         // Return result JSON
         return aSendingReport.getAsJsonString ();
     }
-
-//    @PostMapping(path = "/send", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public String sendMessage(
-//            @RequestBody final byte[] aPayloadBytes,
-//            HttpServletResponse aHttpResponse) throws ConfigurationException {
-//
-//        final PeppolSBDHData aData;
-//        try {
-//            aData = new PeppolSBDHDocumentReader(PeppolIdentifierFactory.INSTANCE).extractData(new NonBlockingByteArrayInputStream(aPayloadBytes));
-//        } catch (final PeppolSBDHDocumentReadException ex) {
-//            // TODO This error handling might be improved to return a status error
-//            // instead
-//            final IJsonObject aJson = new JsonObject();
-//            aJson.add("sbdhParsingException",
-//                    new JsonObject().add("class", ex.getClass().getName())
-//                            .add("message", ex.getMessage()));
-//            LOGGER.error("An error occurred during receival of outgoing message.", ex);
-//            aJson.add("success", false);
-//            return aJson.getAsJsonString(JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);
-//        }
-//
-//        final String senderId = aData.getSenderAsIdentifier().getURIEncoded();
-//        final String receiverId = aData.getReceiverAsIdentifier().getURIEncoded();
-//        final String docTypeId = aData.getDocumentTypeAsIdentifier().getURIEncoded();
-//        final String processId = aData.getProcessAsIdentifier().getURIEncoded();
-//        final String countryC1 = aData.getCountryC1();
-//
-//        LOGGER.info("Trying to send Peppol SBDH message from '" +
-//                senderId +
-//                "' to '" +
-//                receiverId +
-//                "' using '" +
-//                docTypeId +
-//                "' and '" +
-//                processId +
-//                "' for '" +
-//                countryC1 +
-//                "'");
-//
-//        String smlToUse = AS4Configuration.getConfig().getAsString("peppol.smlToUse");
-//        if (smlToUse == null || smlToUse.isEmpty()) {
-//            throw new ConfigurationException("peppol.smlToUse is not set in the configuration.");
-//        } else if (smlToUse.equalsIgnoreCase(MetadataProviderEnum.SML.name())) {
-//            return _sendPeppolMessagePredefinedSbdh(aData, ESML.DIGIT_PRODUCTION, aHttpResponse);
-//        } else if (smlToUse.equalsIgnoreCase(MetadataProviderEnum.SMK.name())) {
-//            return _sendPeppolMessagePredefinedSbdh(aData, ESML.DIGIT_TEST, aHttpResponse);
-//        } else {
-//            throw new ConfigurationException("peppol.smlToUse is not set to a valid value in the configuration.");
-//        }
-//    }
 }

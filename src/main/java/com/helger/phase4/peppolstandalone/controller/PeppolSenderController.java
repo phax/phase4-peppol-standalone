@@ -148,7 +148,9 @@ public class PeppolSenderController
     final String sDocTypeID = aData.getDocumentTypeAsIdentifier ().getURIEncoded ();
     final String sProcessID = aData.getProcessAsIdentifier ().getURIEncoded ();
     final String sCountryCodeC1 = aData.getCountryC1 ();
-    LOGGER.info ("Trying to send Peppol Test SBDH message from '" +
+    LOGGER.info ("Trying to send Peppol " +
+                 eStage.name() +
+                 " SBDH message from '" +
                  sSenderID +
                  "' to '" +
                  sReceiverID +

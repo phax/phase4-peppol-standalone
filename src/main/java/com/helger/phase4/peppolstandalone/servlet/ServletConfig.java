@@ -223,7 +223,7 @@ public class ServletConfig
       }
     }
     else
-      LOGGER.info ("Sucessfully checked that the provided Peppol AP certificate is valid.");
+      LOGGER.info ("Successfully checked that the provided Peppol AP certificate is valid.");
 
     // Must be set independent on the enabled/disable status
     // This must be changed for eB2B

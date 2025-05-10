@@ -163,6 +163,7 @@ public class ServletConfig
     AS4DumpManager.setOutgoingDumper (new AS4OutgoingDumperFileBased ());
   }
 
+  @SuppressWarnings ("removal")
   private static void _initPeppolAS4 ()
   {
     // Our server should check all signing certificates of incoming messages if

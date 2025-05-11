@@ -38,6 +38,8 @@ import com.helger.commons.state.ETriState;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.url.URLHelper;
 import com.helger.httpclient.HttpDebugger;
+import com.helger.peppol.reporting.api.backend.IPeppolReportingBackendSPI;
+import com.helger.peppol.reporting.api.backend.PeppolReportingBackend;
 import com.helger.peppol.security.PeppolTrustedCA;
 import com.helger.peppol.servicedomain.EPeppolNetwork;
 import com.helger.phase4.config.AS4Configuration;
@@ -176,7 +178,7 @@ public class ServletConfig
     // resources, it can be configured here
     {
       final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
-      // TODO eventually configure an outbound proxy here as well
+      // TODO eventually configure an outbound HTTP proxy here as well
       PeppolCRLDownloader.setAsDefaultCRLCache (aHCS);
     }
 
@@ -194,7 +196,7 @@ public class ServletConfig
       throw new InitializationException ("Failed to load configured AS4 private key - fix the configuration");
     LOGGER.info ("Successfully loaded configured AS4 private key from the crypto factory");
 
-    // TODO configure the stage correctly
+    // Configure the stage correctly
     final EPeppolNetwork eStage = APConfig.getPeppolStage ();
 
     final X509Certificate aAPCert = (X509Certificate) aPKE.getCertificate ();
@@ -250,6 +252,10 @@ public class ServletConfig
       Phase4PeppolDefaultReceiverConfiguration.setReceiverCheckEnabled (false);
       LOGGER.warn ("phase4 Peppol receiver checks are disabled");
     }
+
+    // Initialize the Reporting Backend only once
+    if (PeppolReportingBackend.getBackendService ().initBackend (APConfig.getConfig ()).isFailure ())
+      throw new InitializationException ("Failed to init Peppol Reporting Backend Service");
   }
 
   // At 05:00 AM, on day 2 of the month
@@ -279,6 +285,11 @@ public class ServletConfig
     {
       if (WebScopeManager.isGlobalScopePresent ())
       {
+        // Shutdown the Peppol Reporting Backend service, if it was initialized
+        final IPeppolReportingBackendSPI aPRBS = PeppolReportingBackend.getBackendService ();
+        if (aPRBS != null && aPRBS.isInitialized ())
+          aPRBS.shutdownBackend ();
+
         AS4ServerInitializer.shutdownAS4Server ();
         WebFileIO.resetPaths ();
         WebScopeManager.onGlobalEnd ();

@@ -141,7 +141,7 @@ public final class PeppolSender
                                                                   aSmlInfo);
 
       aSMPClient.withHttpClientSettings (aHCS -> {
-        // TODO Add SMP outbound proxy settings here
+        // TODO Add SMP HTTP outbound proxy settings here
         // If this block is not used, it may be removed
       });
 
@@ -152,7 +152,7 @@ public final class PeppolSender
       }
 
       final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
-      // TODO Add AP outbound proxy settings here
+      // TODO Add AP HTTP outbound proxy settings here
 
       final PeppolUserMessageBuilder aBuilder = Phase4PeppolSender.builder ()
                                                                   .httpClientFactory (aHCS)
@@ -216,7 +216,7 @@ public final class PeppolSender
         // In many simple cases, this might be the sender's participant ID
         final String sEndUserID = "TODO";
 
-        // TODO Enable when ready
+        // TODO Enable Peppol Reporting when ready
         if (false)
           aBuilder.createAndStorePeppolReportingItemAfterSending (sEndUserID);
       }
@@ -285,7 +285,7 @@ public final class PeppolSender
                                                                   aSmlInfo);
 
       aSMPClient.withHttpClientSettings (aHCS -> {
-        // TODO Add SMP outbound proxy settings here
+        // TODO Add SMP HTTP outbound proxy settings here
         // If this block is not used, it may be removed
       });
 
@@ -296,7 +296,7 @@ public final class PeppolSender
       }
 
       final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
-      // TODO Add AP outbound proxy settings here
+      // TODO Add AP HTTP outbound proxy settings here
 
       final PeppolUserMessageSBDHBuilder aBuilder = Phase4PeppolSender.sbdhBuilder ()
                                                                       .httpClientFactory (aHCS)
@@ -347,7 +347,7 @@ public final class PeppolSender
         // In many simple cases, this might be the sender's participant ID
         final String sEndUserID = "TODO";
 
-        // TODO Enable when ready
+        // TODO Enable Peppol Reporting when ready
         if (false)
           aBuilder.createAndStorePeppolReportingItemAfterSending (sEndUserID);
       }

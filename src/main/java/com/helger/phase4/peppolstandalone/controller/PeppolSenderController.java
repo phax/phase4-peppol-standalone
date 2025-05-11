@@ -17,7 +17,6 @@
 package com.helger.phase4.peppolstandalone.controller;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +33,7 @@ import com.helger.peppol.security.PeppolTrustedCA;
 import com.helger.peppol.servicedomain.EPeppolNetwork;
 import com.helger.peppol.sml.ESML;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
+import com.helger.phase4.logging.Phase4LoggerFactory;
 import com.helger.phase4.peppol.Phase4PeppolSendingReport;
 import com.helger.phase4.peppolstandalone.APConfig;
 import com.helger.security.certificate.TrustedCAChecker;
@@ -47,7 +47,7 @@ import com.helger.security.certificate.TrustedCAChecker;
 public class PeppolSenderController
 {
   static final String HEADER_X_TOKEN = "X-Token";
-  private static final Logger LOGGER = LoggerFactory.getLogger (PeppolSenderController.class);
+  private static final Logger LOGGER = Phase4LoggerFactory.getLogger (PeppolSenderController.class);
 
   @PostMapping (path = "/sendas4/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}",
                 produces = MediaType.APPLICATION_JSON_VALUE)
@@ -149,7 +149,7 @@ public class PeppolSenderController
     final String sProcessID = aData.getProcessAsIdentifier ().getURIEncoded ();
     final String sCountryCodeC1 = aData.getCountryC1 ();
     LOGGER.info ("Trying to send Peppol " +
-                 eStage.name() +
+                 eStage.name () +
                  " SBDH message from '" +
                  sSenderID +
                  "' to '" +

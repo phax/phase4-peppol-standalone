@@ -19,7 +19,6 @@ package com.helger.phase4.peppolstandalone.controller;
 import java.time.YearMonth;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,6 +37,7 @@ import com.helger.peppol.reporting.jaxb.eusr.v110.EndUserStatisticsReportType;
 import com.helger.peppol.reporting.jaxb.tsr.TransactionStatisticsReport101Marshaller;
 import com.helger.peppol.reporting.jaxb.tsr.v101.TransactionStatisticsReportType;
 import com.helger.peppol.reporting.tsr.TransactionStatisticsReport;
+import com.helger.phase4.logging.Phase4LoggerFactory;
 import com.helger.phase4.peppolstandalone.APConfig;
 import com.helger.phase4.peppolstandalone.reporting.AppReportingHelper;
 
@@ -50,7 +50,7 @@ import com.helger.phase4.peppolstandalone.reporting.AppReportingHelper;
 @RestController
 public class PeppolReportingController
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (PeppolReportingController.class);
+  private static final Logger LOGGER = Phase4LoggerFactory.getLogger (PeppolReportingController.class);
 
   /**
    * This API creates a TSR report from the provided year and month

@@ -24,7 +24,6 @@ import java.time.YearMonth;
 import javax.annotation.Nonnull;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -51,6 +50,7 @@ import com.helger.phase4.dump.AS4IncomingDumperFileBased;
 import com.helger.phase4.dump.AS4OutgoingDumperFileBased;
 import com.helger.phase4.incoming.AS4ServerInitializer;
 import com.helger.phase4.incoming.mgr.AS4ProfileSelector;
+import com.helger.phase4.logging.Phase4LoggerFactory;
 import com.helger.phase4.mgr.MetaAS4Manager;
 import com.helger.phase4.peppol.servlet.Phase4PeppolDefaultReceiverConfiguration;
 import com.helger.phase4.peppolstandalone.APConfig;
@@ -73,7 +73,7 @@ import jakarta.servlet.ServletContext;
 @Configuration
 public class ServletConfig
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (ServletConfig.class);
+  private static final Logger LOGGER = Phase4LoggerFactory.getLogger (ServletConfig.class);
 
   /**
    * This method is a placeholder for retrieving a custom {@link IAS4CryptoFactory}.

@@ -205,6 +205,6 @@ public class PeppolReportingController
     final YearMonth aYearMonth = AppReportingHelper.getValidYearMonthInAPI (nYear, nMonth);
     AppReportingHelper.createAndSendPeppolReports (aYearMonth);
 
-    return "Done - check database";
+    return "Done - check report storage";
   }
 }

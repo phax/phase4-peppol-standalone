@@ -59,7 +59,7 @@
 
   <properties>
     <junit5.version>5.11.4</junit5.version>
-    <peppol-ap-support.version>1.0.1</peppol-ap-support.version>
+    <peppol-ap-support.version>1.0.2</peppol-ap-support.version>
     <peppol-reporting.version>3.1.0</peppol-reporting.version>
     <spring-boot.version>3.4.5</spring-boot.version>
   </properties>

@@ -19,12 +19,17 @@ package com.mysupply.phase4.peppolstandalone.servlet;
 import java.io.File;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
+import java.time.YearMonth;
 
 import javax.annotation.Nonnull;
 
 import com.helger.peppol.security.PeppolTrustedCA;
+import com.helger.peppol.servicedomain.EPeppolNetwork;
+import com.helger.phase4.crypto.AS4CryptoFactoryInMemoryKeyStore;
 import com.helger.security.certificate.ECertificateCheckResult;
 import com.helger.security.certificate.TrustedCAChecker;
+import com.mysupply.phase4.peppolstandalone.APConfig;
+import com.mysupply.phase4.peppolstandalone.reporting.AppReportingHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -61,6 +66,7 @@ import com.helger.xservlet.requesttrack.RequestTrackerSettings;
 import jakarta.activation.CommandMap;
 import jakarta.annotation.PreDestroy;
 import jakarta.servlet.ServletContext;
+import org.springframework.scheduling.annotation.Scheduled;
 
 @Configuration
 public class ServletConfig {
@@ -92,211 +98,194 @@ public class ServletConfig {
         return bean;
     }
 
-    private void _init(@Nonnull final ServletContext aSC) {
+    private void _init (@Nonnull final ServletContext aSC)
+    {
         // Do it only once
-        LOGGER.info("_init executing");
-        if (!WebScopeManager.isGlobalScopePresent()) {
-            WebScopeManager.onGlobalBegin(aSC);
-            _initGlobalSettings(aSC);
-            _initAS4();
-            _initPeppolAS4();
+        if (!WebScopeManager.isGlobalScopePresent ())
+        {
+            WebScopeManager.onGlobalBegin (aSC);
+            _initGlobalSettings (aSC);
+            _initAS4 ();
+            _initPeppolAS4 ();
         }
-        LOGGER.info("_init finished executing");
     }
 
-    private static void _initGlobalSettings(@Nonnull final ServletContext aSC) {
+    private static void _initGlobalSettings (@Nonnull final ServletContext aSC)
+    {
         // Logging: JUL to SLF4J
-        LOGGER.info("_initGlobalSettings executing");
-        SLF4JBridgeHandler.removeHandlersForRootLogger();
-        SLF4JBridgeHandler.install();
+        SLF4JBridgeHandler.removeHandlersForRootLogger ();
+        SLF4JBridgeHandler.install ();
 
-        if (GlobalDebug.isDebugMode()) {
-            RequestTrackerSettings.setLongRunningRequestsCheckEnabled(false);
-            RequestTrackerSettings.setParallelRunningRequestsCheckEnabled(false);
+        if (GlobalDebug.isDebugMode ())
+        {
+            RequestTrackerSettings.setLongRunningRequestsCheckEnabled (false);
+            RequestTrackerSettings.setParallelRunningRequestsCheckEnabled (false);
         }
 
-        HttpDebugger.setEnabled(false);
+        HttpDebugger.setEnabled (false);
 
         // Sanity check
-        if (CommandMap.getDefaultCommandMap().createDataContentHandler(CMimeType.MULTIPART_RELATED.getAsString()) ==
-                null) {
-            throw new IllegalStateException("No DataContentHandler for MIME Type '" +
-                    CMimeType.MULTIPART_RELATED.getAsString() +
+        if (CommandMap.getDefaultCommandMap ().createDataContentHandler (CMimeType.MULTIPART_RELATED.getAsString ()) ==
+                null)
+        {
+            throw new IllegalStateException ("No DataContentHandler for MIME Type '" +
+                    CMimeType.MULTIPART_RELATED.getAsString () +
                     "' is available. There seems to be a problem with the dependencies/packaging");
         }
 
         // Init the data path
         {
             // Get the ServletContext base path
-            final String sServletContextPath = ServletHelper.getServletContextBasePath(aSC);
-            LOGGER.info("servletContextPath located as:" + sServletContextPath);
+            final String sServletContextPath = ServletHelper.getServletContextBasePath (aSC);
             // Get the data path
-            final String sDataPath = AS4Configuration.getDataPath();
-            if (StringHelper.hasNoText(sDataPath))
-                throw new InitializationException("No data path was provided!");
+            final String sDataPath = AS4Configuration.getDataPath ();
+            if (StringHelper.hasNoText (sDataPath))
+                throw new InitializationException ("No data path was provided!");
             final boolean bFileAccessCheck = false;
             // Init the IO layer
-            WebFileIO.initPaths(new File(sDataPath).getAbsoluteFile(), sServletContextPath, bFileAccessCheck);
+            WebFileIO.initPaths (new File (sDataPath).getAbsoluteFile (), sServletContextPath, bFileAccessCheck);
         }
-        LOGGER.info("_initGlobalSettings finished executing");
     }
 
-    private static void _initAS4() {
+    private static void _initAS4 ()
+    {
         // Enforce Peppol profile usage
         // This is the programmatic way to enforce exactly this one profile
         // In a multi-profile environment, that will not work
-        LOGGER.info("_initAS4 executing");
-        AS4ProfileSelector.setCustomDefaultAS4ProfileID(AS4PeppolProfileRegistarSPI.AS4_PROFILE_ID);
+        AS4ProfileSelector.setCustomDefaultAS4ProfileID (AS4PeppolProfileRegistarSPI.AS4_PROFILE_ID);
 
-        AS4ServerInitializer.initAS4Server();
+        AS4ServerInitializer.initAS4Server ();
 
         // dump all messages to a file
-        AS4DumpManager.setIncomingDumper(new AS4IncomingDumperFileBased());
-        AS4DumpManager.setOutgoingDumper(new AS4OutgoingDumperFileBased());
-        LOGGER.info("_initAS4 finished executing");
+        AS4DumpManager.setIncomingDumper (new AS4IncomingDumperFileBased ());
+        AS4DumpManager.setOutgoingDumper (new AS4OutgoingDumperFileBased ());
     }
 
-    private static void _initPeppolAS4() {
-        LOGGER.info("_initPeppolAS4 executing");
-        // Our server expects all SBDH to contain the COUNTRY_C1 element in SBDH
-        // (this is the default setting, but added it here for easy modification)
-        Phase4PeppolDefaultReceiverConfiguration.setCheckSBDHForMandatoryCountryC1(true);
-
+    private static void _initPeppolAS4 ()
+    {
         // Our server should check all signing certificates of incoming messages if
         // they are revoked or not (this is the default setting, but added it here
         // for easy modification)
-        Phase4PeppolDefaultReceiverConfiguration.setCheckSigningCertificateRevocation(true);
+        Phase4PeppolDefaultReceiverConfiguration.setCheckSigningCertificateRevocation (true);
 
         // Make sure the download of CRL is using Apache HttpClient and that the
         // provided settings are used. If e.g. a proxy is needed to access outbound
         // resources, it can be configured here
-        PeppolCRLDownloader.setAsDefaultCRLCache(new Phase4PeppolHttpClientSettings());
+        {
+            final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
+            // TODO eventually configure an outbound proxy here as well
+            PeppolCRLDownloader.setAsDefaultCRLCache (aHCS);
+        }
 
-        X509Certificate aAPCert = validateAPCertificate();
+        // Throws an exception if configuration parameters are missing
+        final AS4CryptoFactoryInMemoryKeyStore aCryptoFactory = getCryptoFactoryToUse ();
+
+        // Check if crypto factory configuration is valid
+        final KeyStore aKS = aCryptoFactory.getKeyStore ();
+        if (aKS == null)
+            throw new InitializationException ("Failed to load configured AS4 Key store - fix the configuration");
+        LOGGER.info ("Successfully loaded configured AS4 key store from the crypto factory");
+
+        final KeyStore.PrivateKeyEntry aPKE = aCryptoFactory.getPrivateKeyEntry ();
+        if (aPKE == null)
+            throw new InitializationException ("Failed to load configured AS4 private key - fix the configuration");
+        LOGGER.info ("Successfully loaded configured AS4 private key from the crypto factory");
+
+        // TODO configure the stage correctly
+        final EPeppolNetwork eStage = APConfig.getPeppolStage ();
+
+        final X509Certificate aAPCert = (X509Certificate) aPKE.getCertificate ();
+
+        // Note: For eB2B you want to check against the eB2B CA instead
+        final TrustedCAChecker aAPCAChecker = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP ()
+                : PeppolTrustedCA.peppolTestAP ();
+
+        // Check the configured Peppol AP certificate
+        // * No caching
+        // * Use global certificate check mode
+        final ECertificateCheckResult eCheckResult = aAPCAChecker.checkCertificate (aAPCert,
+                MetaAS4Manager.getTimestampMgr ()
+                        .getCurrentDateTime (),
+                ETriState.FALSE,
+                null);
+        if (eCheckResult.isInvalid ())
+        {
+            // TODO Change from "true" to "false" once you have a Peppol
+            // certificate so that an exception is thrown
+            if (true)
+                LOGGER.error ("The provided certificate is not a valid Peppol certificate. Check result: " + eCheckResult);
+            else
+            {
+                throw new InitializationException ("The provided certificate is not a Peppol certificate. Check result: " +
+                        eCheckResult);
+            }
+        }
+        else
+            LOGGER.info ("Sucessfully checked that the provided Peppol AP certificate is valid.");
+
+        // Must be set independent on the enabled/disable status
+        // This must be changed for eB2B
+        Phase4PeppolDefaultReceiverConfiguration.setAPCAChecker (aAPCAChecker);
 
         // Eventually enable the receiver check, so that for each incoming request
         // the validity is crosscheck against the owning SMP
-        final String sSMPURL = AS4Configuration.getConfig().getAsString("smp.url");
-        final String sAPURL = AS4Configuration.getThisEndpointAddress();
-        if (StringHelper.hasText(sSMPURL) && StringHelper.hasText(sAPURL)) {
+        final String sSMPURL = APConfig.getMySmpUrl ();
+        final String sAPURL = AS4Configuration.getThisEndpointAddress ();
+        if (StringHelper.hasText (sSMPURL) && StringHelper.hasText (sAPURL))
+        {
             // To process the message even though the receiver is not registered in
             // our AP
-            Phase4PeppolDefaultReceiverConfiguration.setReceiverCheckEnabled(true);
-            Phase4PeppolDefaultReceiverConfiguration.setSMPClient(new SMPClientReadOnly(URLHelper.getAsURI(sSMPURL)));
-            Phase4PeppolDefaultReceiverConfiguration.setWildcardSelectionMode(Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE);
-            Phase4PeppolDefaultReceiverConfiguration.setAS4EndpointURL(sAPURL);
-            Phase4PeppolDefaultReceiverConfiguration.setAPCertificate(aAPCert);
-            LOGGER.info("phase4 Peppol receiver checks are enabled");
-        } else {
-            Phase4PeppolDefaultReceiverConfiguration.setReceiverCheckEnabled(false);
-            LOGGER.warn("phase4 Peppol receiver checks are disabled");
+            Phase4PeppolDefaultReceiverConfiguration.setReceiverCheckEnabled (true);
+            Phase4PeppolDefaultReceiverConfiguration.setSMPClient (new SMPClientReadOnly (URLHelper.getAsURI (sSMPURL)));
+            Phase4PeppolDefaultReceiverConfiguration.setWildcardSelectionMode (Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE);
+            Phase4PeppolDefaultReceiverConfiguration.setAS4EndpointURL (sAPURL);
+            Phase4PeppolDefaultReceiverConfiguration.setAPCertificate (aAPCert);
+            LOGGER.info ("phase4 Peppol receiver checks are enabled");
         }
-        LOGGER.info("_initPeppolAS4 finished executing");
+        else
+        {
+            Phase4PeppolDefaultReceiverConfiguration.setReceiverCheckEnabled (false);
+            LOGGER.warn ("phase4 Peppol receiver checks are disabled");
+        }
     }
 
-    private static X509Certificate validateAPCertificate() throws InitializationException {
-        LOGGER.info("Validating AP certificate");
-        // Throws an exception if configuration parameters are missing
-        final IAS4CryptoFactory aCF = getCryptoFactoryToUse();
-
-        // Check if crypto properties are okay
-        final KeyStore aKS = aCF.getKeyStore();
-        if (aKS == null)
-            throw new InitializationException("Failed to load configured AS4 Key store - fix the configuration");
-        LOGGER.info("Successfully loaded configured AS4 key store from the crypto factory");
-
-        final KeyStore.PrivateKeyEntry aPKE = aCF.getPrivateKeyEntry();
-        if (aPKE == null)
-            throw new InitializationException("Failed to load configured AS4 private key - fix the configuration");
-        LOGGER.info("Successfully loaded configured AS4 private key from the crypto factory");
-
-        final X509Certificate aAPCert = (X509Certificate) aPKE.getCertificate();
-
-        performCertificateValidation(aAPCert);
-
-        return aAPCert;
-    }
-
-    private static void performCertificateValidation(X509Certificate aAPCert) throws InitializationException {
-        TrustedCAChecker testAPChecker = PeppolTrustedCA.peppolTestAP();
-        ECertificateCheckResult testCertificateCheckResult = testAPChecker
-                .checkCertificate(aAPCert,
-                        MetaAS4Manager.getTimestampMgr()
-                                .getCurrentDateTime(),
-                        ETriState.FALSE,
-                        null);
-
-        TrustedCAChecker testEb2bAPChecker = PeppolTrustedCA.peppolTestEb2bAP();
-        ECertificateCheckResult eB2BCertificateCheckResult = testEb2bAPChecker
-                .checkCertificate(aAPCert,
-                        MetaAS4Manager.getTimestampMgr()
-                                .getCurrentDateTime(),
-                        ETriState.FALSE,
-                        null);
-
-        TrustedCAChecker prodAPChecker = PeppolTrustedCA.peppolProductionAP();
-        ECertificateCheckResult prodCertificateCheckResult = prodAPChecker
-                .checkCertificate(aAPCert,
-                        MetaAS4Manager.getTimestampMgr()
-                                .getCurrentDateTime(),
-                        ETriState.FALSE,
-                        null);
-
-        TrustedCAChecker allAPChecker = PeppolTrustedCA.peppolAllAP();
-        ECertificateCheckResult allAPCertificateCheckResult = allAPChecker
-                .checkCertificate(aAPCert,
-                        MetaAS4Manager.getTimestampMgr()
-                                .getCurrentDateTime(),
-                        ETriState.FALSE,
-                        null);
-
-        if (testCertificateCheckResult.isValid()) {
-            LOGGER.info("The provided certificate is a Peppol test certificate");
-            Phase4PeppolDefaultReceiverConfiguration.setAPCAChecker(testAPChecker);
-            return;
-        } else if (eB2BCertificateCheckResult.isValid()) {
-            LOGGER.info("The provided certificate is a Peppol eB2B test certificate");
-            Phase4PeppolDefaultReceiverConfiguration.setAPCAChecker(testEb2bAPChecker);
-            return;
-        } else if (prodCertificateCheckResult.isValid()) {
-            LOGGER.info("The provided certificate is a Peppol production certificate");
-            Phase4PeppolDefaultReceiverConfiguration.setAPCAChecker(prodAPChecker);
-            return;
-        } else if (allAPCertificateCheckResult.isValid()) {
-            LOGGER.info("The provided certificate is a Peppol certificate");
-            Phase4PeppolDefaultReceiverConfiguration.setAPCAChecker(allAPChecker);
-            return;
-        } else {
-            String message = "The provided certificate is not a valid Peppol certificate." + System.lineSeparator() +
-                    "Certificate check results: " + System.lineSeparator() +
-                    testCertificateCheckResult + System.lineSeparator() +
-                    eB2BCertificateCheckResult + System.lineSeparator() +
-                    prodCertificateCheckResult + System.lineSeparator() +
-                    allAPCertificateCheckResult;
-
-            LOGGER.error(message);
-            throw new InitializationException(message);
+    // At 05:00 AM, on day 2 of the month
+    @Scheduled(cron = "0 0 5 2 * *")
+    public void sendPeppolReportingMessages ()
+    {
+        if (APConfig.isSchedulePeppolReporting ())
+        {
+            LOGGER.info ("Running scheduled creation and sending of Peppol Reporting messages");
+            // Use the previous month
+            final YearMonth aYearMonth = YearMonth.now ().minusMonths (1);
+            AppReportingHelper.createAndSendPeppolReports (aYearMonth);
         }
+        else
+            LOGGER.warn ("Creating and sending Peppol Reports is disabled in the configuration");
     }
 
     /**
-     * Special class that is only present to have a graceful shutdown.
+     * Special class that is only present to have a graceful shutdown. The the bean method below.
      *
      * @author Philip Helger
      */
-    private static final class Destroyer {
+    private static final class Destroyer
+    {
         @PreDestroy
-        public void destroy() {
-            if (WebScopeManager.isGlobalScopePresent()) {
-                AS4ServerInitializer.shutdownAS4Server();
-                WebFileIO.resetPaths();
-                WebScopeManager.onGlobalEnd();
+        public void destroy ()
+        {
+            if (WebScopeManager.isGlobalScopePresent ())
+            {
+                AS4ServerInitializer.shutdownAS4Server ();
+                WebFileIO.resetPaths ();
+                WebScopeManager.onGlobalEnd ();
             }
         }
     }
 
     @Bean
-    public Destroyer destroyer() {
+    public Destroyer destroyer ()
+    {
         return new Destroyer();
     }
 }

@@ -48,6 +48,7 @@ public class AS4Servlet extends AbstractXServlet
     final AS4XServletHandler hdl = new AS4XServletHandler ();
     hdl.setRequestHandlerCustomizer (new IAS4ServletRequestHandlerCustomizer ()
     {
+      @SuppressWarnings ("removal")
       public void customizeBeforeHandling (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                                            @Nonnull final AS4UnifiedResponse aUnifiedResponse,
                                            @Nonnull final AS4RequestHandler aRequestHandler)

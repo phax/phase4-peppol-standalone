@@ -77,7 +77,6 @@ public class PeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingSBDHand
             // Example code snippets how to get data
             String c1 = aPeppolSBD.getSenderAsIdentifier().getURIEncoded();
             String c2 = CertificateHelper.getPEMEncodedCertificate (aIncomingState.getSigningCertificate ());
-
             String c4 = aPeppolSBD.getReceiverAsIdentifier().getURIEncoded();
             String docType = aPeppolSBD.getDocumentTypeAsIdentifier().getURIEncoded();
             String process = aPeppolSBD.getProcessAsIdentifier().getURIEncoded();

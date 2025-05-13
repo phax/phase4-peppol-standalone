@@ -36,6 +36,7 @@ import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.phase4.client.IAS4ClientBuildMessageCallback;
 import com.helger.phase4.dynamicdiscovery.AS4EndpointDetailProviderPeppol;
+import com.helger.phase4.logging.Phase4LoggerFactory;
 import com.helger.phase4.model.message.AS4UserMessage;
 import com.helger.phase4.model.message.AbstractAS4Message;
 import com.helger.phase4.peppol.Phase4PeppolSender;
@@ -59,7 +60,7 @@ import com.helger.xml.serialize.read.DOMReader;
 @Immutable
 public final class PeppolSender
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (PeppolSender.class);
+  private static final Logger LOGGER = Phase4LoggerFactory.getLogger (PeppolSender.class);
 
   private PeppolSender ()
   {}
@@ -109,8 +110,10 @@ public final class PeppolSender
     {
       // Payload must be XML - even for Text and Binary content
       final Document aDoc = DOMReader.readXMLDOM (aPayloadBytes);
-      if (aDoc == null)
+      if (aDoc == null || aDoc.getDocumentElement () == null)
         throw new IllegalStateException ("Failed to read provided payload as XML");
+      if (aDoc.getDocumentElement ().getNamespaceURI () == null)
+        throw new IllegalStateException ("Only XML payloads with a namespace are supported");
 
       // Start configuring here
       final IParticipantIdentifier aSenderID = aIF.createParticipantIdentifierWithDefaultScheme (sSenderID);
@@ -135,11 +138,11 @@ public final class PeppolSender
       aSendingReport.setProcessID (aProcessID);
 
       final SMPClientReadOnly aSMPClient = new SMPClientReadOnly (Phase4PeppolSender.URL_PROVIDER,
-              aReceiverID,
-              aSmlInfo);
+                                                                  aReceiverID,
+                                                                  aSmlInfo);
 
       aSMPClient.withHttpClientSettings (aHCS -> {
-        // TODO Add SMP outbound proxy settings here
+        // TODO Add SMP HTTP outbound proxy settings here
         // If this block is not used, it may be removed
       });
 
@@ -150,59 +153,60 @@ public final class PeppolSender
       }
 
       final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
-      // TODO Add AP outbound proxy settings here
+      // TODO Add AP HTTP outbound proxy settings here
 
       final PeppolUserMessageBuilder aBuilder = Phase4PeppolSender.builder ()
-              .httpClientFactory (aHCS)
-              .documentTypeID (aDocTypeID)
-              .processID (aProcessID)
-              .senderParticipantID (aSenderID)
-              .receiverParticipantID (aReceiverID)
-              .senderPartyID (sMyPeppolSeatID)
-              .countryC1 (sCountryCodeC1)
-              .payload (aDoc.getDocumentElement ())
-              .peppolAP_CAChecker (aAPCAChecker)
-              .endpointDetailProvider (AS4EndpointDetailProviderPeppol.create (aSMPClient)
-                      .setUsePFUOI430 (APConfig.isUsePFUOI430 ()))
-              .sbdDocumentConsumer (sbd -> {
-                // Remember SBDH Instance
-                // Identifier
-                aSendingReport.setSBDHInstanceIdentifier (sbd.getStandardBusinessDocumentHeader ()
-                        .getDocumentIdentification ()
-                        .getInstanceIdentifier ());
-              })
-              .endpointURLConsumer (sEndpointUrl -> {
-                // Determined by SMP lookup
-                aSendingReport.setC3EndpointURL (sEndpointUrl);
-              })
-              .certificateConsumer ( (aAPCertificate,
-                                      aCheckDT,
-                                      eCertCheckResult) -> {
-                // Determined by SMP lookup
-                aSendingReport.setC3Cert (aAPCertificate);
-                aSendingReport.setC3CertCheckDT (aCheckDT);
-                aSendingReport.setC3CertCheckResult (eCertCheckResult);
-              })
-              .buildMessageCallback (new IAS4ClientBuildMessageCallback ()
-              {
-                public void onAS4Message (@Nonnull final AbstractAS4Message <?> aMsg)
-                {
-                  // Created AS4 fields
-                  final AS4UserMessage aUserMsg = (AS4UserMessage) aMsg;
-                  aSendingReport.setAS4MessageID (aUserMsg.getEbms3UserMessage ()
-                          .getMessageInfo ()
-                          .getMessageId ());
-                  aSendingReport.setAS4ConversationID (aUserMsg.getEbms3UserMessage ()
-                          .getCollaborationInfo ()
-                          .getConversationId ());
-                }
-              })
-              .signalMsgConsumer ( (aSignalMsg,
-                                    aMessageMetadata,
-                                    aState) -> {
-                aSendingReport.setAS4ReceivedSignalMsg (aSignalMsg);
-              })
-              .disableValidation ();
+                                                                  .httpClientFactory (aHCS)
+                                                                  .documentTypeID (aDocTypeID)
+                                                                  .processID (aProcessID)
+                                                                  .senderParticipantID (aSenderID)
+                                                                  .receiverParticipantID (aReceiverID)
+                                                                  .senderPartyID (sMyPeppolSeatID)
+                                                                  .countryC1 (sCountryCodeC1)
+                                                                  .payload (aDoc.getDocumentElement ())
+                                                                  .peppolAP_CAChecker (aAPCAChecker)
+                                                                  .endpointDetailProvider (AS4EndpointDetailProviderPeppol.create (aSMPClient)
+                                                                                                                          .setUsePFUOI430 (APConfig.isUsePFUOI430 ()))
+                                                                  .sbdDocumentConsumer (sbd -> {
+                                                                    // Remember SBDH Instance
+                                                                    // Identifier
+                                                                    aSendingReport.setSBDHInstanceIdentifier (sbd.getStandardBusinessDocumentHeader ()
+                                                                                                                 .getDocumentIdentification ()
+                                                                                                                 .getInstanceIdentifier ());
+                                                                  })
+                                                                  .endpointURLConsumer (sEndpointUrl -> {
+                                                                    // Determined by SMP lookup
+                                                                    aSendingReport.setC3EndpointURL (sEndpointUrl);
+                                                                  })
+                                                                  .certificateConsumer ( (aAPCertificate,
+                                                                                          aCheckDT,
+                                                                                          eCertCheckResult) -> {
+                                                                    // Determined by SMP lookup
+                                                                    aSendingReport.setC3Cert (aAPCertificate);
+                                                                    aSendingReport.setC3CertCheckDT (aCheckDT);
+                                                                    aSendingReport.setC3CertCheckResult (eCertCheckResult);
+                                                                  })
+                                                                  .sendingDateTimeConsumer (aSendingReport::setAS4SendingDT)
+                                                                  .buildMessageCallback (new IAS4ClientBuildMessageCallback ()
+                                                                  {
+                                                                    public void onAS4Message (@Nonnull final AbstractAS4Message <?> aMsg)
+                                                                    {
+                                                                      // Created AS4 fields
+                                                                      final AS4UserMessage aUserMsg = (AS4UserMessage) aMsg;
+                                                                      aSendingReport.setAS4MessageID (aUserMsg.getEbms3UserMessage ()
+                                                                                                              .getMessageInfo ()
+                                                                                                              .getMessageId ());
+                                                                      aSendingReport.setAS4ConversationID (aUserMsg.getEbms3UserMessage ()
+                                                                                                                   .getCollaborationInfo ()
+                                                                                                                   .getConversationId ());
+                                                                    }
+                                                                  })
+                                                                  .signalMsgConsumer ( (aSignalMsg,
+                                                                                        aMessageMetadata,
+                                                                                        aState) -> {
+                                                                    aSendingReport.setAS4ReceivedSignalMsg (aSignalMsg);
+                                                                  })
+                                                                  .disableValidation ();
       final Wrapper <Phase4Exception> aCaughtEx = new Wrapper <> ();
       eResult = aBuilder.sendMessageAndCheckForReceipt (aCaughtEx::set);
       LOGGER.info ("Peppol client send result: " + eResult);
@@ -213,7 +217,7 @@ public final class PeppolSender
         // In many simple cases, this might be the sender's participant ID
         final String sEndUserID = "TODO";
 
-        // TODO Enable when ready
+        // TODO Enable Peppol Reporting when ready
         if (false)
           aBuilder.createAndStorePeppolReportingItemAfterSending (sEndUserID);
       }
@@ -282,7 +286,7 @@ public final class PeppolSender
                                                                   aSmlInfo);
 
       aSMPClient.withHttpClientSettings (aHCS -> {
-        // TODO Add SMP outbound proxy settings here
+        // TODO Add SMP HTTP outbound proxy settings here
         // If this block is not used, it may be removed
       });
 
@@ -293,7 +297,7 @@ public final class PeppolSender
       }
 
       final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
-      // TODO Add AP outbound proxy settings here
+      // TODO Add AP HTTP outbound proxy settings here
 
       final PeppolUserMessageSBDHBuilder aBuilder = Phase4PeppolSender.sbdhBuilder ()
                                                                       .httpClientFactory (aHCS)
@@ -314,6 +318,7 @@ public final class PeppolSender
                                                                         aSendingReport.setC3CertCheckDT (aCheckDT);
                                                                         aSendingReport.setC3CertCheckResult (eCertCheckResult);
                                                                       })
+                                                                      .sendingDateTimeConsumer (aSendingReport::setAS4SendingDT)
                                                                       .buildMessageCallback (new IAS4ClientBuildMessageCallback ()
                                                                       {
                                                                         public void onAS4Message (@Nonnull final AbstractAS4Message <?> aMsg)
@@ -343,7 +348,7 @@ public final class PeppolSender
         // In many simple cases, this might be the sender's participant ID
         final String sEndUserID = "TODO";
 
-        // TODO Enable when ready
+        // TODO Enable Peppol Reporting when ready
         if (false)
           aBuilder.createAndStorePeppolReportingItemAfterSending (sEndUserID);
       }

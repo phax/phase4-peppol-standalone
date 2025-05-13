@@ -22,7 +22,7 @@
   <parent>
     <groupId>com.helger.phase4</groupId>
     <artifactId>phase4-parent-pom</artifactId>
-    <version>3.1.0-beta2</version>
+    <version>3.1.0</version>
   </parent>
   <artifactId>phase4-peppol-standalone</artifactId>
   <name>phase4-peppol-standalone</name>
@@ -42,8 +42,9 @@
 <!--
   <repositories>
     <repository>
-      <id>central-snapshots</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+      <name>Central Portal Snapshots</name>
+      <id>central-portal-snapshots</id>
+      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
       <releases>
         <enabled>false</enabled>
       </releases>

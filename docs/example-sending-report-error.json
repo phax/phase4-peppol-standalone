@@ -1,0 +1,41 @@
+{
+    "currentDateTimeUTC": "2025-05-19T16:49:32.878Z",
+    "phase4Version": "3.1.1",
+    "smlDnsZone": "acc.edelivery.tech.ec.europa.eu.",
+    "senderId": "iso6523-actorid-upis::9915:helger",
+    "receiverId": "iso6523-actorid-upis::9922:optbcntrlacc1001",
+    "docTypeId": "busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0::2.1",
+    "docTypeIdInCodeList": true,
+    "processId": "cenbii-procid-ubl::urn:fdc:peppol.eu:2017:poacc:billing:01:1.0",
+    "processIdInCodeList": true,
+    "countryC1": "AT",
+    "senderPartyId": "POP000000",
+    "transportProfileId": "peppol-transport-as4-v2_0",
+    "sbdhInstanceIdentifier": "1dcd5b3e-ba5a-4306-9233-614064249b1a",
+    "c3EndpointUrl": "https://phase4-controller.testbedng.acc.peppol.org/rcv1",
+    "c3Cert": "-----BEGIN CERTIFICATE-----\nMIIFwjCCA6qgAwIBAgIQdcvHyRuilYPuwtZo7up+HjANBgkqhkiG9w0BAQsFADBrMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQT3BlblBFUFBPTCBBSVNCTDEWMBQGA1UECxMNRk9SIFRFU1QgT05MWTEpMCcGA1UEAxMgUEVQUE9MIEFDQ0VTUyBQT0lOVCBURVNUIENBIC0gRzIwHhcNMjUwMzA2MDAwMDAwWhcNMjcwMjI0MjM1OTU5WjBPMQswCQYDVQQGEwJCRTETMBEGA1UECgwKT3BlblBlcHBvbDEXMBUGA1UECwwOUEVQUE9MIFRFU1QgQVAxEjAQBgNVBAMMCVBHRDAwMDAwNTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKmr2tbgNaSjUpmv5lxcu7kjnTJEuK11qzf0TlTOBbAXj/HKwPwq/ckEeF2HOVI9hF7rnKwINNqUDjS70cOaqB0lGiIDk1XcGL3fr2lJzlbhvRZ7YWAeEMRzQpKxepxhZXlzsdgxD98dcHPbas5SdbzNMpwL2KSEaaGs9V50hN7un2hkyJ46mM0wbhb3H4ch+pYBZgH7YSBrRf4EP0sARBs5jIPA9VBixuEDKa/qnjTOr/bNbhZUXFKiMMW0Lg1HzJ8jZXKAaNSeYmttFmk0ZEtehNl5uaZhI+jTk9S7f6p/nrKJEvmOOjFNEuVpJprMldpK9OhOBiSxxjazEHR3m98CAwEAAaOCAXwwggF4MAwGA1UdEwEB/wQCMAAwDgYDVR0PAQH/BAQDAgOoMBYGA1UdJQEB/wQMMAoGCCsGAQUFBwMCMB0GA1UdDgQWBBTyRxjum21BsLnMqObPLNnaHQ8opTBdBgNVHR8EVjBUMFKgUKBOhkxodHRwOi8vcGtpLWNybC5zeW1hdXRoLmNvbS9jYV82YTkzNzczNGEzOTNhMDgwNWJmMzNjZGE4YjMzMTA5My9MYXRlc3RDUkwuY3JsMDcGCCsGAQUFBwEBBCswKTAnBggrBgEFBQcwAYYbaHR0cDovL3BraS1vY3NwLnN5bWF1dGguY29tMB8GA1UdIwQYMBaAFGtvS7bxN7orPH8Yzborsrl8KjfrMC0GCmCGSAGG+EUBEAMEHzAdBhNghkgBhvhFARABAgMBAYGpkOEDFgY5NTc2MDgwOQYKYIZIAYb4RQEQBQQrMCkCAQAWJGFIUjBjSE02THk5d2Eya3RjbUV1YzNsdFlYVjBhQzVqYjIwPTANBgkqhkiG9w0BAQsFAAOCAgEAg1iaEwiUjcEyFqq0g2/BKUlTN9zmCzfBAr7FOFnGRexykQK4Bk5dSmwRhhPUiLwpUr2oFCY+61tDu/uzIS/J07WzqLgL0O3yECimsXvAV7JZMbUnswBneufgNsgipi5hD7VNxrStP8wh8n8wZgN6YDDUq6a7ya6/RWMYJclENcDwiE2gQ8wOKgcT/Z2kKdywJLPSiuUzj2VjyKbWxwCOPyzdSPlL+AnyawjzSllkLL5ao8zXGfzXDkIIxo0YaPebDwvlrqkCByxdH86kxKYUSvoSCNQwLmhWrLeZp981/LKYBEZBFem9k6iQrF0phvw7KnkKooxomIDnx7nKlTvCKrKYsSdtephG6ru7U6iVoQj98cdGD06aM4rBIY/kayXak+DE2choEWllLIvB1VEnRFU0PMW0E+vpgbB7anzzr7THzREjDOa6kIGcJdNC/FlTuFA6s2pJDBt6eK0RHIZqJsC7fN8+wA49RUgg6CCBwI9zyweaaZSj43mzYTqNYlEd7sJSglgc05ZdQqxmfPLSh1mhK4ghSb7Rxj7d9RSETr6tb32nVHYKP/HCUObREe0uf6RwwsohjXE7dV9XQWypLEYft8Y97Dn9uvbKkk6QopexGQjkqC4O12eMsKD+Nub/HmynOflc0JHnNU28dZLLuUrsYC1/HvimLnYVqT7BsHg=\n-----END CERTIFICATE-----",
+    "c3CertSubjectCN": "PGD000005",
+    "c3CertSubjectO": "OpenPeppol",
+    "c3CertCheckDT": "2025-05-19T18:49:33.15+02:00",
+    "c3CertCheckResult": "VALID",
+    "as4MessageId": "43fa2a88-92d2-49c6-b18b-cd913cf1b355@phase4",
+    "as4ConversationId": "phase4@Conv2886911484538149295",
+    "as4SendingDateTime": "2025-05-19T18:49:33.171+02:00",
+    "sendingResult": "AS4_ERROR_MESSAGE_RECEIVED",
+    "as4ReceivedSignalMsg": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><eb:SignalMessage xmlns:ns7=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:ns6=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:eb=\"http://docs.oasis-open.org/ebxml-msg/ebms/v3.0/ns/core/200704/\" xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:ebbp=\"http://docs.oasis-open.org/ebxml-bp/ebbp-signals-2.0\"><eb:MessageInfo><eb:Timestamp>2025-05-19T16:49:34.067Z</eb:Timestamp><eb:MessageId>d0be855c-51c5-4302-8d57-de35cf409496@phase4.openpeppol.playground</eb:MessageId><eb:RefToMessageId>43fa2a88-92d2-49c6-b18b-cd913cf1b355@phase4</eb:RefToMessageId></eb:MessageInfo><eb:Error category=\"Content\" refToMessageInError=\"43fa2a88-92d2-49c6-b18b-cd913cf1b355@phase4\" errorCode=\"EBMS:0004\" severity=\"failure\" shortDescription=\"Other\"><eb:Description xml:lang=\"en\">An undefined error occurred.</eb:Description><eb:ErrorDetail>The incoming Peppol message could not be processed.</eb:ErrorDetail></eb:Error></eb:SignalMessage>",
+    "as4ResponseError": true,
+    "as4ResponseErrors": [
+        {
+            "description": "An undefined error occurred.",
+            "errorDetails": "The incoming Peppol message could not be processed.",
+            "category": "Content",
+            "refToMessageInError": "43fa2a88-92d2-49c6-b18b-cd913cf1b355@phase4",
+            "errorCode": "EBMS:0004",
+            "severity": "failure",
+            "shortDescription": "Other"
+        }
+    ],
+    "overallDurationMillis": 1382,
+    "sendingSuccess": false,
+    "overallSuccess": false
+}

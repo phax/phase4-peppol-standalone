@@ -165,7 +165,6 @@ public class ServletConfig
     AS4DumpManager.setOutgoingDumper (new AS4OutgoingDumperFileBased ());
   }
 
-  @SuppressWarnings ("removal")
   private static void _initPeppolAS4 ()
   {
     // Our server should check all signing certificates of incoming messages if
@@ -242,7 +241,6 @@ public class ServletConfig
       // our AP
       Phase4PeppolDefaultReceiverConfiguration.setReceiverCheckEnabled (true);
       Phase4PeppolDefaultReceiverConfiguration.setSMPClient (new SMPClientReadOnly (URLHelper.getAsURI (sSMPURL)));
-      Phase4PeppolDefaultReceiverConfiguration.setWildcardSelectionMode (Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE);
       Phase4PeppolDefaultReceiverConfiguration.setAS4EndpointURL (sAPURL);
       Phase4PeppolDefaultReceiverConfiguration.setAPCertificate (aAPCert);
       LOGGER.info ("phase4 Peppol receiver checks are enabled");

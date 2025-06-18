@@ -48,7 +48,6 @@ public class SpringBootAS4Servlet extends AbstractXServlet
     final AS4XServletHandler hdl = new AS4XServletHandler ();
     hdl.setRequestHandlerCustomizer (new IAS4ServletRequestHandlerCustomizer ()
     {
-      @SuppressWarnings ("removal")
       public void customizeBeforeHandling (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                                            @Nonnull final AS4UnifiedResponse aUnifiedResponse,
                                            @Nonnull final AS4RequestHandler aRequestHandler)
@@ -90,7 +89,6 @@ public class SpringBootAS4Servlet extends AbstractXServlet
             aReceiverCheckData = Phase4PeppolReceiverConfiguration.builder ()
                                                                   .receiverCheckEnabled (true)
                                                                   .serviceMetadataProvider (new SMPClientReadOnly (URLHelper.getAsURI ("http://smp-prod.example.org")))
-                                                                  .wildcardSelectionMode (Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE)
                                                                   .as4EndpointUrl ("https://ap-prod.example.org/as4")
                                                                   .apCertificate (CertificateHelper.convertStringToCertficateOrNull ("....Public Prod AP Cert...."))
                                                                   .sbdhIdentifierFactoryPeppol ()
@@ -104,7 +102,6 @@ public class SpringBootAS4Servlet extends AbstractXServlet
             aReceiverCheckData = Phase4PeppolReceiverConfiguration.builder ()
                                                                   .receiverCheckEnabled (true)
                                                                   .serviceMetadataProvider (new SMPClientReadOnly (URLHelper.getAsURI ("http://smp-test.example.org")))
-                                                                  .wildcardSelectionMode (Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE)
                                                                   .as4EndpointUrl ("https://ap-test.example.org/as4")
                                                                   .apCertificate (CertificateHelper.convertStringToCertficateOrNull ("....Public Test AP Cert...."))
                                                                   .sbdhIdentifierFactoryPeppol ()

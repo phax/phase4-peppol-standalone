@@ -23,13 +23,11 @@ It also contains a lot of boilerplate code to show how certain things can be ach
 
 Sending is triggered via an HTTP POST request.
 
-Since 2025-01-31 all the sending APIs mentioned below also require the HTTP Header `X-Token` to be present and have a specific value.
+All the sending APIs mentioned below also require the HTTP Header `X-Token` to be present and have a specific value.
 What value that is, depends on the configuration property `phase4.api.requiredtoken`.
 The pre-configured value is `NjIh9tIx3Rgzme19mGIy` and should be changed in your own setup.
 
-Since 2025-02-04 instead of providing two different APIs (`/sendtest` and `/sendprod`) only one URL (`/sendas4`)
-is provided, and the actual Peppol Network choice is done based on the `peppol.stage` configuration parameter.
-The same applies to sending the prebuild SBDH - the API changed from `/sendsbdhtest` to `/sendsbdh`.
+The actual Peppol Network choice (test or production network) is done based on the `peppol.stage` configuration parameter.
 
 To send to an AS4 endpoint use this URL (the SBDH is built inside):
 ```

@@ -58,10 +58,9 @@
   -->
 
   <properties>
-    <junit5.version>5.11.4</junit5.version>
     <peppol-ap-support.version>1.0.2</peppol-ap-support.version>
     <peppol-reporting.version>3.1.0</peppol-reporting.version>
-    <spring-boot.version>3.4.5</spring-boot.version>
+    <spring-boot.version>3.5.0</spring-boot.version>
   </properties>
 
   <!-- Include here to not bloat the global scope -->
@@ -144,14 +143,12 @@
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-api</artifactId><!--$NO-MVN-MAN-VER$-->
-      <version>${junit5.version}</version>  <!-- transitive version is 5.10.3 :( -->
+      <artifactId>junit-jupiter-api</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId><!--$NO-MVN-MAN-VER$-->
-      <version>${junit5.version}</version>  <!-- transitive version is 5.10.9 :( -->
+      <artifactId>junit-jupiter-engine</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

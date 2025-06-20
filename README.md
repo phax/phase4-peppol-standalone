@@ -114,6 +114,15 @@ The following configuration properties are contained by default:
    the SML to be used and the CAs against which checks are performed
 * **`peppol.seatid`** - defines your Peppol Seat ID. It could be taken from your AP certificate as well,
    but this way it is a bit easier.
+* **`peppol.owner.countrycode`** - defines the country code of you as a Peppol Service Provider. Use the
+   2-letter country code (as in `AT` for Austria). This is required to send the Peppol Reports to
+   OpenPeppol.
+* **`peppol.reporting.senderid`** - the sending Peppol Participant ID. For now, this can be e.g. the VAT
+   number or organisational number of you as a Service Provider. In **the future** this will most likely need
+   to be an SPID (using the `0242` participant scheme ID). Example value: `9915:TestReportSender`. This will be used
+   as the sending Participant ID for sending Peppol Reports to OpenPeppol.
+* **`peppol.reporting.scheduled`** - a boolean value to indicate, if the Peppol TSR and EUSR reports should
+   automatically sent be towards OpenPeppol on a monthly basis. The cron rule is place is `0 0 5 2 * *`.
 
 ## Running
 

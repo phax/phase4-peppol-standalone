@@ -3,7 +3,7 @@
 This an example standalone implementation of [phase4](https://github.com/phax/phase4) for the Peppol Network.
 
 This is a template application and NOT ready for production use, because you need to take decisions and add some code.
-Of course phase4 itself is ready for production use.
+Of course phase4 itself is ready for production use - see a list of [known phase4 users](https://github.com/phax/phase4/wiki/Known-Users) that have agreed to be publicly listed.
 
 **Note:** because it is a template application, no releases are created - you have to modify it anyway.
 

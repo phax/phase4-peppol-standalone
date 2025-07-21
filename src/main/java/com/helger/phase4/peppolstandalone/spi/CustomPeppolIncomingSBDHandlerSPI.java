@@ -20,6 +20,7 @@ import javax.annotation.Nonnull;
 
 import org.slf4j.Logger;
 import org.unece.cefact.namespaces.sbdh.StandardBusinessDocument;
+import org.w3c.dom.Element;
 
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.collection.impl.ICommonsList;
@@ -28,6 +29,9 @@ import com.helger.peppol.reporting.api.PeppolReportingItem;
 import com.helger.peppol.reporting.api.backend.PeppolReportingBackend;
 import com.helger.peppol.reporting.api.backend.PeppolReportingBackendException;
 import com.helger.peppol.sbdh.PeppolSBDHData;
+import com.helger.peppol.sbdh.payload.PeppolSBDHPayloadBinaryMarshaller;
+import com.helger.peppol.sbdh.spec12.BinaryContentType;
+import com.helger.peppol.sbdh.spec12.ObjectFactory;
 import com.helger.phase4.ebms3header.Ebms3Error;
 import com.helger.phase4.ebms3header.Ebms3UserMessage;
 import com.helger.phase4.incoming.IAS4IncomingMessageMetadata;
@@ -72,6 +76,25 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
     // TODO add your code here
     // E.g. write to disk, write to S3, write to database, write to queue...
     LOGGER.error ("You need to implement handleIncomingSBD to deal with incoming messages");
+
+    if (false)
+    {
+      // TODO example code on how to identify Factur-X payloads
+      final Element aXMLPayload = aPeppolSBD.getBusinessMessageNoClone ();
+      if (ObjectFactory._BinaryContent_QNAME.getLocalPart ().equals (aXMLPayload.getLocalName ()) &&
+          ObjectFactory._BinaryContent_QNAME.getNamespaceURI ().equals (aXMLPayload.getNamespaceURI ()))
+      {
+        if ("urn:peppol:doctype:pdf+xml".equals (aPeppolSBD.getStandard ()) &&
+            "0".equals (aPeppolSBD.getTypeVersion ()) &&
+            "factur-x".equals (aPeppolSBD.getType ()))
+        {
+          // Handle as Factur-X
+          BinaryContentType aBinaryContent = new PeppolSBDHPayloadBinaryMarshaller ().read (aXMLPayload);
+          byte [] aPDFBytes = aBinaryContent.getValue ();
+          // TODO do something with the PDF bytes
+        }
+      }
+    }
 
     // In case there is an error, throw any Exception -> will lead to an AS4
     // Error Message to the sender

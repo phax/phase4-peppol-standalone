@@ -167,11 +167,6 @@ public class ServletConfig
 
   private static void _initPeppolAS4 ()
   {
-    // Our server should check all signing certificates of incoming messages if
-    // they are revoked or not (this is the default setting, but added it here
-    // for easy modification)
-    Phase4PeppolDefaultReceiverConfiguration.setCheckSigningCertificateRevocation (true);
-
     // Make sure the download of CRL is using Apache HttpClient and that the
     // provided settings are used. If e.g. a proxy is needed to access outbound
     // resources, it can be configured here
@@ -200,7 +195,6 @@ public class ServletConfig
 
     final X509Certificate aAPCert = (X509Certificate) aPKE.getCertificate ();
 
-    // Note: For eB2B you want to check against the eB2B CA instead
     final TrustedCAChecker aAPCAChecker = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP ()
                                                                  : PeppolTrustedCA.peppolTestAP ();
 
@@ -228,7 +222,6 @@ public class ServletConfig
       LOGGER.info ("Successfully checked that the provided Peppol AP certificate is valid.");
 
     // Must be set independent on the enabled/disable status
-    // This must be changed for eB2B
     Phase4PeppolDefaultReceiverConfiguration.setAPCAChecker (aAPCAChecker);
 
     // Eventually enable the receiver check, so that for each incoming request

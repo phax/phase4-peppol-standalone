@@ -16,15 +16,13 @@
  */
 package com.helger.phase4.peppolstandalone.spi;
 
-import javax.annotation.Nonnull;
-
 import org.slf4j.Logger;
 import org.unece.cefact.namespaces.sbdh.StandardBusinessDocument;
 import org.w3c.dom.Element;
 
-import com.helger.commons.annotation.IsSPIImplementation;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.http.HttpHeaderMap;
+import com.helger.annotation.style.IsSPIImplementation;
+import com.helger.collection.commons.ICommonsList;
+import com.helger.http.header.HttpHeaderMap;
 import com.helger.peppol.reporting.api.PeppolReportingItem;
 import com.helger.peppol.reporting.api.backend.PeppolReportingBackend;
 import com.helger.peppol.reporting.api.backend.PeppolReportingBackendException;
@@ -41,6 +39,8 @@ import com.helger.phase4.peppol.servlet.IPhase4PeppolIncomingSBDHandlerSPI;
 import com.helger.phase4.peppol.servlet.Phase4PeppolServletMessageProcessorSPI;
 import com.helger.phase4.peppolstandalone.APConfig;
 import com.helger.security.certificate.CertificateHelper;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * This is a way of handling incoming Peppol messages

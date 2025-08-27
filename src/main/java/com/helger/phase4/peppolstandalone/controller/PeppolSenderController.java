@@ -24,8 +24,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.helger.commons.io.stream.NonBlockingByteArrayInputStream;
-import com.helger.commons.string.StringHelper;
+import com.helger.base.io.nonblocking.NonBlockingByteArrayInputStream;
+import com.helger.base.string.StringHelper;
 import com.helger.peppol.sbdh.PeppolSBDHData;
 import com.helger.peppol.sbdh.PeppolSBDHDataReadException;
 import com.helger.peppol.sbdh.PeppolSBDHDataReader;
@@ -59,7 +59,7 @@ public class PeppolSenderController
                                    @PathVariable final String processId,
                                    @PathVariable final String countryC1)
   {
-    if (StringHelper.hasNoText (xtoken))
+    if (StringHelper.isEmpty (xtoken))
     {
       LOGGER.error ("The specific token header is missing");
       throw new HttpForbiddenException ();
@@ -104,7 +104,7 @@ public class PeppolSenderController
   public String sendPeppolSbdhMessage (@RequestHeader (name = HEADER_X_TOKEN, required = true) final String xtoken,
                                        @RequestBody final byte [] aPayloadBytes)
   {
-    if (StringHelper.hasNoText (xtoken))
+    if (StringHelper.isEmpty (xtoken))
     {
       LOGGER.error ("The specific token header is missing");
       throw new HttpForbiddenException ();

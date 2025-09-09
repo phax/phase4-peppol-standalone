@@ -24,7 +24,7 @@
   <parent>
     <groupId>com.helger.phase4</groupId>
     <artifactId>phase4-parent-pom</artifactId>
-    <version>4.0.0</version>
+    <version>4.0.1</version>
   </parent>
   <artifactId>phase4-peppol-standalone</artifactId>
   <name>phase4-peppol-standalone</name>
@@ -60,7 +60,6 @@
   <properties>
     <peppol-ap-support.version>2.0.0</peppol-ap-support.version>
     <peppol-reporting.version>4.0.0</peppol-reporting.version>
-    <junit5.version>5.12.2</junit5.version>
     <spring-boot.version>3.5.5</spring-boot.version>
   </properties>
 
@@ -137,24 +136,6 @@
       <artifactId>jaxb-impl</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <version>${junit5.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-api</artifactId>
-      <version>${junit5.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <version>${junit5.version}</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>

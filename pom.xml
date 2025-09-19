@@ -59,7 +59,7 @@
 
   <properties>
     <peppol-ap-support.version>2.0.0</peppol-ap-support.version>
-    <peppol-reporting.version>4.0.0</peppol-reporting.version>
+    <peppol-reporting.version>4.0.1</peppol-reporting.version>
     <spring-boot.version>3.5.5</spring-boot.version>
   </properties>
 

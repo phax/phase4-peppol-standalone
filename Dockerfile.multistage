@@ -36,8 +36,9 @@ COPY src ./src
 # Build the application
 RUN mvn clean install -DskipTests
 
+
 # Runtime stage
-FROM eclipse-temurin:17-jdk-alpine
+FROM eclipse-temurin:21-jdk-alpine
 
 VOLUME /tmp
 

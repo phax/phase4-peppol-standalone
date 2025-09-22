@@ -32,6 +32,20 @@
   <url>https://github.com/phax/phase4-peppol-standalone</url>
   <inceptionYear>2023</inceptionYear>
 
+  <organization>
+    <name>Philip Helger</name>
+    <url>https://www.helger.com</url>
+  </organization>
+
+  <developers>
+    <developer>
+      <id>philip</id>
+      <name>Philip Helger</name>
+      <email>ph(at)helger.com</email>
+      <url>https://www.helger.com</url>
+    </developer>
+  </developers>
+
   <licenses>
     <license>
       <name>Apache 2</name>

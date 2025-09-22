@@ -7,6 +7,8 @@ Of course phase4 itself is ready for production use - see a list of [known phase
 
 **Note:** because it is a template application, no releases are created - you have to modify it anyway.
 
+Contact me via email for *commercial support* (see `pom.xml` for the address).
+
 This project is part of my Peppol solution stack. See https://github.com/phax/peppol for other components and libraries in that area.
 
 # Functionality

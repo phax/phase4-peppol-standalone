@@ -114,12 +114,22 @@ public final class PeppolSender
         throw new IllegalStateException ("Only XML payloads with a namespace are supported");
 
       // Start configuring here
-      final IParticipantIdentifier aSenderID = aIF.createParticipantIdentifierWithDefaultScheme (sSenderID);
+      IParticipantIdentifier aSenderID = aIF.parseParticipantIdentifier (sSenderID);
+      if (aSenderID == null)
+      {
+        // Fallback to default scheme
+        aSenderID = aIF.createParticipantIdentifierWithDefaultScheme (sSenderID);
+      }
       if (aSenderID == null)
         throw new IllegalStateException ("Failed to parse the sending participant ID '" + sSenderID + "'");
       aSendingReport.setSenderID (aSenderID);
 
-      final IParticipantIdentifier aReceiverID = aIF.createParticipantIdentifierWithDefaultScheme (sReceiverID);
+      IParticipantIdentifier aReceiverID = aIF.parseParticipantIdentifier (sReceiverID);
+      if (aReceiverID == null)
+      {
+        // Fallback to default scheme
+        aReceiverID = aIF.createParticipantIdentifierWithDefaultScheme (sReceiverID);
+      }
       if (aReceiverID == null)
         throw new IllegalStateException ("Failed to parse the receiving participant ID '" + sReceiverID + "'");
       aSendingReport.setReceiverID (aReceiverID);

@@ -163,11 +163,13 @@ public final class PeppolSender
         // If this block is not used, it may be removed
       });
 
-      if (EJavaVersion.getCurrentVersion ().isNewerOrEqualsThan (EJavaVersion.JDK_17))
-      {
-        // Work around the disabled SHA-1 in XMLDsig issue
-        aSMPClient.setSecureValidation (false);
-      }
+      // In the meantime each SMP MUST be able to use SHA-256
+      if (false)
+        if (EJavaVersion.getCurrentVersion ().isNewerOrEqualsThan (EJavaVersion.JDK_17))
+        {
+          // Work around the disabled SHA-1 in XMLDsig issue
+          aSMPClient.setSecureValidation (false);
+        }
 
       final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
       // TODO Add AP HTTP outbound proxy settings here
@@ -304,11 +306,13 @@ public final class PeppolSender
         // If this block is not used, it may be removed
       });
 
-      if (EJavaVersion.getCurrentVersion ().isNewerOrEqualsThan (EJavaVersion.JDK_17))
-      {
-        // Work around the disabled SHA-1 in XMLDsig issue
-        aSMPClient.setSecureValidation (false);
-      }
+      // In the meantime each SMP MUST be able to use SHA-256
+      if (false)
+        if (EJavaVersion.getCurrentVersion ().isNewerOrEqualsThan (EJavaVersion.JDK_17))
+        {
+          // Work around the disabled SHA-1 in XMLDsig issue
+          aSMPClient.setSecureValidation (false);
+        }
 
       final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
       // TODO Add AP HTTP outbound proxy settings here

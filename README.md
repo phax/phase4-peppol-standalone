@@ -75,10 +75,10 @@ The following list contains the elements not considered for this demo applicatio
 * You need your own Peppol certificate to make it work - the contained keystore is a dummy one only
 * Document validation is not included
     * See https://github.com/phax/phive and https://github.com/phax/phive-rules for this.
-* Peppol Reporting is not included, as no reporting backend is present.
-    * You can pick one from https://github.com/phax/peppol-reporting to add to your `pom.xml`
-    * The calls for storing Peppol Reporting information is part of the code, but disabled by default, as relevant parameters cannot automatically be determined
-    * The default storage of Peppol Reports is the file system - you may choose something else here as well (SQL, MongoDB etc.)
+* Peppol Reporting is included, but disabled by default, as no reporting backend is present.
+    * You need to pick a backend (like MySQL or PostgreSQL) from https://github.com/phax/peppol-reporting and add to your `pom.xml`
+    * The calls for storing Peppol Reporting information is part of the code, but disabled by default, as relevant parameters cannot be determined automatically
+    * The default storage of created Peppol Reports is the file system - you should choose something else here as well (SQL, MongoDB etc.)
 
 # Get it up and running
 

@@ -80,4 +80,14 @@ public final class APConfig
   {
     return getConfig ().getAsBoolean ("peppol.reporting.scheduled", true);
   }
+
+  public static boolean isSendingEnabled ()
+  {
+    return getConfig ().getAsBoolean ("peppol.sending.enabled", true);
+  }
+
+  public static boolean isReceivingEnabled ()
+  {
+    return getConfig ().getAsBoolean ("peppol.receiving.enabled", true);
+  }
 }

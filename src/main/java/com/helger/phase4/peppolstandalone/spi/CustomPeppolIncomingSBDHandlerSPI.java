@@ -38,6 +38,7 @@ import com.helger.phase4.logging.Phase4LoggerFactory;
 import com.helger.phase4.peppol.servlet.IPhase4PeppolIncomingSBDHandlerSPI;
 import com.helger.phase4.peppol.servlet.Phase4PeppolServletMessageProcessorSPI;
 import com.helger.phase4.peppolstandalone.APConfig;
+import com.helger.phase4.util.Phase4Exception;
 import com.helger.security.certificate.CertificateHelper;
 
 import jakarta.annotation.Nonnull;
@@ -61,6 +62,12 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
                                  @Nonnull final IAS4IncomingMessageState aIncomingState,
                                  @Nonnull final ICommonsList <Ebms3Error> aProcessingErrorMessages) throws Exception
   {
+    if (!APConfig.isReceivingEnabled ())
+    {
+      LOGGER.info ("Peppol AP receiving is disabled");
+      throw new Phase4Exception ("Peppol AP receiving is disabled");
+    }
+
     final String sMyPeppolSeatID = APConfig.getMyPeppolSeatID ();
 
     // Example code snippets how to get data
@@ -82,11 +89,11 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
       // TODO example code on how to identify Factur-X payloads
       final Element aXMLPayload = aPeppolSBD.getBusinessMessageNoClone ();
       if (ObjectFactory._BinaryContent_QNAME.getLocalPart ().equals (aXMLPayload.getLocalName ()) &&
-          ObjectFactory._BinaryContent_QNAME.getNamespaceURI ().equals (aXMLPayload.getNamespaceURI ()))
+        ObjectFactory._BinaryContent_QNAME.getNamespaceURI ().equals (aXMLPayload.getNamespaceURI ()))
       {
         if ("urn:peppol:doctype:pdf+xml".equals (aPeppolSBD.getStandard ()) &&
-            "0".equals (aPeppolSBD.getTypeVersion ()) &&
-            "factur-x".equals (aPeppolSBD.getType ()))
+          "0".equals (aPeppolSBD.getTypeVersion ()) &&
+          "factur-x".equals (aPeppolSBD.getType ()))
         {
           // Handle as Factur-X
           BinaryContentType aBinaryContent = new PeppolSBDHPayloadBinaryMarshaller ().read (aXMLPayload);

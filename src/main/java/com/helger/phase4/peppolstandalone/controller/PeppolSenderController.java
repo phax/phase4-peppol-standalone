@@ -59,6 +59,12 @@ public class PeppolSenderController
                                    @PathVariable final String processId,
                                    @PathVariable final String countryC1)
   {
+    if (!APConfig.isSendingEnabled ())
+    {
+      LOGGER.info ("Peppol AP sending is disabled");
+      throw new HttpNotFoundException ();
+    }
+
     if (StringHelper.isEmpty (xtoken))
     {
       LOGGER.error ("The specific token header is missing");
@@ -72,8 +78,8 @@ public class PeppolSenderController
 
     final EPeppolNetwork eStage = APConfig.getPeppolStage ();
     final ESML eSML = eStage.isProduction () ? ESML.DIGIT_PRODUCTION : ESML.DIGIT_TEST;
-    final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP () : PeppolTrustedCA
-                                                                                                                   .peppolTestAP ();
+    final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP ()
+                                                          : PeppolTrustedCA.peppolTestAP ();
     LOGGER.info ("Trying to send Peppol " +
                  eStage.name () +
                  " message from '" +
@@ -104,6 +110,12 @@ public class PeppolSenderController
   public String sendPeppolSbdhMessage (@RequestHeader (name = HEADER_X_TOKEN, required = true) final String xtoken,
                                        @RequestBody final byte [] aPayloadBytes)
   {
+    if (!APConfig.isSendingEnabled ())
+    {
+      LOGGER.info ("Peppol AP sending is disabled");
+      throw new HttpNotFoundException ();
+    }
+
     if (StringHelper.isEmpty (xtoken))
     {
       LOGGER.error ("The specific token header is missing");
@@ -117,8 +129,8 @@ public class PeppolSenderController
 
     final EPeppolNetwork eStage = APConfig.getPeppolStage ();
     final ESML eSML = eStage.isProduction () ? ESML.DIGIT_PRODUCTION : ESML.DIGIT_TEST;
-    final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP () : PeppolTrustedCA
-                                                                                                                   .peppolTestAP ();
+    final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP ()
+                                                          : PeppolTrustedCA.peppolTestAP ();
     final Phase4PeppolSendingReport aSendingReport = new Phase4PeppolSendingReport (eSML);
 
     final PeppolSBDHData aData;

@@ -231,7 +231,7 @@ public final class PeppolSender
       {
         // TODO determine the enduser ID of the outbound message
         // In many simple cases, this might be the sender's participant ID
-        final String sEndUserID = "TODO";
+        final String sEndUserID = aSenderID.getURIEncoded ();
 
         // TODO Enable Peppol Reporting when ready
         if (false)
@@ -361,7 +361,7 @@ public final class PeppolSender
       {
         // TODO determine the enduser ID of the outbound message
         // In many simple cases, this might be the sender's participant ID
-        final String sEndUserID = "TODO";
+        final String sEndUserID = aData.getSenderAsIdentifier ().getURIEncoded ();
 
         // TODO Enable Peppol Reporting when ready
         if (false)

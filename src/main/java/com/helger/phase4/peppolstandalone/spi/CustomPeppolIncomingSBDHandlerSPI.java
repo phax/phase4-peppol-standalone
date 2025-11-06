@@ -123,7 +123,7 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
           // TODO determine correct values for the next three fields
           final String sC3ID = sMyPeppolSeatID;
           final String sC4CountryCode = "AT";
-          final String sEndUserID = "EndUserID";
+          final String sEndUserID = aPeppolSBD.getReceiverAsIdentifier ().getURIEncoded ();
 
           // Create the reporting item
           final PeppolReportingItem aReportingItem = Phase4PeppolServletMessageProcessorSPI.createPeppolReportingItemForReceivedMessage (aUserMessage,

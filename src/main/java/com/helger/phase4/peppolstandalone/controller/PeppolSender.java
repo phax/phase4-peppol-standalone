@@ -24,6 +24,7 @@ import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.system.EJavaVersion;
 import com.helger.base.timing.StopWatch;
 import com.helger.base.wrapper.Wrapper;
+import com.helger.mime.CMimeType;
 import com.helger.peppol.sbdh.PeppolSBDHData;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppolid.IDocumentTypeIdentifier;
@@ -31,6 +32,8 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
+import com.helger.peppolid.peppol.doctype.EPredefinedDocumentTypeIdentifier;
+import com.helger.peppolid.peppol.process.EPredefinedProcessIdentifier;
 import com.helger.phase4.client.IAS4ClientBuildMessageCallback;
 import com.helger.phase4.logging.Phase4LoggerFactory;
 import com.helger.phase4.model.message.AS4UserMessage;
@@ -183,6 +186,184 @@ public final class PeppolSender
                                                                   .senderPartyID (sMyPeppolSeatID)
                                                                   .countryC1 (sCountryCodeC1)
                                                                   .payload (aDoc.getDocumentElement ())
+                                                                  .peppolAP_CAChecker (aAPCAChecker)
+                                                                  .smpClient (aSMPClient)
+                                                                  .sbdDocumentConsumer (sbd -> {
+                                                                    // Remember SBDH Instance
+                                                                    // Identifier
+                                                                    aSendingReport.setSBDHInstanceIdentifier (sbd.getStandardBusinessDocumentHeader ()
+                                                                                                                 .getDocumentIdentification ()
+                                                                                                                 .getInstanceIdentifier ());
+                                                                  })
+                                                                  .endpointURLConsumer (aSendingReport::setC3EndpointURL)
+                                                                  .technicalContactConsumer (aSendingReport::setC3TechnicalContact)
+                                                                  .certificateConsumer ( (aAPCertificate,
+                                                                                          aCheckDT,
+                                                                                          eCertCheckResult) -> {
+                                                                    // Determined by SMP lookup
+                                                                    aSendingReport.setC3Cert (aAPCertificate);
+                                                                    aSendingReport.setC3CertCheckDT (aCheckDT);
+                                                                    aSendingReport.setC3CertCheckResult (eCertCheckResult);
+                                                                  })
+                                                                  .sendingDateTimeConsumer (aSendingReport::setAS4SendingDT)
+                                                                  .buildMessageCallback (new IAS4ClientBuildMessageCallback ()
+                                                                  {
+                                                                    public void onAS4Message (@Nonnull final AbstractAS4Message <?> aMsg)
+                                                                    {
+                                                                      // Created AS4 fields
+                                                                      final AS4UserMessage aUserMsg = (AS4UserMessage) aMsg;
+                                                                      aSendingReport.setAS4MessageID (aUserMsg.getEbms3UserMessage ()
+                                                                                                              .getMessageInfo ()
+                                                                                                              .getMessageId ());
+                                                                      aSendingReport.setAS4ConversationID (aUserMsg.getEbms3UserMessage ()
+                                                                                                                   .getCollaborationInfo ()
+                                                                                                                   .getConversationId ());
+                                                                    }
+                                                                  })
+                                                                  .signalMsgConsumer ( (aSignalMsg,
+                                                                                        aMessageMetadata,
+                                                                                        aState) -> {
+                                                                    aSendingReport.setAS4ReceivedSignalMsg (aSignalMsg);
+                                                                  })
+                                                                  .disableValidation ();
+      final Wrapper <Phase4Exception> aCaughtEx = new Wrapper <> ();
+      eResult = aBuilder.sendMessageAndCheckForReceipt (aCaughtEx::set);
+      LOGGER.info ("Peppol client send result: " + eResult);
+
+      if (eResult.isSuccess ())
+      {
+        // TODO determine the enduser ID of the outbound message
+        // In many simple cases, this might be the sender's participant ID
+        final String sEndUserID = aSenderID.getURIEncoded ();
+
+        // TODO Enable Peppol Reporting when ready
+        if (false)
+          aBuilder.createAndStorePeppolReportingItemAfterSending (sEndUserID);
+      }
+
+      aSendingReport.setAS4SendingResult (eResult);
+
+      if (aCaughtEx.isSet ())
+      {
+        final Phase4Exception ex = aCaughtEx.get ();
+        LOGGER.error ("Error sending Peppol message via AS4", ex);
+        aSendingReport.setAS4SendingException (ex);
+        bExceptionCaught = true;
+      }
+    }
+    catch (final Exception ex)
+    {
+      // Mostly errors on HTTP level
+      LOGGER.error ("Error sending Peppol message via AS4", ex);
+      aSendingReport.setAS4SendingException (ex);
+      bExceptionCaught = true;
+    }
+    finally
+    {
+      aSW.stop ();
+      aSendingReport.setOverallDurationMillis (aSW.getMillis ());
+    }
+
+    // Result may be null
+    final boolean bSendingSuccess = eResult != null && eResult.isSuccess ();
+    aSendingReport.setSendingSuccess (bSendingSuccess);
+    aSendingReport.setOverallSuccess (bSendingSuccess && !bExceptionCaught);
+
+    return aSendingReport;
+  }
+
+  /**
+   * Send a Peppol Factur-X message with PDF payload where the SBDH is created internally by phase4
+   *
+   * @param aSmlInfo
+   *        The SML to be used for receiver lookup
+   * @param aAPCAChecker
+   *        The Peppol CA checker to be used.
+   * @param aPDFBytes
+   *        The main PDF document to be send
+   * @param sSenderID
+   *        The Peppol sender Participant ID
+   * @param sReceiverID
+   *        The Peppol receiver Participant ID
+   * @param sCountryCodeC1
+   *        The Country Code of the sender (C1)
+   * @return The created sending report and never <code>null</code>.
+   */
+  @Nonnull
+  public static Phase4PeppolSendingReport sendPeppolFacturXMessageCreatingSbdh (@Nonnull final ISMLInfo aSmlInfo,
+                                                                                @Nonnull final TrustedCAChecker aAPCAChecker,
+                                                                                @Nonnull final byte [] aPDFBytes,
+                                                                                @Nonnull @Nonempty final String sSenderID,
+                                                                                @Nonnull @Nonempty final String sReceiverID,
+                                                                                @Nonnull @Nonempty final String sCountryCodeC1)
+  {
+    final IIdentifierFactory aIF = PeppolIdentifierFactory.INSTANCE;
+    final String sMyPeppolSeatID = APConfig.getMyPeppolSeatID ();
+
+    final Phase4PeppolSendingReport aSendingReport = new Phase4PeppolSendingReport (aSmlInfo);
+    aSendingReport.setCountryC1 (sCountryCodeC1);
+    aSendingReport.setSenderPartyID (sMyPeppolSeatID);
+
+    EAS4UserMessageSendResult eResult = null;
+    boolean bExceptionCaught = false;
+    final StopWatch aSW = StopWatch.createdStarted ();
+    try
+    {
+      // Start configuring here
+      IParticipantIdentifier aSenderID = aIF.parseParticipantIdentifier (sSenderID);
+      if (aSenderID == null)
+      {
+        // Fallback to default scheme
+        aSenderID = aIF.createParticipantIdentifierWithDefaultScheme (sSenderID);
+      }
+      if (aSenderID == null)
+        throw new IllegalStateException ("Failed to parse the sending participant ID '" + sSenderID + "'");
+      aSendingReport.setSenderID (aSenderID);
+
+      IParticipantIdentifier aReceiverID = aIF.parseParticipantIdentifier (sReceiverID);
+      if (aReceiverID == null)
+      {
+        // Fallback to default scheme
+        aReceiverID = aIF.createParticipantIdentifierWithDefaultScheme (sReceiverID);
+      }
+      if (aReceiverID == null)
+        throw new IllegalStateException ("Failed to parse the receiving participant ID '" + sReceiverID + "'");
+      aSendingReport.setReceiverID (aReceiverID);
+
+      // Hard coded Factur-X
+      IDocumentTypeIdentifier aDocTypeID = EPredefinedDocumentTypeIdentifier.urn_peppol_doctype_pdf_xml__urn_cen_eu_en16931_2017_conformant_urn_peppol_france_billing_Factur_X_1_0__D22B;
+      aSendingReport.setDocTypeID (aDocTypeID);
+
+      // Assume regulated process
+      IProcessIdentifier aProcessID = EPredefinedProcessIdentifier.urn_peppol_france_billing_regulated;
+      aSendingReport.setProcessID (aProcessID);
+
+      final SMPClientReadOnly aSMPClient = new SMPClientReadOnly (Phase4PeppolSender.URL_PROVIDER,
+                                                                  aReceiverID,
+                                                                  aSmlInfo);
+
+      aSMPClient.withHttpClientSettings (aHCS -> {
+        // TODO Add SMP HTTP outbound proxy settings here
+        // If this block is not used, it may be removed
+      });
+
+      final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
+      // TODO Add AP HTTP outbound proxy settings here
+
+      final PeppolUserMessageBuilder aBuilder = Phase4PeppolSender.builder ()
+                                                                  .httpClientFactory (aHCS)
+                                                                  .documentTypeID (aDocTypeID)
+                                                                  .processID (aProcessID)
+                                                                  .senderParticipantID (aSenderID)
+                                                                  .receiverParticipantID (aReceiverID)
+                                                                  .senderPartyID (sMyPeppolSeatID)
+                                                                  .countryC1 (sCountryCodeC1)
+                                                                  .sbdhStandard ("urn:peppol:doctype:pdf+xml")
+                                                                  .sbdhTypeVersion ("0")
+                                                                  .sbdhType ("factur-x")
+                                                                  .payloadBinaryContent (aPDFBytes,
+                                                                                         CMimeType.APPLICATION_PDF,
+                                                                                         null)
                                                                   .peppolAP_CAChecker (aAPCAChecker)
                                                                   .smpClient (aSMPClient)
                                                                   .sbdDocumentConsumer (sbd -> {

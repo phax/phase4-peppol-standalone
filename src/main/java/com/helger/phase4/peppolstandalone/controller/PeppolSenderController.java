@@ -106,6 +106,55 @@ public class PeppolSenderController
     return aSendingReport.getAsJsonString ();
   }
 
+  @PostMapping (path = "/sendas4-facturx/{senderId}/{receiverId}/{countryC1}",
+                produces = MediaType.APPLICATION_JSON_VALUE)
+  public String sendPeppolFacturX (@RequestHeader (name = HEADER_X_TOKEN, required = true) final String xtoken,
+                                   @RequestBody final byte [] aPayloadBytes,
+                                   @PathVariable final String senderId,
+                                   @PathVariable final String receiverId,
+                                   @PathVariable final String countryC1)
+  {
+    if (!APConfig.isSendingEnabled ())
+    {
+      LOGGER.info ("Peppol AP sending is disabled");
+      throw new HttpNotFoundException ();
+    }
+
+    if (StringHelper.isEmpty (xtoken))
+    {
+      LOGGER.error ("The specific token header is missing");
+      throw new HttpForbiddenException ();
+    }
+    if (!xtoken.equals (APConfig.getPhase4ApiRequiredToken ()))
+    {
+      LOGGER.error ("The specified token value does not match the configured required token");
+      throw new HttpForbiddenException ();
+    }
+
+    final EPeppolNetwork eStage = APConfig.getPeppolStage ();
+    final ESML eSML = eStage.isProduction () ? ESML.DIGIT_PRODUCTION : ESML.DIGIT_TEST;
+    final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP ()
+                                                          : PeppolTrustedCA.peppolTestAP ();
+    LOGGER.info ("Trying to send Peppol " +
+                 eStage.name () +
+                 " message from '" +
+                 senderId +
+                 "' to '" +
+                 receiverId +
+                 "' using Factur-X for '" +
+                 countryC1 +
+                 "'");
+    final Phase4PeppolSendingReport aSendingReport = PeppolSender.sendPeppolFacturXMessageCreatingSbdh (eSML,
+                                                                                                        aAPCA,
+                                                                                                        aPayloadBytes,
+                                                                                                        senderId,
+                                                                                                        receiverId,
+                                                                                                        countryC1);
+
+    // Return as JSON
+    return aSendingReport.getAsJsonString ();
+  }
+
   @PostMapping (path = "/sendsbdh", produces = MediaType.APPLICATION_JSON_VALUE)
   public String sendPeppolSbdhMessage (@RequestHeader (name = HEADER_X_TOKEN, required = true) final String xtoken,
                                        @RequestBody final byte [] aPayloadBytes)

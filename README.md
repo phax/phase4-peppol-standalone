@@ -131,7 +131,7 @@ The following configuration properties are contained by default:
 If you run it with `java -jar target/phase4-peppol-standalone-x.y.z.jar` it will spawn a local Tomcat at port `8080` and you can access it via `http://localhost:8080`.
 It should show a small introduction page. The `/as4` servlet itself has no user interface.
 
-In case you run the application behind an HTTP proxy, modify the settings in the configuration file (`http.proxy.*`).
+In case you run the application behind an HTTP proxy, modify the settings in the configuration file (`http.proxy.*`) and check the code for respective `TODO` comments.
 
 In case you don't like port 8080, also change it in the configuration file.
 

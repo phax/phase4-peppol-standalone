@@ -24,7 +24,7 @@
   <parent>
     <groupId>com.helger.phase4</groupId>
     <artifactId>phase4-parent-pom</artifactId>
-    <version>4.0.2</version>
+    <version>4.1.0</version>
   </parent>
   <artifactId>phase4-peppol-standalone</artifactId>
   <name>phase4-peppol-standalone</name>
@@ -72,8 +72,8 @@
   -->
 
   <properties>
-    <peppol-ap-support.version>2.0.2</peppol-ap-support.version>
-    <peppol-reporting.version>4.0.1</peppol-reporting.version>
+    <peppol-ap-support.version>2.1.0</peppol-ap-support.version>
+    <peppol-reporting.version>4.1.0</peppol-reporting.version>
     <spring-boot.version>3.5.7</spring-boot.version>
   </properties>
 

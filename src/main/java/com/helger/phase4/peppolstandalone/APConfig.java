@@ -16,12 +16,13 @@
  */
 package com.helger.phase4.peppolstandalone;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.config.fallback.IConfigWithFallback;
 import com.helger.peppol.servicedomain.EPeppolNetwork;
 import com.helger.phase4.config.AS4Configuration;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 @Immutable
@@ -30,13 +31,13 @@ public final class APConfig
   private APConfig ()
   {}
 
-  @Nonnull
+  @NonNull
   public static IConfigWithFallback getConfig ()
   {
     return AS4Configuration.getConfig ();
   }
 
-  @Nonnull
+  @NonNull
   public static EPeppolNetwork getPeppolStage ()
   {
     final String sStageID = getConfig ().getAsString ("peppol.stage");

@@ -21,6 +21,7 @@ import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.time.YearMonth;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -65,7 +66,6 @@ import com.helger.web.scope.mgr.WebScopeManager;
 import com.helger.xservlet.requesttrack.RequestTrackerSettings;
 
 import jakarta.activation.CommandMap;
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.PreDestroy;
 import jakarta.servlet.ServletContext;
 
@@ -79,7 +79,7 @@ public class ServletConfig
    *
    * @return the {@link IAS4CryptoFactory} to use. May not be <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   public static AS4CryptoFactoryInMemoryKeyStore getCryptoFactoryToUse ()
   {
     final AS4CryptoFactoryConfiguration ret = AS4CryptoFactoryConfiguration.getDefaultInstance ();
@@ -101,7 +101,7 @@ public class ServletConfig
     return bean;
   }
 
-  private void _init (@Nonnull final ServletContext aSC)
+  private void _init (@NonNull final ServletContext aSC)
   {
     // Do it only once
     if (!WebScopeManager.isGlobalScopePresent ())
@@ -113,7 +113,7 @@ public class ServletConfig
     }
   }
 
-  private static void _initGlobalSettings (@Nonnull final ServletContext aSC)
+  private static void _initGlobalSettings (@NonNull final ServletContext aSC)
   {
     // Logging: JUL to SLF4J
     SLF4JBridgeHandler.removeHandlersForRootLogger ();
@@ -128,8 +128,8 @@ public class ServletConfig
     HttpDebugger.setEnabled (false);
 
     // Sanity check
-    if (CommandMap.getDefaultCommandMap ().createDataContentHandler (CMimeType.MULTIPART_RELATED.getAsString ()) ==
-        null)
+    if (CommandMap.getDefaultCommandMap ()
+                  .createDataContentHandler (CMimeType.MULTIPART_RELATED.getAsString ()) == null)
     {
       throw new IllegalStateException ("No DataContentHandler for MIME Type '" +
                                        CMimeType.MULTIPART_RELATED.getAsString () +
@@ -209,13 +209,12 @@ public class ServletConfig
     {
       // TODO Change from "true" to "false" once you have a Peppol
       // certificate so that an exception is thrown
-      if (true)
-        LOGGER.error ("The provided certificate is not a valid Peppol certificate. Check result: " + eCheckResult);
-      else
+      if (false)
       {
         throw new InitializationException ("The provided certificate is not a Peppol certificate. Check result: " +
                                            eCheckResult);
       }
+      LOGGER.error ("The provided certificate is not a valid Peppol certificate. Check result: " + eCheckResult);
     }
     else
       LOGGER.info ("Successfully checked that the provided Peppol AP certificate is valid.");

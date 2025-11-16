@@ -16,6 +16,7 @@
  */
 package com.helger.phase4.peppolstandalone.spi;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.unece.cefact.namespaces.sbdh.StandardBusinessDocument;
 import org.w3c.dom.Element;
@@ -41,8 +42,6 @@ import com.helger.phase4.peppolstandalone.APConfig;
 import com.helger.phase4.util.Phase4Exception;
 import com.helger.security.certificate.CertificateHelper;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * This is a way of handling incoming Peppol messages
  *
@@ -53,14 +52,14 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
 {
   private static final Logger LOGGER = Phase4LoggerFactory.getLogger (CustomPeppolIncomingSBDHandlerSPI.class);
 
-  public void handleIncomingSBD (@Nonnull final IAS4IncomingMessageMetadata aMessageMetadata,
-                                 @Nonnull final HttpHeaderMap aHeaders,
-                                 @Nonnull final Ebms3UserMessage aUserMessage,
-                                 @Nonnull final byte [] aSBDBytes,
-                                 @Nonnull final StandardBusinessDocument aSBD,
-                                 @Nonnull final PeppolSBDHData aPeppolSBD,
-                                 @Nonnull final IAS4IncomingMessageState aIncomingState,
-                                 @Nonnull final ICommonsList <Ebms3Error> aProcessingErrorMessages) throws Exception
+  public void handleIncomingSBD (@NonNull final IAS4IncomingMessageMetadata aMessageMetadata,
+                                 @NonNull final HttpHeaderMap aHeaders,
+                                 @NonNull final Ebms3UserMessage aUserMessage,
+                                 @NonNull final byte [] aSBDBytes,
+                                 @NonNull final StandardBusinessDocument aSBD,
+                                 @NonNull final PeppolSBDHData aPeppolSBD,
+                                 @NonNull final IAS4IncomingMessageState aIncomingState,
+                                 @NonNull final ICommonsList <Ebms3Error> aProcessingErrorMessages) throws Exception
   {
     if (!APConfig.isReceivingEnabled ())
     {

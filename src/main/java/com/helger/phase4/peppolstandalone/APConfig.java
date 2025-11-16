@@ -17,13 +17,12 @@
 package com.helger.phase4.peppolstandalone;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.config.fallback.IConfigWithFallback;
 import com.helger.peppol.servicedomain.EPeppolNetwork;
 import com.helger.phase4.config.AS4Configuration;
-
-import jakarta.annotation.Nullable;
 
 @Immutable
 public final class APConfig

@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
 import com.helger.base.enforce.ValueEnforcer;
@@ -56,8 +57,6 @@ import com.helger.phase4.peppolstandalone.APConfig;
 import com.helger.phase4.peppolstandalone.controller.HttpForbiddenException;
 import com.helger.phase4.peppolstandalone.controller.PeppolSender;
 import com.helger.security.certificate.TrustedCAChecker;
-
-import jakarta.annotation.Nullable;
 
 /**
  * Helper class for report generation

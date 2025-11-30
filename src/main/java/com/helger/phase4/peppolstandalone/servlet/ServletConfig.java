@@ -120,8 +120,8 @@ public class ServletConfig
     SLF4JBridgeHandler.install ();
 
     // Order matters
-    GlobalDebug.setProductionModeDirect (APConfig.isProductionMode ());
-    GlobalDebug.setDebugModeDirect (APConfig.isDebugMode ());
+    GlobalDebug.setProductionModeDirect (AS4Configuration.isGlobalProduction ());
+    GlobalDebug.setDebugModeDirect (AS4Configuration.isGlobalDebug ());
 
     if (GlobalDebug.isDebugMode ())
     {

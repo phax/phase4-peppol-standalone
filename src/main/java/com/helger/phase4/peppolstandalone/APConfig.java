@@ -20,6 +20,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.concurrent.Immutable;
+import com.helger.base.debug.GlobalDebug;
 import com.helger.config.fallback.IConfigWithFallback;
 import com.helger.peppol.servicedomain.EPeppolNetwork;
 import com.helger.phase4.config.AS4Configuration;
@@ -34,6 +35,16 @@ public final class APConfig
   public static IConfigWithFallback getConfig ()
   {
     return AS4Configuration.getConfig ();
+  }
+
+  public static boolean isDebugMode ()
+  {
+    return getConfig ().getAsBoolean ("global.debug", GlobalDebug.DEFAULT_DEBUG_MODE);
+  }
+
+  public static boolean isProductionMode ()
+  {
+    return getConfig ().getAsBoolean ("global.production", GlobalDebug.DEFAULT_PRODUCTION_MODE);
   }
 
   @NonNull

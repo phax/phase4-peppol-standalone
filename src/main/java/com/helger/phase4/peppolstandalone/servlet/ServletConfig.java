@@ -215,10 +215,10 @@ public class ServletConfig
       // certificate so that an exception is thrown
       if (false)
       {
-        throw new InitializationException ("The provided certificate is not a Peppol certificate. Check result: " +
+        throw new InitializationException ("The provided certificate is not a Peppol AP certificate. Check result: " +
                                            eCheckResult);
       }
-      LOGGER.error ("The provided certificate is not a valid Peppol certificate. Check result: " + eCheckResult);
+      LOGGER.error ("The provided certificate is not a valid Peppol AP certificate. Check result: " + eCheckResult);
     }
     else
       LOGGER.info ("Successfully checked that the provided Peppol AP certificate is valid.");

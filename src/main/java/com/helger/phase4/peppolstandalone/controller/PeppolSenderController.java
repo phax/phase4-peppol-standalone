@@ -18,6 +18,7 @@ package com.helger.phase4.peppolstandalone.controller;
 
 import org.slf4j.Logger;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,6 +49,12 @@ public class PeppolSenderController
 {
   static final String HEADER_X_TOKEN = "X-Token";
   private static final Logger LOGGER = Phase4LoggerFactory.getLogger (PeppolSenderController.class);
+
+  @GetMapping (path = "/phase4ping", produces = MediaType.TEXT_PLAIN_VALUE)
+  public String ping ()
+  {
+    return "pong";
+  }
 
   @PostMapping (path = "/sendas4/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}",
                 produces = MediaType.APPLICATION_JSON_VALUE)

@@ -22,7 +22,6 @@ import org.unece.cefact.namespaces.sbdh.StandardBusinessDocument;
 import org.w3c.dom.Element;
 
 import com.helger.annotation.style.IsSPIImplementation;
-import com.helger.collection.commons.ICommonsList;
 import com.helger.http.header.HttpHeaderMap;
 import com.helger.peppol.reporting.api.PeppolReportingItem;
 import com.helger.peppol.reporting.api.backend.PeppolReportingBackend;
@@ -31,8 +30,8 @@ import com.helger.peppol.sbdh.PeppolSBDHData;
 import com.helger.peppol.sbdh.payload.PeppolSBDHPayloadBinaryMarshaller;
 import com.helger.peppol.sbdh.spec12.BinaryContentType;
 import com.helger.peppol.sbdh.spec12.ObjectFactory;
-import com.helger.phase4.ebms3header.Ebms3Error;
 import com.helger.phase4.ebms3header.Ebms3UserMessage;
+import com.helger.phase4.error.AS4ErrorList;
 import com.helger.phase4.incoming.IAS4IncomingMessageMetadata;
 import com.helger.phase4.incoming.IAS4IncomingMessageState;
 import com.helger.phase4.logging.Phase4LoggerFactory;
@@ -59,7 +58,7 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
                                  @NonNull final StandardBusinessDocument aSBD,
                                  @NonNull final PeppolSBDHData aPeppolSBD,
                                  @NonNull final IAS4IncomingMessageState aIncomingState,
-                                 @NonNull final ICommonsList <Ebms3Error> aProcessingErrorMessages) throws Exception
+                                 @NonNull final AS4ErrorList aProcessingErrorMessages) throws Exception
   {
     if (!APConfig.isReceivingEnabled ())
     {

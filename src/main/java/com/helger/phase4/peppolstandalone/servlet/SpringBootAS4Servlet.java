@@ -32,7 +32,7 @@ import com.helger.phase4.peppol.servlet.Phase4PeppolServletMessageProcessorSPI;
 import com.helger.phase4.servlet.AS4UnifiedResponse;
 import com.helger.phase4.servlet.AS4XServletHandler;
 import com.helger.phase4.servlet.IAS4ServletRequestHandlerCustomizer;
-import com.helger.security.certificate.CertificateHelper;
+import com.helger.security.certificate.CertificateDecodeHelper;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xservlet.AbstractXServlet;
@@ -90,7 +90,9 @@ public class SpringBootAS4Servlet extends AbstractXServlet
                                                                   .receiverCheckEnabled (true)
                                                                   .serviceMetadataProvider (new SMPClientReadOnly (URLHelper.getAsURI ("http://smp-prod.example.org")))
                                                                   .as4EndpointUrl ("https://ap-prod.example.org/as4")
-                                                                  .apCertificate (CertificateHelper.convertStringToCertficateOrNull ("....Public Prod AP Cert...."))
+                                                                  .apCertificate (new CertificateDecodeHelper ().source ("....Public Prod AP Cert....")
+                                                                                                                .pemEncoded (true)
+                                                                                                                .getDecodedOrNull ())
                                                                   .sbdhIdentifierFactoryPeppol ()
                                                                   .performSBDHValueChecks (Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks ())
                                                                   .checkSBDHForMandatoryCountryC1 (Phase4PeppolDefaultReceiverConfiguration.isCheckSBDHForMandatoryCountryC1 ())
@@ -103,7 +105,9 @@ public class SpringBootAS4Servlet extends AbstractXServlet
                                                                   .receiverCheckEnabled (true)
                                                                   .serviceMetadataProvider (new SMPClientReadOnly (URLHelper.getAsURI ("http://smp-test.example.org")))
                                                                   .as4EndpointUrl ("https://ap-test.example.org/as4")
-                                                                  .apCertificate (CertificateHelper.convertStringToCertficateOrNull ("....Public Test AP Cert...."))
+                                                                  .apCertificate (new CertificateDecodeHelper ().source ("....Public Test AP Cert....")
+                                                                                                                .pemEncoded (true)
+                                                                                                                .getDecodedOrNull ())
                                                                   .sbdhIdentifierFactoryPeppol ()
                                                                   .performSBDHValueChecks (Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks ())
                                                                   .checkSBDHForMandatoryCountryC1 (Phase4PeppolDefaultReceiverConfiguration.isCheckSBDHForMandatoryCountryC1 ())

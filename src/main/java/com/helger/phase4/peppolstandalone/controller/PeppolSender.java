@@ -22,7 +22,6 @@ import org.w3c.dom.Document;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.Immutable;
-import com.helger.base.system.EJavaVersion;
 import com.helger.base.timing.StopWatch;
 import com.helger.base.wrapper.Wrapper;
 import com.helger.mime.CMimeType;
@@ -165,14 +164,6 @@ public final class PeppolSender
         // If this block is not used, it may be removed
       });
 
-      // In the meantime each SMP MUST be able to use SHA-256
-      if (false)
-        if (EJavaVersion.getCurrentVersion ().isNewerOrEqualsThan (EJavaVersion.JDK_17))
-        {
-          // Work around the disabled SHA-1 in XMLDsig issue
-          aSMPClient.setSecureValidation (false);
-        }
-
       final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
       // TODO Add AP HTTP outbound proxy settings here
 
@@ -187,12 +178,12 @@ public final class PeppolSender
                                                                   .payload (aDoc.getDocumentElement ())
                                                                   .peppolAP_CAChecker (aAPCAChecker)
                                                                   .smpClient (aSMPClient)
-                                                                  .sbdDocumentConsumer (sbd -> {
+                                                                  .sbdDocumentConsumer (aSBD -> {
                                                                     // Remember SBDH Instance
                                                                     // Identifier
-                                                                    aSendingReport.setSBDHInstanceIdentifier (sbd.getStandardBusinessDocumentHeader ()
-                                                                                                                 .getDocumentIdentification ()
-                                                                                                                 .getInstanceIdentifier ());
+                                                                    aSendingReport.setSBDHInstanceIdentifier (aSBD.getStandardBusinessDocumentHeader ()
+                                                                                                                  .getDocumentIdentification ()
+                                                                                                                  .getInstanceIdentifier ());
                                                                   })
                                                                   .endpointURLConsumer (aSendingReport::setC3EndpointURL)
                                                                   .technicalContactConsumer (aSendingReport::setC3TechnicalContact)
@@ -219,6 +210,7 @@ public final class PeppolSender
                                                                                                                    .getConversationId ());
                                                                     }
                                                                   })
+                                                                  .rawResponseConsumer (aSendingReport::setRawHttpResponse)
                                                                   .signalMsgConsumer ( (aSignalMsg,
                                                                                         aMessageMetadata,
                                                                                         aState) -> {
@@ -330,11 +322,11 @@ public final class PeppolSender
       aSendingReport.setReceiverID (aReceiverID);
 
       // Hard coded Factur-X
-      IDocumentTypeIdentifier aDocTypeID = EPredefinedDocumentTypeIdentifier.urn_peppol_doctype_pdf_xml__urn_cen_eu_en16931_2017_conformant_urn_peppol_france_billing_Factur_X_1_0__D22B;
+      final IDocumentTypeIdentifier aDocTypeID = EPredefinedDocumentTypeIdentifier.urn_peppol_doctype_pdf_xml__urn_cen_eu_en16931_2017_conformant_urn_peppol_france_billing_Factur_X_1_0__D22B;
       aSendingReport.setDocTypeID (aDocTypeID);
 
       // Assume regulated process
-      IProcessIdentifier aProcessID = EPredefinedProcessIdentifier.urn_peppol_france_billing_regulated;
+      final IProcessIdentifier aProcessID = EPredefinedProcessIdentifier.urn_peppol_france_billing_regulated;
       aSendingReport.setProcessID (aProcessID);
 
       final SMPClientReadOnly aSMPClient = new SMPClientReadOnly (Phase4PeppolSender.URL_PROVIDER,
@@ -397,6 +389,7 @@ public final class PeppolSender
                                                                                                                    .getConversationId ());
                                                                     }
                                                                   })
+                                                                  .rawResponseConsumer (aSendingReport::setRawHttpResponse)
                                                                   .signalMsgConsumer ( (aSignalMsg,
                                                                                         aMessageMetadata,
                                                                                         aState) -> {
@@ -486,14 +479,6 @@ public final class PeppolSender
         // If this block is not used, it may be removed
       });
 
-      // In the meantime each SMP MUST be able to use SHA-256
-      if (false)
-        if (EJavaVersion.getCurrentVersion ().isNewerOrEqualsThan (EJavaVersion.JDK_17))
-        {
-          // Work around the disabled SHA-1 in XMLDsig issue
-          aSMPClient.setSecureValidation (false);
-        }
-
       final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
       // TODO Add AP HTTP outbound proxy settings here
 
@@ -528,6 +513,7 @@ public final class PeppolSender
                                                                                                                        .getConversationId ());
                                                                         }
                                                                       })
+                                                                      .rawResponseConsumer (aSendingReport::setRawHttpResponse)
                                                                       .signalMsgConsumer ( (aSignalMsg,
                                                                                             aMessageMetadata,
                                                                                             aState) -> {

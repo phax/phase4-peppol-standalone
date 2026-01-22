@@ -74,7 +74,7 @@
   <properties>
     <peppol-ap-support.version>2.1.0</peppol-ap-support.version>
     <peppol-reporting.version>4.1.0</peppol-reporting.version>
-    <spring-boot.version>4.0.1</spring-boot.version>
+    <spring-boot.version>4.0.2</spring-boot.version>
   </properties>
 
   <!-- Include here to not bloat the global scope -->

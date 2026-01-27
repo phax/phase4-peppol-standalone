@@ -28,10 +28,10 @@ services:
     labels:
       - "traefik.enable=true"
       # HTTP
-      - "traefik.http.routers.phase4-http.rule=Host(`ap.net.recommand.com`)"
+      - "traefik.http.routers.phase4-http.rule=Host(`${PHASE4_HOST}`)"
       - "traefik.http.routers.phase4-http.entrypoints=web"
       # HTTPS
-      - "traefik.http.routers.phase4.rule=Host(`ap.net.recommand.com`)"
+      - "traefik.http.routers.phase4.rule=Host(`${PHASE4_HOST}`)"
       - "traefik.http.routers.phase4.entrypoints=websecure"
       - "traefik.http.routers.phase4.tls.certresolver=letsencrypt"
       - "traefik.http.services.phase4.loadbalancer.server.port=8080"
@@ -53,10 +53,10 @@ services:
       - "traefik.http.routers.phoss-smp-europa-http.rule=HostRegexp(`{subdomain:.*}.europa.eu`)"
       - "traefik.http.routers.phoss-smp-europa-http.entrypoints=web"
       - "traefik.http.routers.phoss-smp-europa-http.service=phoss-smp"
-      - "traefik.http.routers.phoss-smp-http.rule=Host(`smp.net.recommand.com`)"
+      - "traefik.http.routers.phoss-smp-http.rule=Host(`${SMP_HOST}`)"
       - "traefik.http.routers.phoss-smp-http.entrypoints=web"
       # HTTPS
-      - "traefik.http.routers.phoss-smp.rule=Host(`smp.net.recommand.com`)"
+      - "traefik.http.routers.phoss-smp.rule=Host(`${SMP_HOST}`)"
       - "traefik.http.routers.phoss-smp.entrypoints=websecure"
       - "traefik.http.routers.phoss-smp.tls.certresolver=letsencrypt"
       - "traefik.http.services.phoss-smp.loadbalancer.server.port=8080"

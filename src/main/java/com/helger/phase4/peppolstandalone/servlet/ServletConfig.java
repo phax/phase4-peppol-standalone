@@ -60,6 +60,8 @@ import com.helger.phase4.profile.peppol.Phase4PeppolHttpClientSettings;
 import com.helger.photon.io.WebFileIO;
 import com.helger.security.certificate.ECertificateCheckResult;
 import com.helger.security.certificate.TrustedCAChecker;
+import com.helger.security.revocation.CertificateRevocationCheckerDefaults;
+import com.helger.security.revocation.ERevocationCheckMode;
 import com.helger.servlet.ServletHelper;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.web.scope.mgr.WebScopeManager;
@@ -178,6 +180,9 @@ public class ServletConfig
       // TODO eventually configure an outbound HTTP proxy here as well
       PeppolCRLDownloader.setAsDefaultCRLCache (aHCS);
     }
+
+    // Set revocation check mode to CRL_BEFORE_OCSP for better resilience https://github.com/phax/phase4/issues/354
+    CertificateRevocationCheckerDefaults.setRevocationCheckMode (ERevocationCheckMode.CRL_BEFORE_OCSP);
 
     // Throws an exception if configuration parameters are missing
     final AS4CryptoFactoryInMemoryKeyStore aCryptoFactory = getCryptoFactoryToUse ();

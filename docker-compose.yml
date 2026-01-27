@@ -20,6 +20,7 @@ services:
   phase4:
     build:
       context: .
+      dockerfile: Dockerfile.multistage
     container_name: phase4
     restart: unless-stopped
     volumes:

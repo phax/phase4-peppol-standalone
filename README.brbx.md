@@ -11,6 +11,8 @@ This repository contains a containerized setup for running a PEPPOL Access Point
 
 ```
 .
+├── .env              # Environment variables (URLs and hostnames) - create from .env.example
+├── .env.example      # Template for environment variables
 ├── ap-config/         # Phase4 AP configuration
 ├── ap-generated/      # Generated files for phase4
 ├── smp-config/        # SMP configuration
@@ -39,6 +41,12 @@ This repository contains a containerized setup for running a PEPPOL Access Point
    chmod 600 traefik/acme.json
    ```
 
+3. Copy the environment configuration template:
+   ```bash
+   cp .env.example .env
+   ```
+   Then edit `.env` and update the domain URLs (see Environment Configuration section below)
+
 ### 2. Configuration
 
 #### Traefik Setup
@@ -59,11 +67,16 @@ Configure your domain's DNS records to point to your server:
 - `ap.your-domain.com` → Your server's IP
 - `smp.your-domain.com` → Your server's IP
 
-#### Update Docker Compose
+#### Environment Configuration
 
-Edit `docker-compose.yml` and replace the following domains with your own:
-- `ap.net.recommand.com` → `ap.your-domain.com`
-- `smp.net.recommand.com` → `smp.your-domain.com`
+Copy the example environment file and update it with your domain URLs:
+
+```bash
+cp .env.example .env
+```
+
+Then edit `.env` and replace the placeholder values with your actual domain names.
+Docker Compose automatically reads the `.env` file and uses these variables in `docker-compose.yml`.
 
 ### 3. Phase4 Configuration
 
@@ -140,6 +153,7 @@ docker compose up -d
 ### Backup
 
 Regular backups should be made of:
+- `.env` file (contains your domain configuration)
 - `smp-persistent/` directory
 - `ap-generated/` directory
 - Configuration files in `ap-config/` and `smp-config/`

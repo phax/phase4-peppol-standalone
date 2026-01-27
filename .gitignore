@@ -17,3 +17,4 @@ private-*.properties
 ./smp-persistent
 .DS_Store
 .env
+src/main/resources/application.properties

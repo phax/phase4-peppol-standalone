@@ -1,0 +1,112 @@
+#
+# Copyright (C) 2023-2025 Philip Helger (www.helger.com)
+# philip[at]helger[dot]com
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# [CHANGEME] Set to "false" when deployed on a server 
+global.debug=true
+# [CHANGEME] Set to "true" when deployed on a server 
+global.production=false
+global.nostartupinfo=true
+
+# [CHANGEME] Where to store runtime data
+#global.datapath=/var/www/as4/data
+global.datapath=generated/
+
+# [CHANGEME] Use this to switch between "prod" (production) and "test" (test) 
+peppol.stage=test
+
+# [CHANGEME] Your Peppol Seat ID taken from your AP/SMP certificate
+peppol.seatid=POP000000
+
+# [CHANGEME] Use your Peppol organisation's country code
+peppol.owner.countrycode=AT
+
+# [CHANGEME] Use the Peppol SPID number (without the Pxx prefix!)
+peppol.reporting.senderid=0242:000000
+
+# Enable or disable the scheduling of Peppol Reporting create, validate, store and send to run monthly
+peppol.reporting.scheduled=true
+
+peppol.reporting.csv.filename=/generated/reporting.csv
+
+# [CHANGEME] Public endpoint of this AP
+phase4.endpoint.address=http://localhost:8080/as4
+
+# [CHANGEME] Public URL of your SMP to check for valid inbound requests
+#smp.url=http://smp.helger.com
+
+# [CHANGEME] The mandatory value required in the "X-Token" HTTP header for the sending APIs
+phase4.api.requiredtoken=NjIh9tIx3Rgzme19mGIy
+
+# [CHANGEME] Internal token for document receiving endpoint
+recommand.api.internal.token=INSERT_TOKEN_HERE
+
+# [CHANGEME] Recommand API endpoint
+recommand.api.endpoint=https://peppol.recommand.com
+
+# [CHANGEME] AS4 dump directory
+phase4.dump.path=${global.datapath}phase4-dumps/
+
+# [CHANGEME] put your keystore details here
+org.apache.wss4j.crypto.merlin.keystore.type=JKS
+org.apache.wss4j.crypto.merlin.keystore.file=invalid-keystore-pw-peppol.jks
+org.apache.wss4j.crypto.merlin.keystore.password=peppol
+org.apache.wss4j.crypto.merlin.keystore.alias=1
+org.apache.wss4j.crypto.merlin.keystore.private.password=peppol
+
+# This is a default Peppol Truststore - should be refined for production
+org.apache.wss4j.crypto.merlin.truststore.type=PKCS12
+# All these truststores are predefined, and are part of the peppol-commons library
+#   See https://github.com/phax/peppol-commons/tree/master/peppol-commons/src/main/resources/truststore
+#
+# For Test only use:       truststore/2025/ap-test-truststore.p12
+# For Production only use: truststore/2025/ap-prod-truststore.p12
+org.apache.wss4j.crypto.merlin.truststore.file=truststore/2025/ap-test-truststore.p12
+org.apache.wss4j.crypto.merlin.truststore.password=peppol
+
+# SMP Client
+smpclient.truststore.type=PKCS12
+# All these truststores are predefined, and are part of the peppol-commons library
+#   See https://github.com/phax/peppol-commons/tree/master/peppol-commons/src/main/resources/truststore
+#
+# For Test only use:       truststore/2025/smp-test-truststore.p12
+# For Production only use: truststore/2025/smp-prod-truststore.p12
+smpclient.truststore.path=truststore/2025/smp-test-truststore.p12
+smpclient.truststore.password=peppol
+
+# Outbound Proxy (if needed)
+#http.proxy.host=
+#http.proxy.port=
+#http.proxy.nonProxyHosts
+
+# [CHANGEME] SpringBoot port
+server.port=8080
+
+# SpringBoot - /actuator/shutdown
+management.endpoints.web.exposure.include=*
+management.endpoint.shutdown.enabled=true
+endpoints.shutdown.enabled=true
+
+# SpringBoot - Max file size for large tests
+spring.servlet.multipart.max-file-size=100MB
+spring.servlet.multipart.max-request-size=100MB
+
+# When running behind a load balancer, this might help:
+#server.forward-headers-strategy = native
+#server.tomcat.remoteip.remote-ip-header = x-forwarded-for
+#server.tomcat.remoteip.protocol-header = x-forwarded-proto
+#server.tomcat.remoteip.port-header = x-forwarded-port
+#server.tomcat.remoteip.host-header = x-forwarded-host

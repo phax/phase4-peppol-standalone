@@ -15,7 +15,34 @@
 # limitations under the License.
 #
 
+# Multi-stage build: Build stage
+FROM eclipse-temurin:21-alpine AS builder
+
+# Install Maven
+RUN apk add --no-cache maven
+
+# Set working directory
+WORKDIR /app
+
+# Copy pom.xml first for better Docker layer caching
+COPY pom.xml .
+
+# Download dependencies
+RUN mvn dependency:go-offline -B
+
+# Copy source code
+COPY src ./src
+
+# Build the application
+RUN mvn clean install -DskipTests
+
+
+# Runtime stage
 FROM eclipse-temurin:21-alpine
+
 VOLUME /tmp
-COPY --from=build /workspace/app/target/*.jar app.jar
+
+# Copy the built jar from builder stage
+COPY --from=builder /app/target/*.jar app.jar
+
 ENTRYPOINT ["java","-jar","/app.jar"]

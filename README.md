@@ -10,6 +10,8 @@ Of course phase4 itself is ready for production use - see a list of [known phase
 
 **Note:** because it is a template application, no releases are created - you have to modify it anyway.
 
+Contact me via email for *commercial support* (see `pom.xml` for the address).
+
 This project is part of my Peppol solution stack. See https://github.com/phax/peppol for other components and libraries in that area.
 
 # Functionality
@@ -76,10 +78,10 @@ The following list contains the elements not considered for this demo applicatio
 * You need your own Peppol certificate to make it work - the contained keystore is a dummy one only
 * Document validation is not included
     * See https://github.com/phax/phive and https://github.com/phax/phive-rules for this.
-* Peppol Reporting is not included, as no reporting backend is present.
-    * You can pick one from https://github.com/phax/peppol-reporting to add to your `pom.xml`
-    * The calls for storing Peppol Reporting information is part of the code, but disabled by default, as relevant parameters cannot automatically be determined
-    * The default storage of Peppol Reports is the file system - you may choose something else here as well (SQL, MongoDB etc.)
+* Peppol Reporting is included, but disabled by default, as no reporting backend is present.
+    * You need to pick a backend (like MySQL or PostgreSQL) from https://github.com/phax/peppol-reporting and add to your `pom.xml`
+    * The calls for storing Peppol Reporting information is part of the code, but disabled by default, as relevant parameters cannot be determined automatically
+    * The default storage of created Peppol Reports is the file system - you should choose something else here as well (SQL, MongoDB etc.)
 
 # Get it up and running
 
@@ -132,7 +134,7 @@ The following configuration properties are contained by default:
 If you run it with `java -jar target/phase4-peppol-standalone-x.y.z.jar` it will spawn a local Tomcat at port `8080` and you can access it via `http://localhost:8080`.
 It should show a small introduction page. The `/as4` servlet itself has no user interface.
 
-In case you run the application behind an HTTP proxy, modify the settings in the configuration file (`http.proxy.*`).
+In case you run the application behind an HTTP proxy, modify the settings in the configuration file (`http.proxy.*`) and check the code for respective `TODO` comments.
 
 In case you don't like port 8080, also change it in the configuration file.
 

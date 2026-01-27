@@ -16,10 +16,10 @@
  */
 package com.helger.phase4.peppolstandalone;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
+import com.helger.annotation.concurrent.Immutable;
 import com.helger.config.fallback.IConfigWithFallback;
 import com.helger.peppol.servicedomain.EPeppolNetwork;
 import com.helger.phase4.config.AS4Configuration;
@@ -30,13 +30,13 @@ public final class APConfig
   private APConfig ()
   {}
 
-  @Nonnull
+  @NonNull
   public static IConfigWithFallback getConfig ()
   {
     return AS4Configuration.getConfig ();
   }
 
-  @Nonnull
+  @NonNull
   public static EPeppolNetwork getPeppolStage ()
   {
     final String sStageID = getConfig ().getAsString ("peppol.stage");
@@ -79,6 +79,16 @@ public final class APConfig
   public static boolean isSchedulePeppolReporting ()
   {
     return getConfig ().getAsBoolean ("peppol.reporting.scheduled", true);
+  }
+
+  public static boolean isSendingEnabled ()
+  {
+    return getConfig ().getAsBoolean ("peppol.sending.enabled", true);
+  }
+
+  public static boolean isReceivingEnabled ()
+  {
+    return getConfig ().getAsBoolean ("peppol.receiving.enabled", true);
   }
 
   @Nullable

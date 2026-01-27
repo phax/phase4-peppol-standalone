@@ -21,18 +21,17 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.YearMonth;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
-import com.helger.commons.ValueEnforcer;
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.datetime.PDTFactory;
-import com.helger.commons.string.StringHelper;
-import com.helger.commons.timing.StopWatch;
-import com.helger.commons.wrapper.Wrapper;
+import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.string.StringHelper;
+import com.helger.base.timing.StopWatch;
+import com.helger.base.wrapper.Wrapper;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.ICommonsList;
+import com.helger.datetime.helper.PDTFactory;
 import com.helger.peppol.reporting.api.CPeppolReporting;
 import com.helger.peppol.reporting.api.PeppolReportingHelper;
 import com.helger.peppol.reporting.api.PeppolReportingItem;
@@ -68,7 +67,7 @@ public final class AppReportingHelper
 {
   private static final Logger LOGGER = Phase4LoggerFactory.getLogger (AppReportingHelper.class);
 
-  @Nonnull
+  @NonNull
   public static YearMonth getValidYearMonthInAPI (final int nYear, final int nMonth)
   {
     if (nYear < 2024)
@@ -86,7 +85,7 @@ public final class AppReportingHelper
   }
 
   @Nullable
-  public static TransactionStatisticsReportType createTSR (@Nonnull final YearMonth aYearMonth) throws PeppolReportingBackendException
+  public static TransactionStatisticsReportType createTSR (@NonNull final YearMonth aYearMonth) throws PeppolReportingBackendException
   {
     LOGGER.info ("Trying to create Peppol Reporting TSR for " + aYearMonth);
 
@@ -109,7 +108,7 @@ public final class AppReportingHelper
   }
 
   @Nullable
-  public static EndUserStatisticsReportType createEUSR (@Nonnull final YearMonth aYearMonth) throws PeppolReportingBackendException
+  public static EndUserStatisticsReportType createEUSR (@NonNull final YearMonth aYearMonth) throws PeppolReportingBackendException
   {
     LOGGER.info ("Trying to create Peppol Reporting EUSR for " + aYearMonth);
 
@@ -137,7 +136,7 @@ public final class AppReportingHelper
    * @param aYearMonth
    *        The reporting period to use. May not be <code>null</code>.
    */
-  public static void createAndSendPeppolReports (@Nonnull final YearMonth aYearMonth)
+  public static void createAndSendPeppolReports (@NonNull final YearMonth aYearMonth)
   {
     ValueEnforcer.notNull (aYearMonth, "YearMonth");
 
@@ -149,11 +148,11 @@ public final class AppReportingHelper
       // Make Network decisions
       final EPeppolNetwork eStage = APConfig.getPeppolStage ();
       final ESML eSML = eStage.isProduction () ? ESML.DIGIT_PRODUCTION : ESML.DIGIT_TEST;
-      final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP () : PeppolTrustedCA
-                                                                                                                     .peppolTestAP ();
+      final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP ()
+                                                            : PeppolTrustedCA.peppolTestAP ();
       // Sender: your company participant ID
       final String sSenderID = APConfig.getMyPeppolReportingSenderID ();
-      if (StringHelper.hasNoText (sSenderID))
+      if (StringHelper.isEmpty (sSenderID))
         throw new IllegalStateException ("No Peppol Reporting Sender ID is configured");
 
       // Receiver: production OpenPeppol; test Helger

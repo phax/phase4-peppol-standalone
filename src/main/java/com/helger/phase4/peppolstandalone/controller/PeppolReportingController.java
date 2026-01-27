@@ -25,9 +25,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.string.StringHelper;
+import com.helger.base.string.StringHelper;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.peppol.reporting.api.PeppolReportingItem;
 import com.helger.peppol.reporting.api.backend.PeppolReportingBackend;
 import com.helger.peppol.reporting.api.backend.PeppolReportingBackendException;
@@ -69,7 +69,7 @@ public class PeppolReportingController
                                           @PathVariable (name = "year", required = true) final int nYear,
                                           @PathVariable (name = "month", required = true) final int nMonth)
   {
-    if (StringHelper.hasNoText (xtoken))
+    if (StringHelper.isEmpty (xtoken))
     {
       LOGGER.error ("The specific token header is missing");
       throw new HttpForbiddenException ();
@@ -129,7 +129,7 @@ public class PeppolReportingController
                                            @PathVariable (name = "year", required = true) final int nYear,
                                            @PathVariable (name = "month", required = true) final int nMonth)
   {
-    if (StringHelper.hasNoText (xtoken))
+    if (StringHelper.isEmpty (xtoken))
     {
       LOGGER.error ("The specific token header is missing");
       throw new HttpForbiddenException ();
@@ -190,7 +190,7 @@ public class PeppolReportingController
                                             @PathVariable (name = "year", required = true) final int nYear,
                                             @PathVariable (name = "month", required = true) final int nMonth)
   {
-    if (StringHelper.hasNoText (xtoken))
+    if (StringHelper.isEmpty (xtoken))
     {
       LOGGER.error ("The specific token header is missing");
       throw new HttpForbiddenException ();

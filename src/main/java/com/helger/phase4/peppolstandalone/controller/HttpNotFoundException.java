@@ -14,15 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phase4.peppolstandalone;
+package com.helger.phase4.peppolstandalone.controller;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-@SpringBootTest
-final class Phase4PeppolStandaloneApplicationTests
+/**
+ * REST Controller exception mapping to HTTP 404 (Not Found)
+ *
+ * @author Philip Helger
+ */
+@ResponseStatus (HttpStatus.NOT_FOUND)
+public class HttpNotFoundException extends RuntimeException
 {
-  @Test
-  void testContextLoads ()
+  public HttpNotFoundException ()
   {}
+
+  public HttpNotFoundException (final String sMsg)
+  {
+    super (sMsg);
+  }
 }

@@ -21,8 +21,7 @@ import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.time.YearMonth;
 
-import javax.annotation.Nonnull;
-
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -30,13 +29,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import com.helger.commons.debug.GlobalDebug;
-import com.helger.commons.exception.InitializationException;
-import com.helger.commons.mime.CMimeType;
-import com.helger.commons.state.ETriState;
-import com.helger.commons.string.StringHelper;
-import com.helger.commons.url.URLHelper;
+import com.helger.base.debug.GlobalDebug;
+import com.helger.base.exception.InitializationException;
+import com.helger.base.state.ETriState;
+import com.helger.base.string.StringHelper;
+import com.helger.base.url.URLHelper;
 import com.helger.httpclient.HttpDebugger;
+import com.helger.mime.CMimeType;
 import com.helger.peppol.reporting.api.backend.IPeppolReportingBackendSPI;
 import com.helger.peppol.reporting.api.backend.PeppolReportingBackend;
 import com.helger.peppol.security.PeppolTrustedCA;
@@ -80,7 +79,7 @@ public class ServletConfig
    *
    * @return the {@link IAS4CryptoFactory} to use. May not be <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   public static AS4CryptoFactoryInMemoryKeyStore getCryptoFactoryToUse ()
   {
     final AS4CryptoFactoryConfiguration ret = AS4CryptoFactoryConfiguration.getDefaultInstance ();
@@ -102,7 +101,7 @@ public class ServletConfig
     return bean;
   }
 
-  private void _init (@Nonnull final ServletContext aSC)
+  private void _init (@NonNull final ServletContext aSC)
   {
     // Do it only once
     if (!WebScopeManager.isGlobalScopePresent ())
@@ -114,11 +113,15 @@ public class ServletConfig
     }
   }
 
-  private static void _initGlobalSettings (@Nonnull final ServletContext aSC)
+  private static void _initGlobalSettings (@NonNull final ServletContext aSC)
   {
     // Logging: JUL to SLF4J
     SLF4JBridgeHandler.removeHandlersForRootLogger ();
     SLF4JBridgeHandler.install ();
+
+    // Order matters
+    GlobalDebug.setProductionModeDirect (AS4Configuration.isGlobalProduction ());
+    GlobalDebug.setDebugModeDirect (AS4Configuration.isGlobalDebug ());
 
     if (GlobalDebug.isDebugMode ())
     {
@@ -129,8 +132,8 @@ public class ServletConfig
     HttpDebugger.setEnabled (false);
 
     // Sanity check
-    if (CommandMap.getDefaultCommandMap ().createDataContentHandler (CMimeType.MULTIPART_RELATED.getAsString ()) ==
-        null)
+    if (CommandMap.getDefaultCommandMap ()
+                  .createDataContentHandler (CMimeType.MULTIPART_RELATED.getAsString ()) == null)
     {
       throw new IllegalStateException ("No DataContentHandler for MIME Type '" +
                                        CMimeType.MULTIPART_RELATED.getAsString () +
@@ -143,7 +146,7 @@ public class ServletConfig
       final String sServletContextPath = ServletHelper.getServletContextBasePath (aSC);
       // Get the data path
       final String sDataPath = AS4Configuration.getDataPath ();
-      if (StringHelper.hasNoText (sDataPath))
+      if (StringHelper.isEmpty (sDataPath))
         throw new InitializationException ("No data path was provided!");
       final boolean bFileAccessCheck = false;
       // Init the IO layer
@@ -210,13 +213,12 @@ public class ServletConfig
     {
       // TODO Change from "true" to "false" once you have a Peppol
       // certificate so that an exception is thrown
-      if (true)
-        LOGGER.error ("The provided certificate is not a valid Peppol certificate. Check result: " + eCheckResult);
-      else
+      if (false)
       {
-        throw new InitializationException ("The provided certificate is not a Peppol certificate. Check result: " +
+        throw new InitializationException ("The provided certificate is not a Peppol AP certificate. Check result: " +
                                            eCheckResult);
       }
+      LOGGER.error ("The provided certificate is not a valid Peppol AP certificate. Check result: " + eCheckResult);
     }
     else
       LOGGER.info ("Successfully checked that the provided Peppol AP certificate is valid.");
@@ -228,7 +230,7 @@ public class ServletConfig
     // the validity is crosscheck against the owning SMP
     final String sSMPURL = APConfig.getMySmpUrl ();
     final String sAPURL = AS4Configuration.getThisEndpointAddress ();
-    if (StringHelper.hasText (sSMPURL) && StringHelper.hasText (sAPURL))
+    if (StringHelper.isNotEmpty (sSMPURL) && StringHelper.isNotEmpty (sAPURL))
     {
       // To process the message even though the receiver is not registered in
       // our AP

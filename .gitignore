@@ -10,11 +10,11 @@ private-*.properties
 *.p12
 *.jks
 
-./traefik/
-./ap-config/
-./ap-generated/
-./smp-config/
-./smp-persistent/
+/traefik/
+/ap-config/
+/ap-generated/
+/smp-config/
+/smp-persistent/
 .DS_Store
 .env
 src/main/resources/application.properties

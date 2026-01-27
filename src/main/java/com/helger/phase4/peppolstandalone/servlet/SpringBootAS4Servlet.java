@@ -95,7 +95,6 @@ public class SpringBootAS4Servlet extends AbstractXServlet
                                                                                                                 .getDecodedOrNull ())
                                                                   .sbdhIdentifierFactoryPeppol ()
                                                                   .performSBDHValueChecks (Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks ())
-                                                                  .checkSBDHForMandatoryCountryC1 (Phase4PeppolDefaultReceiverConfiguration.isCheckSBDHForMandatoryCountryC1 ())
                                                                   .checkSigningCertificateRevocation (Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation ())
                                                                   .build ();
           }
@@ -110,7 +109,6 @@ public class SpringBootAS4Servlet extends AbstractXServlet
                                                                                                                 .getDecodedOrNull ())
                                                                   .sbdhIdentifierFactoryPeppol ()
                                                                   .performSBDHValueChecks (Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks ())
-                                                                  .checkSBDHForMandatoryCountryC1 (Phase4PeppolDefaultReceiverConfiguration.isCheckSBDHForMandatoryCountryC1 ())
                                                                   .checkSigningCertificateRevocation (Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation ())
                                                                   .build ();
           }

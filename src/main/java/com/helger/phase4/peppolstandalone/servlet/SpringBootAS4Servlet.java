@@ -113,6 +113,15 @@ public class SpringBootAS4Servlet extends Phase4PeppolAS4Servlet
           aRequestHandler.getProcessorOfType (Phase4PeppolServletMessageProcessorSPI.class)
                          .setReceiverCheckData (aReceiverCheckData);
         }
+
+        if (false)
+        {
+          // Install a global consumer that is called every time an inbound message triggers an AS4
+          // Error Message
+          aRequestHandler.setErrorConsumer ( (aMsgMetadata, aIncomingState, aEbmsErrors, aAS4ErrorMsg) -> {
+            // TODO
+          });
+        }
       }
 
       @Override

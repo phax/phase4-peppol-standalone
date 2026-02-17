@@ -17,6 +17,8 @@
 package com.helger.phase4.peppolstandalone.servlet;
 
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.base.string.StringHelper;
 import com.helger.base.url.URLHelper;
@@ -36,6 +38,8 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 public class SpringBootAS4Servlet extends Phase4PeppolAS4Servlet
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (SpringBootAS4Servlet.class);
+
   public SpringBootAS4Servlet ()
   {
     super (new Phase4PeppolServletRequestHandlerCustomizer ()
@@ -118,8 +122,11 @@ public class SpringBootAS4Servlet extends Phase4PeppolAS4Servlet
         {
           // Install a global consumer that is called every time an inbound message triggers an AS4
           // Error Message
-          aRequestHandler.setErrorConsumer ( (aMsgMetadata, aIncomingState, aEbmsErrors, aAS4ErrorMsg) -> {
-            // TODO
+          aRequestHandler.setErrorConsumer ( (aMessageMetdata, aIncomingState, aEbmsErrors, aAS4ErrorMsg) -> {
+            LOGGER.error ("!!! An AS4 error was created for incoming request " +
+                          aMessageMetdata.getIncomingUniqueID ());
+            LOGGER.error ("   Found " + aEbmsErrors.size () + " errors");
+            LOGGER.error ("   The created AS4 error message has the AS4 Message ID " + aAS4ErrorMsg.getMessagingID ());
           });
         }
       }

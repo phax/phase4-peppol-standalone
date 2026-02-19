@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (C) 2023-2026 Philip Helger (www.helger.com)
+    Copyright (C) 2023-2025 Philip Helger (www.helger.com)
     philip[at]helger[dot]com
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,7 @@
   <parent>
     <groupId>com.helger.phase4</groupId>
     <artifactId>phase4-parent-pom</artifactId>
-    <version>4.3.0</version>
+    <version>4.2.5</version>
   </parent>
   <artifactId>phase4-peppol-standalone</artifactId>
   <name>phase4-peppol-standalone</name>
@@ -72,7 +72,7 @@
   -->
 
   <properties>
-    <peppol-ap-support.version>2.1.1</peppol-ap-support.version>
+    <peppol-ap-support.version>2.1.0</peppol-ap-support.version>
     <peppol-reporting.version>4.1.0</peppol-reporting.version>
     <spring-boot.version>4.0.2</spring-boot.version>
   </properties>
@@ -91,7 +91,12 @@
   </dependencyManagement>
 
   <dependencies>
-    <dependency>
+      <dependency>
+          <groupId>org.springdoc</groupId>
+          <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+          <version>2.8.5</version>
+      </dependency>
+      <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
     </dependency>
@@ -110,6 +115,16 @@
       <artifactId>spring-boot-devtools</artifactId>
       <scope>runtime</scope>
       <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.data</groupId>
+      <artifactId>spring-data-jpa</artifactId>
     </dependency>
 
     <dependency>
@@ -133,11 +148,11 @@
       <artifactId>peppol-reporting</artifactId>
       <version>${peppol-reporting.version}</version>
     </dependency>
-    <!-- TODO Choose any other backend implementation -->
     <dependency>
       <groupId>com.helger.peppol</groupId>
-      <artifactId>peppol-reporting-backend-inmemory</artifactId>
+      <artifactId>peppol-reporting-backend-sql</artifactId>
       <version>${peppol-reporting.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>com.helger.peppol</groupId>
@@ -151,42 +166,81 @@
     </dependency>
 
     <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+      <version>11.8.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-database-postgresql</artifactId>
+      <version>11.8.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hibernate.orm</groupId>
+      <artifactId>hibernate-core</artifactId>
+      <version>6.6.3.Final</version>
+    </dependency>
+
+      <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>42.7.5</version>
+      </dependency>
+
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>2.3.232</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>com.helger.commons</groupId>
       <artifactId>ph-unittest-support-ext</artifactId>
       <scope>test</scope>
       <exclusions>
-        <exclusion>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-        </exclusion>
+          <exclusion>
+              <groupId>junit</groupId>
+              <artifactId>junit</artifactId>
+          </exclusion>
       </exclusions>
     </dependency>
+      <dependency>
+        <groupId>net.java.dev.jna</groupId>
+        <artifactId>jna-platform</artifactId>
+        <version>5.18.1</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.waffle</groupId>
+        <artifactId>waffle-jna</artifactId>
+        <version>3.5.1</version>
+      </dependency>
   </dependencies>
 
   <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <excludes>
-          <exclude>**/*.p12</exclude>
-          <exclude>**/*.jks</exclude>
-        </excludes>
-      </resource>
-    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <release>17</release>
+          <release>21</release>
+          <source>21</source>
+          <target>21</target>
           <!-- Required for Spring Boot -->
           <parameters>true</parameters>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.5.3</version>
       </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
@@ -194,38 +248,15 @@
         <version>${spring-boot.version}</version>
         <executions>
           <execution>
-            <id>repackage-main</id>
             <goals>
               <goal>repackage</goal>
             </goals>
-            <configuration>
-              <mainClass>com.mysupply.phase4.peppolstandalone.Phase4PeppolStandaloneApplication</mainClass>
-              <layout>ZIP</layout>
-            </configuration>
-          </execution>
-          <execution>
-            <id>repackage-tsr</id>
-            <goals>
-              <goal>repackage</goal>
-            </goals>
-            <configuration>
-              <mainClass>com.mysupply.phase4.peppolstandalone.reporting.TransactionStatisticsReportApp</mainClass>
-              <layout>ZIP</layout>
-              <classifier>TSR</classifier>
-            </configuration>
-          </execution>
-          <execution>
-            <id>repackage-eusr</id>
-            <goals>
-              <goal>repackage</goal>
-            </goals>
-            <configuration>
-              <mainClass>com.mysupply.phase4.peppolstandalone.reporting.EndUserStatisticsReportApp</mainClass>
-              <layout>ZIP</layout>
-              <classifier>EUSR</classifier>
-            </configuration>
           </execution>
         </executions>
+        <configuration>
+          <mainClass>com.mysupply.phase4.peppolstandalone.Phase4PeppolStandaloneApplication</mainClass>
+          <layout>ZIP</layout>
+        </configuration>
       </plugin>
     </plugins>
   </build>

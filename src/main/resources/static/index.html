@@ -1,6 +1,6 @@
 <!--
 
-    Copyright (C) 2023-2026 Philip Helger (www.helger.com)
+    Copyright (C) 2023-204 Philip Helger (www.helger.com)
     philip[at]helger[dot]com
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>phase4-peppol-standalone</title>
+    <title>phase4 peppol </title>
     <style type="text/css">
 * { font-family: sans-serif; }
 code { font-family: 'Courier New', Courier, monospace; color:firebrick; background-color: #eee; }
@@ -27,14 +27,13 @@ div { margin:1em 0; }
 </style>
   </head>
   <body>
-    <h1>phase4-peppol-standalone is working</h1>
-    <div>See <a href="https://github.com/phax/phase4-peppol-standalone/">https://github.com/phax/phase4-peppol-standalone/</a> for details.</div>
+    <h1>phase4-peppol is up and running working</h1>
+    <div>The instance is a derived work of phase4-peppol-standalone, see <a href="https://github.com/phax/phase4-peppol-standalone/">https://github.com/phax/phase4-peppol-standalone/</a> for details.</div>
 
     <h2>Sending Peppol messages</h2>
-    <div>Send Peppol AS4 messages via <code>/sendas4/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}</code> (will create SBDH)</div>
-    <div>Send Peppol SBDH messages via <code>/sendsbdh</code></div>
+    <div>Send Peppol messages including externally generated SBDH via <code>/sender/v1.0</code></div>
     
-    <h2>Receiving Peppol messages</h2>
+<h2>Receiving Peppol messages</h2>
     <div>Peppol AS4 messages are received via HTTP POST at <code>/as4</code></div>
   </body>
 </html>

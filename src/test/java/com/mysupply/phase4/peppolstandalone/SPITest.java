@@ -14,23 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phase4.peppolstandalone;
+package com.mysupply.phase4.peppolstandalone;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import org.junit.jupiter.api.Test;
+
+import com.helger.unittestext.SPITestHelper;
 
 /**
- * This is the application entrypoint.
+ * Test SPI definitions
  *
  * @author Philip Helger
  */
-@SpringBootApplication
-@EnableScheduling
-public class Phase4PeppolStandaloneApplication
+public final class SPITest
 {
-  public static void main (final String [] args)
+  @Test
+  public void testBasic () throws Exception
   {
-    SpringApplication.run (Phase4PeppolStandaloneApplication.class, args);
+    SPITestHelper.testIfAllSPIImplementationsAreValid ();
   }
 }

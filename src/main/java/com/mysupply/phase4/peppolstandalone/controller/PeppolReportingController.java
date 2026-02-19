@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phase4.peppolstandalone.controller;
+package com.mysupply.phase4.peppolstandalone.controller;
 
 import java.time.YearMonth;
 
@@ -37,9 +37,9 @@ import com.helger.peppol.reporting.jaxb.eusr.v110.EndUserStatisticsReportType;
 import com.helger.peppol.reporting.jaxb.tsr.TransactionStatisticsReport101Marshaller;
 import com.helger.peppol.reporting.jaxb.tsr.v101.TransactionStatisticsReportType;
 import com.helger.peppol.reporting.tsr.TransactionStatisticsReport;
+import com.mysupply.phase4.peppolstandalone.APConfig;
+import com.mysupply.phase4.peppolstandalone.reporting.AppReportingHelper;
 import com.helger.phase4.logging.Phase4LoggerFactory;
-import com.helger.phase4.peppolstandalone.APConfig;
-import com.helger.phase4.peppolstandalone.reporting.AppReportingHelper;
 
 /**
  * This is the primary REST controller for the APIs to create Peppol Reports TSR and EUSR.<br>
@@ -205,6 +205,6 @@ public class PeppolReportingController
     final YearMonth aYearMonth = AppReportingHelper.getValidYearMonthInAPI (nYear, nMonth);
     AppReportingHelper.createAndSendPeppolReports (aYearMonth);
 
-    return "Done - check report storage";
+    return "Done - check database";
   }
 }

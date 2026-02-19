@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phase4.peppolstandalone.controller;
+package com.mysupply.phase4.peppolstandalone.controller;
 
+import com.helger.phase4.config.AS4Configuration;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
@@ -42,7 +43,7 @@ import com.helger.phase4.peppol.Phase4PeppolSender;
 import com.helger.phase4.peppol.Phase4PeppolSender.PeppolUserMessageBuilder;
 import com.helger.phase4.peppol.Phase4PeppolSender.PeppolUserMessageSBDHBuilder;
 import com.helger.phase4.peppol.Phase4PeppolSendingReport;
-import com.helger.phase4.peppolstandalone.APConfig;
+import com.mysupply.phase4.peppolstandalone.APConfig;
 import com.helger.phase4.profile.peppol.Phase4PeppolHttpClientSettings;
 import com.helger.phase4.sender.EAS4UserMessageSendResult;
 import com.helger.phase4.util.Phase4Exception;
@@ -525,13 +526,26 @@ public final class PeppolSender
 
       if (eResult.isSuccess ())
       {
+        new Thread(() -> {
         // TODO determine the enduser ID of the outbound message
         // In many simple cases, this might be the sender's participant ID
-        final String sEndUserID = aData.getSenderAsIdentifier ().getURIEncoded ();
+        String sEndUserID = aData.getSenderAsIdentifier ().getURIEncoded ();
+        if(sEndUserID == null) {
+          sEndUserID = APConfig.getMyPeppolSeatID ();
+        }
 
-        // TODO Enable Peppol Reporting when ready
-        if (false)
-          aBuilder.createAndStorePeppolReportingItemAfterSending (sEndUserID);
+        final boolean createPeppolReportingItem = AS4Configuration
+                .getConfig()
+                .getAsBoolean("peppol.createReportingItem");
+
+          try {
+            if (createPeppolReportingItem) {
+                  aBuilder.createAndStorePeppolReportingItemAfterSending(sEndUserID);
+            }
+          } catch (final Exception ex) {
+
+            LOGGER.error("Failed to store Peppol Reporting Item", ex);}
+        }).start();
       }
 
       aSendingReport.setAS4SendingResult (eResult);

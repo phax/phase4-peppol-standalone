@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SbdMappings>
+	<!-- All change to the file will result in auto refresh the loaded data. -->
+	<!-- All schemeId mappings is case-insensitive. -->
+	<MappingIdentifiers>
+		<!-- Identify the schemeId mapping to use. -->
+		<!-- Empty value in 'customizationId', 'profile', 'uniqueName', and 'recipient', ignores the check when identifing if the list should be used. -->
+		<!-- This is just for demostration - note it result in using the default mappings. -->
+		<!-- <MappingIdentifier customizationId="OIOUBL-2.01" recipient="DK99010080" mapping="Default"/> -->
+		<!-- <MappingIdentifier customizationId="OIOUBL-2.01" recipient="" mapping="Default"/> -->
+
+		<!-- We always used the first list that match the request, so this entry MUST be the last line. -->
+		<!--<MappingIdentifier customizationId="" profile="" sender="" recipient="" mapping="Default"/>-->
+	</MappingIdentifiers>
+
+	<Mappings>
+
+
+		<Mapping>
+			<!-- Internationally approved ICDs -->
+			<!-- https://docs.peppol.eu/edelivery/codelists/ -->
+			<Entry from="FR:SIRENE"  to="FR" name="Institut National de la Statistique et des Etudes Economiques, (I.N.S.E.E.)" />
+			<Entry from="0002"       to="FR" />
+			
+			<Entry from="SE:ORGNR"   to="SE" name="The National Tax Board" />
+			<Entry from="0007"       to="SE" />
+			
+			<Entry from="FR:SIRET"   to="FR" name="DU PONT DE NEMOURS" />
+			<Entry from="0009"       to="FR" />
+			
+			<Entry from="FI:OVT"     to="FI" name="National Board of Taxes, (Verohallitus)" />
+			<Entry from="0037"       to="FI" />
+			
+			<Entry from="DUNS"       to="ZZ" name="Dun and Bradstreet Ltd" />
+			<Entry from="0060"       to="ZZ" />
+			
+			<!--<Entry from="GLN"        to="0088" name="GS1 GLN" />-->
+			
+			<Entry from="DK:P"       to="DK" name="Danish Chamber of Commerce" />
+			<Entry from="0096"       to="DK" />
+			
+			<Entry from="IT:FTI"     to="IT" name="FTI - Ediforum Italia" />
+			<Entry from="0097"       to="IT" />
+			
+			<Entry from="NL:KVK"     to="NL" name="Vereniging van Kamers van Koophandel en Fabrieken in Nederland, Scheme" />
+			<Entry from="0106"       to="NL" />
+			
+			<Entry from="NAL"        to="ZZ" name="Directorates of the European Commission" />
+			<Entry from="0130"       to="ZZ" />
+			
+			<Entry from="IT:SIA"     to="IT" name="SIA-Società Interbancaria per l'Automazione S.p.A." />
+			<Entry from="0135"       to="IT" />
+			
+			<Entry from="IT:SECETI"  to="IT" name="Servizi Centralizzati SECETI S.p.A." />
+			<Entry from="0142"       to="IT" />
+			
+			<Entry from="AU:ABN"     to="AU" name="Australian Taxation Office" />
+			<Entry from="0151"       to="AU" />
+			
+			<Entry from="CH:UIDB"    to="CH" name="Swiss Federal Statistical Office (FSO)" />
+			<Entry from="0183"       to="CH" />
+
+			<Entry from="DIGST"      to="DK" name="The Danish Agency for EDB'ish" />
+			<Entry from="0184"       to="DK" />
+			
+			<Entry from="JP:SST"     to="JP" name="National Tax Agency Japan" />
+			<Entry from="0188"       to="JP" />
+
+			<Entry from="NL:OINO"    to="NL" name="Logius" />
+			<Entry from="0190"       to="NL" />
+
+			<Entry from="EE:CC"      to="EE" name="Estonian Company Code" />
+			<Entry from="0191"       to="EE" />
+
+			<Entry from="NO:ORG"     to="NO" name="Enhetsregisteret ved Bronnøysundregisterne" />
+			<Entry from="0192"       to="NO" />
+
+			<Entry from="UBLBE"      to="BE" name="UBL.BE" />
+			<Entry from="0193"       to="BE" />
+
+			<Entry from="SG:UEN"     to="SG" name="Infocomm Media Development Authority" />
+			<Entry from="0195"       to="SG" />
+
+			<Entry from="IS:KTNR"    to="IS" name="Directorate of Internal Revenue" />
+			<Entry from="0196"       to="IS" />
+
+			<Entry from="DK:ERST"    to="DK" name="The Danish Business Authority" />
+			<Entry from="0198"       to="DK" />
+
+			<Entry from="LEI"        to="ZZ" name="Legal Entity Identifier (LEI)" />
+			<Entry from="0199"       to="ZZ" />
+
+			<Entry from="LT:LEC"     to="LT" name="State Enterprise Centre of Registers" />
+			<Entry from="0200"       to="LT" />
+
+			<Entry from="IT:CUUO"    to="IT" name="Codice Univoco Unità Organizzativa iPA" />
+			<Entry from="0201"       to="IT" />
+
+			<Entry from="DE:LWID"    to="DE" name="Leitweg-ID" />
+			<Entry from="0204"       to="DE" />
+
+			<Entry from="IT:COD"     to="IT" name="Agenzia delle Entrate" />
+			<Entry from="0205"       to="IT" />
+			
+			<Entry from="BE:EN"      to="BE" name="Numero d'entreprise / ondernemingsnummer / Unternehmensnummer" />
+			<Entry from="0208"       to="BE" />
+			
+			<Entry from="GS1"		 to="ZZ" name="GS1" />
+			<Entry from="0209"       to="ZZ" />
+
+			<Entry from="IT:CFI"	 to="IT" name="Agenzia delle Entrate" />
+			<Entry from="0210"       to="IT" />
+
+			<Entry from="IT:IVA"	 to="IT" name="Agenzia delle Entrate" />
+			<Entry from="0211"       to="IT" />
+			
+			<Entry from="FI:ORG"	 to="FI" name="State Treasury of Finland / Valtiokonttori" />
+			<Entry from="0212"       to="FI" />
+			
+			<Entry from="FI:VAT"	 to="FI" name="State Treasury of Finland / Valtiokonttori" />
+			<Entry from="0213"       to="FI" />
+			
+			<Entry from="FI:NSI"	 to="FI" name="Tieto Finland Oy" />
+			<Entry from="0215"       to="FI" />
+			
+			<Entry from="FI:OVT2"	 to="FI" name="TIEKE- Tietoyhteiskunnan kehittamiskeskus ry" />
+			<Entry from="0216"       to="FI" />
+
+			<Entry from="JP:IIN"	 to="JP" name="Name: National Tax Agency Japan" />
+			<Entry from="0221"       to="JP" />
+			
+			<Entry from="MY:EIF"	 to="MY" name="Malaysia Digital Economy Corporation Sdn Bhd (MDEC)" />
+			<Entry from="0230"       to="MY" />			
+			
+			<!-- ICDs created and maintained by OpenPEPPOL -->
+			<!-- @Deprecated -->
+			<Entry from="DK:CPR"     to="DK" name="Danish Ministry of the Interior and Health" />
+			<Entry from="9901"       to="DK" />
+			
+			<!-- @Deprecated -->
+			<Entry from="DK:CVR"     to="DK" name="The Danish Commerce and Companies Agency" />
+			<Entry from="9902"       to="DK" />
+			<Entry from="0184"       to="DK" />
+
+			<!-- @Deprecated -->
+			<Entry from="DK:SE"      to="DK" name="Danish Ministry of Taxation, Central Customs and Tax Administration" />
+			<Entry from="9904"       to="DK" />
+
+			<!-- @Deprecated -->
+			<Entry from="DK:VANS"    to="DK" name="Danish VANS providers" />
+			<Entry from="9905"       to="DK" />
+
+			<!-- @Deprecated -->
+			<Entry from="IT:VAT"     to="IT" name="Ufficio responsabile gestione partite IVA" />
+			<Entry from="9906"       to="IT" />
+
+			<!-- @Deprecated -->
+			<Entry from="IT:CF"      to="IT" name="TAX Authority" />
+			<Entry from="9907"       to="IT" />
+
+			<!-- @Deprecated -->
+			<Entry from="NO:ORGNR"   to="NO" name="Enhetsregisteret ved Bronnøysundregisterne" />
+			<Entry from="9908"       to="NO" />
+
+			<!-- @Deprecated -->
+			<Entry from="NO:VAT"     to="NO" name="Norwegian VAT number" />
+			<Entry from="9909"       to="NO" />
+			
+			<Entry from="HU:VAT"     to="HU" name="Hungarian VAT number" />
+			<Entry from="9910"       to="HU" />
+
+			<!-- @Deprecated -->
+			<!--<Entry from="EU:VAT"     to="ZZ" name="National ministries of Economy" />
+			<Entry from="9912"       to="ZZ" />-->
+			
+			<Entry from="EU:REID"    to="ZZ" name="Business Registers Network" />
+			<Entry from="9913"       to="ZZ" />
+
+			<Entry from="AT:VAT"     to="AT" name="Österreichische Umsatzsteuer-Identifikationsnummer" />
+			<Entry from="9914"       to="AT" />
+
+			<Entry from="AT:GOV"     to="AT" name="Österreichisches Verwaltungs bzw. Organisationskennzeichen" />
+			<Entry from="9915"       to="AT" />
+
+			<!-- @Deprecated -->
+			<Entry from="AT:CID"     to="AT" name="Firmenidentifikationsnummer der Statistik Austria" />
+			<Entry from="9916"       to="AT" />
+			
+			<!-- @Deprecated -->
+			<Entry from="IS:KT"      to="IS" name="Icelandic National Registry" />
+			<Entry from="9917"       to="IS" />
+
+			<Entry from="IBAN"       to="ZZ" name="SOCIETY FOR WORLDWIDE INTERBANK FINANCIAL, TELECOMMUNICATION S.W.I.F.T" />
+			<Entry from="9918"       to="ZZ" />
+
+			<Entry from="AT:KUR"     to="AT" name="Kennziffer des Unternehmensregisters" />
+			<Entry from="9919"       to="AT" />
+
+			<Entry from="ES:VAT"     to="ES" name="Agencia Española de Administración Tributaria" />
+			<Entry from="9920"       to="ES" />
+
+			<!-- @Deprecated -->
+			<Entry from="IT:IPA"     to="IT" name="Indice delle Pubbliche Amministrazioni" />
+			<Entry from="9921"       to="IT" />
+
+			<Entry from="AD:VAT"     to="AD" name="Andorra VAT number" />
+			<Entry from="9922"       to="AD" />
+
+			<Entry from="AL:VAT"     to="AL" name="Albania VAT number" />
+			<Entry from="9923"       to="AL" />
+
+			<Entry from="BA:VAT"     to="BA" name="Bosnia and Herzegovina VAT number" />
+			<Entry from="9924"       to="BA" />
+
+			<Entry from="BE:VAT"     to="BE" name="Belgium VAT number" />
+			<Entry from="9925"       to="BE" />
+
+			<Entry from="BG:VAT"     to="BG" name="Bulgaria VAT number" />
+			<Entry from="9926"       to="BG" />
+
+			<Entry from="CH:VAT"     to="CH" name="Switzerland VAT number" />
+			<Entry from="9927"       to="CH" />
+
+			<Entry from="CY:VAT"     to="CY" name="Cyprus VAT number" />
+			<Entry from="9928"       to="CY" />
+
+			<Entry from="CZ:VAT"     to="CZ" name="Czech Republic VAT number" />
+			<Entry from="9929"       to="CZ" />
+
+			<Entry from="DE:VAT"     to="DE" name="Germany VAT number" />
+			<Entry from="9930"       to="DE" />
+
+			<Entry from="EE:VAT"     to="EE" name="Estonia VAT number" />
+			<Entry from="9931"       to="EE" />
+
+			<Entry from="GB:VAT"     to="GB" name="United Kingdom VAT number" />
+			<Entry from="9932"       to="GB" />
+
+			<Entry from="GR:VAT"     to="GB" name="Greece VAT number" />
+			<Entry from="9933"       to="GB" />
+
+			<Entry from="HR:VAT"     to="HR" name="Croatia VAT number" />
+			<Entry from="9934"       to="HR" />
+
+			<Entry from="IE:VAT"     to="IE" name="Ireland VAT number" />
+			<Entry from="9935"       to="IE" />
+
+			<Entry from="LI:VAT"     to="LI" name="Liechtenstein VAT number" />
+			<Entry from="9936"       to="LI" />
+
+			<Entry from="LT:VAT"     to="LT" name="Lithuania VAT number" />
+			<Entry from="9937"       to="LT" />
+
+			<Entry from="LU:VAT"     to="LU" name="Luxemburg VAT number" />
+			<Entry from="9938"       to="LU" />
+
+			<Entry from="LV:VAT"     to="LV" name="Latvia VAT number" />
+			<Entry from="9939"       to="LV" />
+
+			<Entry from="MC:VAT"     to="MC" name="Monaco VAT number" />
+			<Entry from="9940"       to="MC" />
+
+			<Entry from="ME:VAT"     to="ME" name="Montenegro VAT number" />
+			<Entry from="9941"       to="ME" />
+
+			<Entry from="MK:VAT"     to="MK" name="Macedonia, the former Yugoslav Republic of VAT number" />
+			<Entry from="9942"       to="MK" />
+
+			<Entry from="MT:VAT"     to="MT" name="Malta VAT number" />
+			<Entry from="9943"       to="MT" />
+
+			<Entry from="NL:VAT"     to="NL" name="Netherlands VAT number" />
+			<Entry from="9944"       to="NL" />
+
+			<Entry from="PL:VAT"     to="PL" name="Poland VAT number" />
+			<Entry from="9945"       to="PL" />
+
+			<Entry from="PT:VAT"     to="PT" name="Portugal VAT number" />
+			<Entry from="9946"       to="PT" />
+
+			<Entry from="RO:VAT"     to="RO" name="Romania VAT number" />
+			<Entry from="9947"       to="RO" />
+
+			<Entry from="RS:VAT"     to="RS" name="Serbia VAT number" />
+			<Entry from="9948"       to="RS" />
+
+			<Entry from="SI:VAT"     to="SI" name="Slovenia VAT number" />
+			<Entry from="9949"       to="SI" />
+
+			<Entry from="SK:VAT"     to="SK" name="Slovakia VAT number" />
+			<Entry from="9950"       to="SK" />
+
+			<Entry from="SM:VAT"     to="SM" name="San Marino VAT number" />
+			<Entry from="9951"       to="SM" />
+
+			<Entry from="TR:VAT"     to="TR" name="Turkey VAT number" />
+			<Entry from="9952"       to="TR" />
+
+			<Entry from="VA:VAT"     to="VA" name="Holy See (Vatican City State) VAT number" />
+			<Entry from="9953"       to="VA" />
+
+			<!-- @Deprecated -->
+			<Entry from="NL:OIN"     to="NL" name="Dutch Originator's Identification Number" />
+			<Entry from="9954"       to="NL" />
+
+			<!-- @Deprecated -->
+			<Entry from="SE:VAT"     to="SE" name="Swedish VAT number" />
+			<Entry from="9955"       to="SE" />
+
+			<!-- @Deprecated -->
+			<Entry from="BE:CBE"     to="BE" name="Belgian Crossroad Bank of Enterprises" />
+			<Entry from="9956"       to="BE" />
+
+			<Entry from="FR:VAT"     to="FR" name="French VAT number" />
+			<Entry from="9957"       to="FR" />
+
+			<!-- @Deprecated -->
+			<Entry from="DE:LID"     to="DE" name="German Leitweg ID" />
+			<Entry from="9958"       to="DE" />
+		
+			<Entry from="US:EIN"     to="US" name="US Employer ID Number" />
+			<Entry from="9959"       to="US" />
+		</Mapping>
+
+		<!-- This is just a demo list, that shows how to do it. -->
+
+	</Mappings>
+</SbdMappings>

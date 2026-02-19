@@ -2,12 +2,10 @@
 
 This an example standalone implementation of [phase4](https://github.com/phax/phase4) for the Peppol Network.
 
-This is a template application and NOT ready for production use, because you need to take decisions and add some code.
-Of course phase4 itself is ready for production use - see a list of [known phase4 users](https://github.com/phax/phase4/wiki/Known-Users) that have agreed to be publicly listed.
+This is a demo application and NOT ready for production use (of course phase4 itself is ready for production use).
+Use it as a template to add your own code.
 
-**Note:** because it is a template application, no releases are created - you have to modify it anyway.
-
-Contact me via email for *commercial support* (see `pom.xml` for the address).
+**Note:** because it is demo code, no releases are created - you have to modify it anyway.
 
 This project is part of my Peppol solution stack. See https://github.com/phax/peppol for other components and libraries in that area.
 
@@ -25,7 +23,7 @@ It also contains a lot of boilerplate code to show how certain things can be ach
 
 Sending is triggered via an HTTP POST request.
 
-All the sending APIs mentioned below also require the HTTP Header `X-Token` to be present and have a specific value.
+Since 2025-01-31 all the sending APIs mentioned below also require the HTTP Header `X-Token` to be present and have a specific value.
 What value that is, depends on the configuration property `phase4.api.requiredtoken`.
 The pre-configured value is `NjIh9tIx3Rgzme19mGIy` and should be changed in your own setup.
 
@@ -33,6 +31,7 @@ The actual Peppol Network choice (test or production network) is done based on t
 
 To send to an AS4 endpoint use this URL (the SBDH is built inside):
 ```
+mysupply - jlm - should NOT be used.
 /sendas4/{senderId}/{receiverId}/{docTypeId}/{processId}/{countryC1}
 ```
 
@@ -139,3 +138,22 @@ In case you don't like port 8080, also change it in the configuration file.
 
 My personal [Coding Styleguide](https://github.com/phax/meta/blob/master/CodingStyleguide.md) |
 It is appreciated if you star the GitHub project if you like it.
+
+---
+
+# mySupply custom implementation details
+
+peppol-reporting has been added to this repository. Since there are two implementations using `Flyway` for schema migration in the SQL backend, mySupply has also added a custom Flyway usage implementation.
+This feature has required separating the database into two separate schemas of which only the peppol-reporting based schema can have it's schema name configured. mySupply's added schema migrations
+have been "hardcoded" to schema name `peppol_documents` to avoid custom implementation of the actual database connection, queries etc using a JpaRepository. You seemingly cannot assign 
+dynamic schema names to entities within a `JpaRepository` (at least without implementing all queries by yourself).
+
+## Configurations
+mySupply has added a few configurations, mainly to support the backend implementation for storing/retrieving documents to a database also using Flyway (like Philip Helger's peppol-reporting does).
+
+The following configuration properties have been added by mySupply:
+* **`peppol.documents.jdbc.url`** - the JDBC URL to connect to the database. For example `jdbc:postgresql://localhost:5432/peppol_documents`. This also configures `spring.datasource.url` for JpaRepositories.
+* **`peppol.documents.jdbc.username`** - The database username to use. This also configures `spring.datasource.username` for JpaRepositories.
+* **`peppol.documents.jdbc.password`** - The database password to use. This also configures `spring.datasource.password` for JpaRepositories.
+* **`peppol.documents.jdbc.driver`** - Currently only PostgreSQL is supported so should be set to `org.postgresql.Driver`. This also configures `spring.datasource.driver-class-name` for JpaRepositories.
+* **`peppol.documents.jdbc.locations`** - Currently only PostgreSQL is supported so should point to `classpath:db/migrations/postgres`.

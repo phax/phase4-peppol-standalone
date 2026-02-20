@@ -32,7 +32,7 @@ import com.helger.peppol.sbdh.PeppolSBDHDataReadException;
 import com.helger.peppol.sbdh.PeppolSBDHDataReader;
 import com.helger.peppol.security.PeppolTrustedCA;
 import com.helger.peppol.servicedomain.EPeppolNetwork;
-import com.helger.peppol.sml.ESML;
+import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.phase4.logging.Phase4LoggerFactory;
 import com.helger.phase4.peppol.Phase4PeppolSendingReport;
@@ -84,7 +84,7 @@ public class PeppolSenderController
     }
 
     final EPeppolNetwork eStage = APConfig.getPeppolStage ();
-    final ESML eSML = eStage.isProduction () ? ESML.DIGIT_PRODUCTION : ESML.DIGIT_TEST;
+    final ISMLInfo aSML = eStage.getSMLInfo ();
     final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP ()
                                                           : PeppolTrustedCA.peppolTestAP ();
     LOGGER.info ("Trying to send Peppol " +
@@ -100,7 +100,7 @@ public class PeppolSenderController
                  "' for '" +
                  countryC1 +
                  "'");
-    final Phase4PeppolSendingReport aSendingReport = PeppolSender.sendPeppolMessageCreatingSbdh (eSML,
+    final Phase4PeppolSendingReport aSendingReport = PeppolSender.sendPeppolMessageCreatingSbdh (aSML,
                                                                                                  aAPCA,
                                                                                                  aPayloadBytes,
                                                                                                  senderId,
@@ -139,7 +139,7 @@ public class PeppolSenderController
     }
 
     final EPeppolNetwork eStage = APConfig.getPeppolStage ();
-    final ESML eSML = eStage.isProduction () ? ESML.DIGIT_PRODUCTION : ESML.DIGIT_TEST;
+    final ISMLInfo aSMLInfo = eStage.getSMLInfo ();
     final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP ()
                                                           : PeppolTrustedCA.peppolTestAP ();
     LOGGER.info ("Trying to send Peppol " +
@@ -151,7 +151,7 @@ public class PeppolSenderController
                  "' using Factur-X for '" +
                  countryC1 +
                  "'");
-    final Phase4PeppolSendingReport aSendingReport = PeppolSender.sendPeppolFacturXMessageCreatingSbdh (eSML,
+    final Phase4PeppolSendingReport aSendingReport = PeppolSender.sendPeppolFacturXMessageCreatingSbdh (aSMLInfo,
                                                                                                         aAPCA,
                                                                                                         aPayloadBytes,
                                                                                                         senderId,
@@ -184,10 +184,10 @@ public class PeppolSenderController
     }
 
     final EPeppolNetwork eStage = APConfig.getPeppolStage ();
-    final ESML eSML = eStage.isProduction () ? ESML.DIGIT_PRODUCTION : ESML.DIGIT_TEST;
+    final ISMLInfo aSMLInfo = eStage.getSMLInfo ();
     final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP ()
                                                           : PeppolTrustedCA.peppolTestAP ();
-    final Phase4PeppolSendingReport aSendingReport = new Phase4PeppolSendingReport (eSML);
+    final Phase4PeppolSendingReport aSendingReport = new Phase4PeppolSendingReport (aSMLInfo);
 
     final PeppolSBDHData aData;
     try
@@ -230,7 +230,7 @@ public class PeppolSenderController
                  sCountryCodeC1 +
                  "'");
 
-    PeppolSender.sendPeppolMessagePredefinedSbdh (aData, eSML, aAPCA, aSendingReport);
+    PeppolSender.sendPeppolMessagePredefinedSbdh (aData, aSMLInfo, aAPCA, aSendingReport);
 
     // Return result JSON
     return aSendingReport.getAsJsonString ();

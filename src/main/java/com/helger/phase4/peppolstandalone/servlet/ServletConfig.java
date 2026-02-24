@@ -172,7 +172,7 @@ public class ServletConfig
     // resources, it can be configured here
     {
       final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
-      // TODO eventually configure an outbound HTTP proxy here as well
+      APConfig.applyHttpProxySettings (aHCS);
       PeppolCRLDownloader.setAsDefaultCRLCache (aHCS);
     }
 
@@ -232,7 +232,9 @@ public class ServletConfig
       // To process the message even though the receiver is not registered in
       // our AP
       Phase4PeppolDefaultReceiverConfiguration.setReceiverCheckEnabled (true);
-      Phase4PeppolDefaultReceiverConfiguration.setSMPClient (new SMPClientReadOnly (URLHelper.getAsURI (sSMPURL)));
+      final SMPClientReadOnly aReceiverCheckSMPClient = new SMPClientReadOnly (URLHelper.getAsURI (sSMPURL));
+      APConfig.applyHttpProxySettings (aReceiverCheckSMPClient.httpClientSettings ());
+      Phase4PeppolDefaultReceiverConfiguration.setSMPClient (aReceiverCheckSMPClient);
       Phase4PeppolDefaultReceiverConfiguration.setAS4EndpointURL (sAPURL);
       Phase4PeppolDefaultReceiverConfiguration.setAPCertificate (aAPCert);
       LOGGER.info ("phase4 Peppol receiver checks are enabled");

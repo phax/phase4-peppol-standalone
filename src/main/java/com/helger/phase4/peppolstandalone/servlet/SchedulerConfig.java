@@ -51,7 +51,7 @@ public class SchedulerConfig implements SchedulingConfigurer
     // Schedule task
     final String sCronKey = "0 " + nMinute + " " + nHour + " " + nDayOfMonth + " * *";
     aTaskRegistrar.addCronTask (new CronTask ( () -> {
-      if (APConfig.isSchedulePeppolReporting ())
+      if (APConfig.isPeppolReportingScheduled ())
       {
         LOGGER.info ("Running scheduled creation and sending of Peppol Reporting messages");
         // Use the previous month

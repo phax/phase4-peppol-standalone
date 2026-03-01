@@ -85,7 +85,7 @@ public final class APConfig
     return getConfig ().getAsString ("peppol.reporting.senderid");
   }
 
-  public static boolean isSchedulePeppolReporting ()
+  public static boolean isPeppolReportingScheduled ()
   {
     return getConfig ().getAsBoolean ("peppol.reporting.scheduled", true);
   }

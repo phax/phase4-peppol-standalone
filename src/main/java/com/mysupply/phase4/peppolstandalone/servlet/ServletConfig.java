@@ -68,9 +68,11 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.PreDestroy;
 import jakarta.servlet.ServletContext;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.scheduling.annotation.Scheduled;
 
 @Configuration
+@ConditionalOnWebApplication
 public class ServletConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServletConfig.class);
 
@@ -251,20 +253,20 @@ public class ServletConfig {
         }
     }
 
-    // At 05:00 AM, on day 2 of the month
-    @Scheduled(cron = "0 0 5 2 * *")
-    public void sendPeppolReportingMessages ()
-    {
-        if (APConfig.isSchedulePeppolReporting ())
-        {
-            LOGGER.info ("Running scheduled creation and sending of Peppol Reporting messages");
-            // Use the previous month
-            final YearMonth aYearMonth = YearMonth.now ().minusMonths (1);
-            AppReportingHelper.createAndSendPeppolReports (aYearMonth);
-        }
-        else
-            LOGGER.warn ("Creating and sending Peppol Reports is disabled in the configuration");
-    }
+//    // At 05:00 AM, on day 2 of the month
+//    @Scheduled(cron = "0 0 5 2 * *")
+//    public void sendPeppolReportingMessages ()
+//    {
+//        if (APConfig.isSchedulePeppolReporting ())
+//        {
+//            LOGGER.info ("Running scheduled creation and sending of Peppol Reporting messages");
+//            // Use the previous month
+//            final YearMonth aYearMonth = YearMonth.now ().minusMonths (1);
+//            AppReportingHelper.createAndSendPeppolReports (aYearMonth);
+//        }
+//        else
+//            LOGGER.warn ("Creating and sending Peppol Reports is disabled in the configuration");
+//    }
 
     /**
      * Special class that is only present to have a graceful shutdown. The the bean method below.

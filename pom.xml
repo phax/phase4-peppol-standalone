@@ -247,16 +247,42 @@
         <artifactId>spring-boot-maven-plugin</artifactId>
         <version>${spring-boot.version}</version>
         <executions>
+          <!-- Primary application -->
           <execution>
+            <id>repackage-main</id>
             <goals>
               <goal>repackage</goal>
             </goals>
+            <configuration>
+              <mainClass>com.mysupply.phase4.peppolstandalone.Phase4PeppolStandaloneApplication</mainClass>
+              <layout>ZIP</layout>
+            </configuration>
+          </execution>
+          <!-- Transaction Statistics Report runner -->
+          <execution>
+            <id>repackage-transaction-statistics-report</id>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+            <configuration>
+              <mainClass>com.mysupply.phase4.peppolstandalone.reporting.TransactionStatisticsReportApp</mainClass>
+              <layout>ZIP</layout>
+              <classifier>transaction-statistics-report</classifier>
+            </configuration>
+          </execution>
+          <!-- End User Statistics Report runner -->
+          <execution>
+            <id>repackage-end-user-statistics-report</id>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+            <configuration>
+              <mainClass>com.mysupply.phase4.peppolstandalone.reporting.EndUserStatisticsReportApp</mainClass>
+              <layout>ZIP</layout>
+              <classifier>end-user-statistics-report</classifier>
+            </configuration>
           </execution>
         </executions>
-        <configuration>
-          <mainClass>com.mysupply.phase4.peppolstandalone.Phase4PeppolStandaloneApplication</mainClass>
-          <layout>ZIP</layout>
-        </configuration>
       </plugin>
     </plugins>
   </build>

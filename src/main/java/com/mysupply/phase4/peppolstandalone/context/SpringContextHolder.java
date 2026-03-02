@@ -17,4 +17,8 @@ public class SpringContextHolder implements ApplicationContextAware {
     public static void autowireBean(Object bean) {
         context.getAutowireCapableBeanFactory().autowireBean(bean);
     }
+
+    public static <T> T getBean(Class<T> beanClass) {
+        return context.getBean(beanClass);
+    }
 }

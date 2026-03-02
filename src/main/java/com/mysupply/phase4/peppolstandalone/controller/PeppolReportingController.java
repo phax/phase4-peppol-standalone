@@ -171,40 +171,4 @@ public class PeppolReportingController
       throw new HttpInternalServerErrorException ("Failed to read Peppol Reporting backend data: " + ex.getMessage ());
     }
   }
-
-  /**
-   * This API creates a TSR and EUSR report for the provided year and month, validate them, store
-   * them and send them to the dedicated receiver.
-   *
-   * @param xtoken
-   *        The X-Token header
-   * @param nYear
-   *        The year to use. Must be &ge; 2024
-   * @param nMonth
-   *        The month to use. Must be &ge; 1 and &le; 12
-   * @return A constant string
-   */
-  @GetMapping (path = "/do-peppol-reporting/{year}/{month}", produces = MediaType.APPLICATION_XML_VALUE)
-  public String createValidateStoreAndSend (@RequestHeader (name = PeppolSenderController.HEADER_X_TOKEN,
-                                                            required = true) final String xtoken,
-                                            @PathVariable (name = "year", required = true) final int nYear,
-                                            @PathVariable (name = "month", required = true) final int nMonth)
-  {
-    if (StringHelper.isEmpty (xtoken))
-    {
-      LOGGER.error ("The specific token header is missing");
-      throw new HttpForbiddenException ();
-    }
-    if (!xtoken.equals (APConfig.getPhase4ApiRequiredToken ()))
-    {
-      LOGGER.error ("The specified token value does not match the configured required token");
-      throw new HttpForbiddenException ();
-    }
-
-    // Check parameters
-    final YearMonth aYearMonth = AppReportingHelper.getValidYearMonthInAPI (nYear, nMonth);
-    AppReportingHelper.createAndSendPeppolReports (aYearMonth);
-
-    return "Done - check database";
-  }
 }

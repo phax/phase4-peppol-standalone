@@ -61,7 +61,7 @@ public class SpringBootAS4Servlet extends AbstractXServlet
 
         final boolean performSBDHValueChecks = AS4Configuration
                 .getConfig()
-                .getAsBoolean("peppol.rceiver.PerformSBDHValueChecks", true);
+                .getAsBoolean("peppol.receiver.PerformSBDHValueChecks", true);
         Phase4PeppolDefaultReceiverConfiguration.setPerformSBDHValueChecks(performSBDHValueChecks);
 
         // by Philip Helger
@@ -143,5 +143,6 @@ public class SpringBootAS4Servlet extends AbstractXServlet
 
     // HTTP POST only
     handlerRegistry ().registerHandler (EHttpMethod.POST, hdl);
+
   }
 }

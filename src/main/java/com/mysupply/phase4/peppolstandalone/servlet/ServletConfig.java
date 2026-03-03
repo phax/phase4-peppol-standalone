@@ -176,9 +176,6 @@ public class ServletConfig {
         // resources, it can be configured here
         {
             final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
-            // Configure HTTP client timeouts to handle unstable connections
-            aHCS.setConnectTimeout (Timeout.ofSeconds(30L));  // 30 seconds connection timeout
-            aHCS.setConnectionRequestTimeout (Timeout.ofSeconds(60L));      // 60 seconds socket/read timeout
             // TODO eventually configure an outbound proxy here as well
             PeppolCRLDownloader.setAsDefaultCRLCache (aHCS);
         }

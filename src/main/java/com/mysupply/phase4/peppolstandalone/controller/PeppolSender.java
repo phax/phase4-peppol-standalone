@@ -167,9 +167,6 @@ public final class PeppolSender
       });
 
       final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
-      // Configure HTTP client timeouts to handle unstable connections
-      aHCS.setConnectTimeout (Timeout.ofSeconds(30L));  // 30 seconds connection timeout
-      aHCS.setConnectionRequestTimeout (Timeout.ofSeconds(60L));      // 60 seconds socket/read timeout
       // TODO Add AP HTTP outbound proxy settings here
 
       final PeppolUserMessageBuilder aBuilder = Phase4PeppolSender.builder ()
@@ -344,9 +341,6 @@ public final class PeppolSender
       });
 
       final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
-      // Configure HTTP client timeouts to handle unstable connections
-      aHCS.setConnectTimeout (Timeout.ofSeconds(30L));  // 30 seconds connection timeout
-      aHCS.setConnectionRequestTimeout (Timeout.ofSeconds(60L));      // 60 seconds socket/read timeout
       // TODO Add AP HTTP outbound proxy settings here
 
       final PeppolUserMessageBuilder aBuilder = Phase4PeppolSender.builder ()
@@ -488,9 +482,6 @@ public final class PeppolSender
       });
 
       final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
-      // Configure HTTP client timeouts to handle unstable connections
-      aHCS.setConnectTimeout (Timeout.ofSeconds(30L));  // 30 seconds connection timeout
-      aHCS.setConnectionRequestTimeout (Timeout.ofSeconds(60L));      // 60 seconds socket/read timeout
       // TODO Add AP HTTP outbound proxy settings here
 
       final PeppolUserMessageSBDHBuilder aBuilder = Phase4PeppolSender.sbdhBuilder ()

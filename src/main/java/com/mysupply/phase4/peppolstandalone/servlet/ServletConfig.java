@@ -21,6 +21,7 @@ import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.time.YearMonth;
 
+import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -175,6 +176,9 @@ public class ServletConfig {
         // resources, it can be configured here
         {
             final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
+            // Configure HTTP client timeouts to handle unstable connections
+            aHCS.setConnectTimeout (Timeout.ofSeconds(30L));  // 30 seconds connection timeout
+            aHCS.setConnectionRequestTimeout (Timeout.ofSeconds(60L));      // 60 seconds socket/read timeout
             // TODO eventually configure an outbound proxy here as well
             PeppolCRLDownloader.setAsDefaultCRLCache (aHCS);
         }

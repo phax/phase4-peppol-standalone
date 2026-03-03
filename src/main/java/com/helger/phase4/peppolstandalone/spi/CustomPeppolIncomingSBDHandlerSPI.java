@@ -1,5 +1,5 @@
 ///*
-// * Copyright (C) 2023-2025 Philip Helger (www.helger.com)
+// * Copyright (C) 2023-2026 Philip Helger (www.helger.com)
 // * philip[at]helger[dot]com
 // *
 // * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,11 +16,15 @@
 // */
 //package com.helger.phase4.peppolstandalone.spi;
 //
+//import java.nio.charset.StandardCharsets;
+//
 //import org.jspecify.annotations.NonNull;
+//import org.jspecify.annotations.Nullable;
 //import org.slf4j.Logger;
 //import org.unece.cefact.namespaces.sbdh.StandardBusinessDocument;
 //import org.w3c.dom.Element;
 //
+//import com.helger.annotation.Nonempty;
 //import com.helger.annotation.style.IsSPIImplementation;
 //import com.helger.http.header.HttpHeaderMap;
 //import com.helger.peppol.reporting.api.PeppolReportingItem;
@@ -35,6 +39,7 @@
 //import com.helger.phase4.incoming.IAS4IncomingMessageMetadata;
 //import com.helger.phase4.incoming.IAS4IncomingMessageState;
 //import com.helger.phase4.logging.Phase4LoggerFactory;
+//import com.helger.phase4.messaging.EAS4MessageMode;
 //import com.helger.phase4.peppol.servlet.IPhase4PeppolIncomingSBDHandlerSPI;
 //import com.helger.phase4.peppol.servlet.Phase4PeppolServletMessageProcessorSPI;
 //import com.helger.phase4.peppolstandalone.APConfig;
@@ -94,8 +99,8 @@
 //          "factur-x".equals (aPeppolSBD.getType ()))
 //        {
 //          // Handle as Factur-X
-//          BinaryContentType aBinaryContent = new PeppolSBDHPayloadBinaryMarshaller ().read (aXMLPayload);
-//          byte [] aPDFBytes = aBinaryContent.getValue ();
+//          final BinaryContentType aBinaryContent = new PeppolSBDHPayloadBinaryMarshaller ().read (aXMLPayload);
+//          final byte [] aPDFBytes = aBinaryContent.getValue ();
 //          // TODO do something with the PDF bytes
 //        }
 //      }
@@ -139,5 +144,21 @@
 //          // TODO improve error handling
 //        }
 //    }).start ();
+//  }
+//
+//  public void processAS4ResponseMessage (@NonNull final IAS4IncomingMessageMetadata aIncomingMessageMetadata,
+//                                         @NonNull final IAS4IncomingMessageState aIncomingState,
+//                                         @NonNull @Nonempty final String sResponseMessageID,
+//                                         final byte @Nullable [] aResponseBytes,
+//                                         final boolean bResponsePayloadIsAvailable,
+//                                         @NonNull final AS4ErrorList aEbmsErrorMessages)
+//  {
+//    if (aIncomingMessageMetadata.getMode () == EAS4MessageMode.REQUEST)
+//      LOGGER.info ("AS4 response on an inbound message");
+//    else
+//      LOGGER.info ("AS4 response on an outbound message");
+//
+//    if (bResponsePayloadIsAvailable)
+//      LOGGER.info ("  Response content: " + new String (aResponseBytes, StandardCharsets.UTF_8));
 //  }
 //}

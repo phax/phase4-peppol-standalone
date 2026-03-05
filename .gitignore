@@ -1,5 +1,4 @@
-.classpath
-.project
+.claude/
 .settings/
 
 bin/
@@ -9,7 +8,11 @@ generated/
 private-*.properties
 *.p12
 *.jks
+
+.classpath
 .DS_Store
+.project
+CLAUDE.md
+
 .idea/
-/src/main/java/com/helger/phase4/peppolstandalone/
 .gitconfig

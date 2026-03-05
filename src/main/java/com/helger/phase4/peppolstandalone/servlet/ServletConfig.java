@@ -1,5 +1,5 @@
 ///*
-// * Copyright (C) 2023-2025 Philip Helger (www.helger.com)
+// * Copyright (C) 2023-2026 Philip Helger (www.helger.com)
 // * philip[at]helger[dot]com
 // *
 // * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,6 @@
 //import java.io.File;
 //import java.security.KeyStore;
 //import java.security.cert.X509Certificate;
-//import java.time.YearMonth;
 //
 //import org.jspecify.annotations.NonNull;
 //import org.slf4j.Logger;
@@ -27,7 +26,6 @@
 //import org.springframework.boot.web.servlet.ServletRegistrationBean;
 //import org.springframework.context.annotation.Bean;
 //import org.springframework.context.annotation.Configuration;
-//import org.springframework.scheduling.annotation.Scheduled;
 //
 //import com.helger.base.debug.GlobalDebug;
 //import com.helger.base.exception.InitializationException;
@@ -53,7 +51,6 @@
 //import com.helger.phase4.mgr.MetaAS4Manager;
 //import com.helger.phase4.peppol.servlet.Phase4PeppolDefaultReceiverConfiguration;
 //import com.helger.phase4.peppolstandalone.APConfig;
-//import com.helger.phase4.peppolstandalone.reporting.AppReportingHelper;
 //import com.helger.phase4.profile.peppol.AS4PeppolProfileRegistarSPI;
 //import com.helger.phase4.profile.peppol.PeppolCRLDownloader;
 //import com.helger.phase4.profile.peppol.Phase4PeppolHttpClientSettings;
@@ -175,7 +172,7 @@
 //    // resources, it can be configured here
 //    {
 //      final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
-//      // TODO eventually configure an outbound HTTP proxy here as well
+//      APConfig.applyHttpProxySettings (aHCS);
 //      PeppolCRLDownloader.setAsDefaultCRLCache (aHCS);
 //    }
 //
@@ -235,7 +232,9 @@
 //      // To process the message even though the receiver is not registered in
 //      // our AP
 //      Phase4PeppolDefaultReceiverConfiguration.setReceiverCheckEnabled (true);
-//      Phase4PeppolDefaultReceiverConfiguration.setSMPClient (new SMPClientReadOnly (URLHelper.getAsURI (sSMPURL)));
+//      final SMPClientReadOnly aReceiverCheckSMPClient = new SMPClientReadOnly (URLHelper.getAsURI (sSMPURL));
+//      APConfig.applyHttpProxySettings (aReceiverCheckSMPClient.httpClientSettings ());
+//      Phase4PeppolDefaultReceiverConfiguration.setSMPClient (aReceiverCheckSMPClient);
 //      Phase4PeppolDefaultReceiverConfiguration.setAS4EndpointURL (sAPURL);
 //      Phase4PeppolDefaultReceiverConfiguration.setAPCertificate (aAPCert);
 //      LOGGER.info ("phase4 Peppol receiver checks are enabled");
@@ -249,21 +248,6 @@
 //    // Initialize the Reporting Backend only once
 //    if (PeppolReportingBackend.getBackendService ().initBackend (APConfig.getConfig ()).isFailure ())
 //      throw new InitializationException ("Failed to init Peppol Reporting Backend Service");
-//  }
-//
-//  // At 05:00 AM, on day 2 of the month
-//  @Scheduled (cron = "0 0 5 2 * *")
-//  public void sendPeppolReportingMessages ()
-//  {
-//    if (APConfig.isSchedulePeppolReporting ())
-//    {
-//      LOGGER.info ("Running scheduled creation and sending of Peppol Reporting messages");
-//      // Use the previous month
-//      final YearMonth aYearMonth = YearMonth.now ().minusMonths (1);
-//      AppReportingHelper.createAndSendPeppolReports (aYearMonth);
-//    }
-//    else
-//      LOGGER.warn ("Creating and sending Peppol Reports is disabled in the configuration");
 //  }
 //
 //  /**

@@ -14,21 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mysupply.phase4.peppolstandalone.controller;
+package com.helger.phase4.peppolstandalone;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
-/**
- * REST Controller exception mapping to HTTP 500 (Internal Server Error)
- *
- * @author Philip Helger
- */
-@ResponseStatus (HttpStatus.INTERNAL_SERVER_ERROR)
-public class HttpInternalServerErrorException extends RuntimeException
+@SpringBootTest
+final class Phase4PeppolStandaloneApplicationTests
 {
-  public HttpInternalServerErrorException (final String sMsg)
-  {
-    super (sMsg);
-  }
+  @Test
+  void testContextLoads ()
+  {}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2025 Philip Helger (www.helger.com)
+ * Copyright (C) 2023-2026 Philip Helger (www.helger.com)
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -160,14 +160,10 @@ public final class PeppolSender
       final SMPClientReadOnly aSMPClient = new SMPClientReadOnly (Phase4PeppolSender.URL_PROVIDER,
                                                                   aReceiverID,
                                                                   aSmlInfo);
-
-      aSMPClient.withHttpClientSettings (aHCS -> {
-        // TODO Add SMP HTTP outbound proxy settings here
-        // If this block is not used, it may be removed
-      });
+      APConfig.applyHttpProxySettings (aSMPClient.httpClientSettings ());
 
       final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
-      // TODO Add AP HTTP outbound proxy settings here
+      APConfig.applyHttpProxySettings (aHCS);
 
       final PeppolUserMessageBuilder aBuilder = Phase4PeppolSender.builder ()
                                                                   .httpClientFactory (aHCS)
@@ -334,14 +330,10 @@ public final class PeppolSender
       final SMPClientReadOnly aSMPClient = new SMPClientReadOnly (Phase4PeppolSender.URL_PROVIDER,
                                                                   aReceiverID,
                                                                   aSmlInfo);
-
-      aSMPClient.withHttpClientSettings (aHCS -> {
-        // TODO Add SMP HTTP outbound proxy settings here
-        // If this block is not used, it may be removed
-      });
+      APConfig.applyHttpProxySettings (aSMPClient.httpClientSettings ());
 
       final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
-      // TODO Add AP HTTP outbound proxy settings here
+      APConfig.applyHttpProxySettings (aHCS);
 
       final PeppolUserMessageBuilder aBuilder = Phase4PeppolSender.builder ()
                                                                   .httpClientFactory (aHCS)
@@ -475,14 +467,10 @@ public final class PeppolSender
       final SMPClientReadOnly aSMPClient = new SMPClientReadOnly (Phase4PeppolSender.URL_PROVIDER,
                                                                   aReceiverID,
                                                                   aSmlInfo);
-
-      aSMPClient.withHttpClientSettings (aHCS -> {
-        // TODO Add SMP HTTP outbound proxy settings here
-        // If this block is not used, it may be removed
-      });
+      APConfig.applyHttpProxySettings (aSMPClient.httpClientSettings ());
 
       final Phase4PeppolHttpClientSettings aHCS = new Phase4PeppolHttpClientSettings ();
-      // TODO Add AP HTTP outbound proxy settings here
+      APConfig.applyHttpProxySettings (aHCS);
 
       final PeppolUserMessageSBDHBuilder aBuilder = Phase4PeppolSender.sbdhBuilder ()
                                                                       .httpClientFactory (aHCS)

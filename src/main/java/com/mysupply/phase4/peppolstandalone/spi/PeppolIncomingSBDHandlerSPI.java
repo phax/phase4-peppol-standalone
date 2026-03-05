@@ -16,14 +16,17 @@
  */
 package com.mysupply.phase4.peppolstandalone.spi;
 
+import com.helger.annotation.Nonempty;
 import com.helger.annotation.style.IsSPIImplementation;
 import com.helger.http.header.HttpHeaderMap;
+import com.helger.phase4.messaging.EAS4MessageMode;
 import com.helger.security.certificate.CertificateHelper;
 import com.mysupply.phase4.ICountryCodeMapper;
 import com.mysupply.phase4.domain.Document;
 import com.mysupply.phase4.peppolstandalone.APConfig;
 import com.mysupply.phase4.peppolstandalone.context.SpringContextHolder;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +45,8 @@ import com.helger.phase4.incoming.IAS4IncomingMessageState;
 import com.helger.phase4.peppol.servlet.IPhase4PeppolIncomingSBDHandlerSPI;
 import com.helger.phase4.peppol.servlet.Phase4PeppolServletMessageProcessorSPI;
 import com.mysupply.phase4.persistence.ISBDRepository;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * This is a way of handling incoming Peppol messages
@@ -176,6 +181,17 @@ public class PeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingSBDHand
                     // TODO improve error handling
                 }
         }).start();
+    }
+
+    @Override
+    public void processAS4ResponseMessage(@NonNull IAS4IncomingMessageMetadata aIncomingMessageMetadata, @NonNull IAS4IncomingMessageState aIncomingState, @NonNull @Nonempty String sResponseMessageID, byte @Nullable [] aResponseBytes, boolean bResponsePayloadIsAvailable, @NonNull AS4ErrorList aEbmsErrorMessages) {
+        if (aIncomingMessageMetadata.getMode () == EAS4MessageMode.REQUEST)
+            LOGGER.info ("AS4 response on an inbound message");
+        else
+            LOGGER.info ("AS4 response on an outbound message");
+
+        if (bResponsePayloadIsAvailable)
+            LOGGER.info ("  Response content: " + new String (aResponseBytes, StandardCharsets.UTF_8));
     }
 
     private String GetDomain(HttpHeaderMap aHeaders)

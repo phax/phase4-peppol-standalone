@@ -15,6 +15,8 @@ public class CountryCodeMapper implements ICountryCodeMapper {
 
     private static final Logger logger = LoggerFactory.getLogger(CountryCodeMapper.class);
 
+    public static final String DEFAULT_COUNTRY_CODE = "ZZ";
+
     private final SbdMappingData sbdMappingData;
 
     /**
@@ -280,7 +282,7 @@ public class CountryCodeMapper implements ICountryCodeMapper {
                     prefix = Integer.parseInt(prefixStr);
                     if (prefix != 0) {
                         countryCode = mapGlnToCountryCode(prefix, this.mapGlnShort);
-                        if (!"ZZ".equals(countryCode)) {
+                        if (!this.DEFAULT_COUNTRY_CODE.equals(countryCode)) {
                             return countryCode;
                         }
                     }
@@ -292,7 +294,7 @@ public class CountryCodeMapper implements ICountryCodeMapper {
                     prefix = Integer.parseInt(prefixStr);
                     if (prefix != 0) {
                         countryCode = mapGlnToCountryCode(prefix, this.mapGlnMedium);
-                        if (!"ZZ".equals(countryCode)) {
+                        if (!this.DEFAULT_COUNTRY_CODE.equals(countryCode)) {
                             return countryCode;
                         }
                     }
@@ -304,7 +306,7 @@ public class CountryCodeMapper implements ICountryCodeMapper {
                     prefix = Integer.parseInt(prefixStr);
                     if (prefix != 0) {
                         countryCode = mapGlnToCountryCode(prefix, this.mapGlnLong);
-                        if (!"ZZ".equals(countryCode)) {
+                        if (!this.DEFAULT_COUNTRY_CODE.equals(countryCode)) {
                             return countryCode;
                         }
                     }
@@ -314,7 +316,7 @@ public class CountryCodeMapper implements ICountryCodeMapper {
                 if (this.customMappings.containsKey(endpointValue)) {
                     countryCode = this.customMappings.get(endpointValue);
                 } else {
-                    countryCode = "ZZ";
+                    countryCode = this.DEFAULT_COUNTRY_CODE;
                 }
 
             } catch (NumberFormatException ex) {
@@ -322,11 +324,11 @@ public class CountryCodeMapper implements ICountryCodeMapper {
                 if (this.customMappings.containsKey(endpointValue)) {
                     countryCode = this.customMappings.get(endpointValue);
                 } else {
-                    countryCode = "ZZ";
+                    countryCode = this.DEFAULT_COUNTRY_CODE;
                 }
             }
         } else {
-            countryCode = "ZZ";
+            countryCode = this.DEFAULT_COUNTRY_CODE;
         }
 
         return countryCode;
@@ -340,7 +342,7 @@ public class CountryCodeMapper implements ICountryCodeMapper {
      */
     private String mapGlnToCountryCode(int prefix, Map<Integer, String> map) {
         String countryCode = map.get(prefix);
-        return countryCode != null ? countryCode : "ZZ";
+        return countryCode != null ? countryCode : this.DEFAULT_COUNTRY_CODE;
     }
 
     /**
@@ -350,7 +352,7 @@ public class CountryCodeMapper implements ICountryCodeMapper {
      */
     private String mapEndpointTypeToCountryCode(String endpointType) {
         String countryCode = this.sbdMappingData.tryMap(endpointType);
-        return countryCode != null ? countryCode : "ZZ";
+        return countryCode != null ? countryCode : this.DEFAULT_COUNTRY_CODE;
     }
 
 //    /**

@@ -9,6 +9,7 @@ import com.helger.peppol.reportingsupport.PeppolReportingSupport;
 import com.helger.peppol.reportingsupport.sql.PeppolReportSQLHandler;
 import com.helger.peppol.reportingsupport.sql.PeppolReportStorageSQL;
 import com.helger.phase4.logging.Phase4LoggerFactory;
+import com.mysupply.phase4.CountryCodeMapper;
 import com.mysupply.phase4.peppolstandalone.APConfig;
 import org.slf4j.Logger;
 import org.springframework.boot.CommandLineRunner;
@@ -62,6 +63,9 @@ public class EndUserStatisticsReportApp implements CommandLineRunner {
                     final IPeppolReportStorage aReportingStorage = new PeppolReportStorageSQL(aSQLHandler, aSQLHandler.getTableNamePrefix());
                     final PeppolReportingSupport aPRS = new PeppolReportingSupport(aReportingStorage);
                     final Wrapper<String> aEUSRString = new Wrapper<>();
+
+                    this.cleanUpEndUserStatisticsReport(report);
+
                     if (aPRS.validateAndStorePeppolEUSR11(report, aEUSRString::set).isSuccess()) {
                         final String sEUSRXml = aEUSRString.get();
                         if (sEUSRXml == null) {
@@ -81,5 +85,11 @@ public class EndUserStatisticsReportApp implements CommandLineRunner {
         } catch (final Exception ex) {
             LOGGER.error("Error creating End User Statistics Report", ex);
         }
+    }
+
+    private void cleanUpEndUserStatisticsReport(final EndUserStatisticsReportType report) {
+        report.getSubset().removeIf(subsetType ->
+                subsetType.getKey().stream().anyMatch(keyType ->
+                        CountryCodeMapper.DEFAULT_COUNTRY_CODE.equals(keyType.getValue())));
     }
 }

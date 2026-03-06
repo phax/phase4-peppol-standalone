@@ -23,24 +23,21 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.base.string.StringHelper;
 import com.helger.base.url.URLHelper;
-import com.helger.http.EHttpMethod;
 import com.helger.phase4.crypto.AS4CryptoFactoryInMemoryKeyStore;
 import com.helger.phase4.incoming.AS4IncomingProfileSelectorConstant;
 import com.helger.phase4.incoming.AS4RequestHandler;
 import com.helger.phase4.incoming.mgr.AS4ProfileSelector;
 import com.helger.phase4.model.pmode.resolve.AS4DefaultPModeResolver;
+import com.helger.phase4.peppol.servlet.Phase4PeppolAS4Servlet;
 import com.helger.phase4.peppol.servlet.Phase4PeppolDefaultReceiverConfiguration;
 import com.helger.phase4.peppol.servlet.Phase4PeppolReceiverConfiguration;
 import com.helger.phase4.peppol.servlet.Phase4PeppolServletMessageProcessorSPI;
 import com.helger.phase4.servlet.AS4UnifiedResponse;
-import com.helger.phase4.servlet.AS4XServletHandler;
-import com.helger.phase4.servlet.IAS4ServletRequestHandlerCustomizer;
 import com.helger.security.certificate.CertificateDecodeHelper;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
-import com.helger.xservlet.AbstractXServlet;
 
-public class SpringBootAS4Servlet extends AbstractXServlet
+public class SpringBootAS4Servlet extends Phase4PeppolAS4Servlet
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SpringBootAS4Servlet.class);
 
@@ -153,8 +150,5 @@ public class SpringBootAS4Servlet extends AbstractXServlet
         super.customizeAfterHandling (aRequestScope, aUnifiedResponse, aRequestHandler);
       }
     });
-
-    // HTTP POST only
-    handlerRegistry ().registerHandler (EHttpMethod.POST, hdl);
   }
 }

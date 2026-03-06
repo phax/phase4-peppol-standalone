@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2025 Philip Helger (www.helger.com)
+ * Copyright (C) 2023-2026 Philip Helger (www.helger.com)
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,10 @@
  */
 package com.mysupply.phase4.peppolstandalone.servlet;
 
+import com.helger.phase4.config.AS4Configuration;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.base.string.StringHelper;
 import com.helger.base.url.URLHelper;
@@ -39,24 +42,29 @@ import com.helger.xservlet.AbstractXServlet;
 
 public class SpringBootAS4Servlet extends AbstractXServlet
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (SpringBootAS4Servlet.class);
+
   public SpringBootAS4Servlet ()
   {
-    // Multipart is handled specifically inside
-    settings ().setMultipartEnabled (false);
-
-    // The main XServlet handler to handle the inbound request
-    final AS4XServletHandler hdl = new AS4XServletHandler ();
-    hdl.setRequestHandlerCustomizer (new IAS4ServletRequestHandlerCustomizer ()
+    super (new Phase4PeppolServletRequestHandlerCustomizer ()
     {
-      @SuppressWarnings ("removal")
+      @Override
       public void customizeBeforeHandling (@NonNull final IRequestWebScopeWithoutResponse aRequestScope,
                                            @NonNull final AS4UnifiedResponse aUnifiedResponse,
                                            @NonNull final AS4RequestHandler aRequestHandler)
       {
+        // Parent always first
+        super.customizeBeforeHandling (aRequestScope, aUnifiedResponse, aRequestHandler);
+
         final AS4CryptoFactoryInMemoryKeyStore aCryptoFactory = ServletConfig.getCryptoFactoryToUse ();
 
         // This method refers to the outer static method
         aRequestHandler.setCryptoFactory (aCryptoFactory);
+
+        final boolean performSBDHValueChecks = AS4Configuration
+                .getConfig()
+                .getAsBoolean("peppol.receiver.PerformSBDHValueChecks", true);
+        Phase4PeppolDefaultReceiverConfiguration.setPerformSBDHValueChecks(performSBDHValueChecks);
 
         // by Philip Helger
         aRequestHandler.getProcessorOfType (Phase4PeppolServletMessageProcessorSPI.class)
@@ -95,7 +103,6 @@ public class SpringBootAS4Servlet extends AbstractXServlet
             aReceiverCheckData = Phase4PeppolReceiverConfiguration.builder ()
                                                                   .receiverCheckEnabled (true)
                                                                   .serviceMetadataProvider (new SMPClientReadOnly (URLHelper.getAsURI ("http://smp-prod.example.org")))
-                                                                  ////.wildcardSelectionMode (Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE)
                                                                   .as4EndpointUrl ("https://ap-prod.example.org/as4")
                                                                   .apCertificate (new CertificateDecodeHelper ().source ("....Public Prod AP Cert....")
                                                                                                                 .pemEncoded (true)
@@ -110,7 +117,6 @@ public class SpringBootAS4Servlet extends AbstractXServlet
             aReceiverCheckData = Phase4PeppolReceiverConfiguration.builder ()
                                                                   .receiverCheckEnabled (true)
                                                                   .serviceMetadataProvider (new SMPClientReadOnly (URLHelper.getAsURI ("http://smp-test.example.org")))
-                                                                  ////.wildcardSelectionMode (Phase4PeppolDefaultReceiverConfiguration.DEFAULT_WILDCARD_SELECTION_MODE)
                                                                   .as4EndpointUrl ("https://ap-test.example.org/as4")
                                                                   .apCertificate (new CertificateDecodeHelper ().source ("....Public Test AP Cert....")
                                                                                                                 .pemEncoded (true)
@@ -125,13 +131,26 @@ public class SpringBootAS4Servlet extends AbstractXServlet
           aRequestHandler.getProcessorOfType (Phase4PeppolServletMessageProcessorSPI.class)
                          .setReceiverCheckData (aReceiverCheckData);
         }
+
+        if (false)
+        {
+          // Install a global consumer that is called every time an inbound message triggers an AS4
+          // Error Message
+          aRequestHandler.setErrorConsumer ( (aMessageMetdata, aIncomingState, aEbmsErrors, aAS4ErrorMsg) -> {
+            LOGGER.error ("!!! An AS4 error was created for incoming request " +
+                          aMessageMetdata.getIncomingUniqueID ());
+            LOGGER.error ("   Found " + aEbmsErrors.size () + " errors");
+            LOGGER.error ("   The created AS4 error message has the AS4 Message ID " + aAS4ErrorMsg.getMessagingID ());
+          });
+        }
       }
 
       public void customizeAfterHandling (@NonNull final IRequestWebScopeWithoutResponse aRequestScope,
                                           @NonNull final AS4UnifiedResponse aUnifiedResponse,
                                           @NonNull final AS4RequestHandler aRequestHandler)
       {
-        // empty
+        // Parent always last
+        super.customizeAfterHandling (aRequestScope, aUnifiedResponse, aRequestHandler);
       }
     });
 

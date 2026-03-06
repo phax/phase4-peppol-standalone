@@ -21,6 +21,7 @@ import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.time.YearMonth;
 
+import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;

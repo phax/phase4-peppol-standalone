@@ -145,5 +145,4 @@ public final class AppReportingHelper {
       return aSendingReport.getAsXMLString();
     };
   }
-
 }

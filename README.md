@@ -2,13 +2,13 @@
 
 This an example standalone implementation of [phase4](https://github.com/phax/phase4) for the Peppol Network.
 
-** == == == == == == == == == **
+**== == == == == == == == ==**
 
 ## phoss-ap
 
 Please see [phoss-ap](https://github.com/phax/phoss-ap) for a complete standalone Peppol Access Point (AP) based on [phase4](https://github.com/phax/phase4) and Spring Boot 4.x
 
-** == == == == == == == == == **
+**== == == == == == == == ==**
 
 This is a template application and NOT ready for production use, because you need to take decisions and add some code.
 Of course phase4 itself is ready for production use - see a list of [known phase4 users](https://github.com/phax/phase4/wiki/Known-Users) that have agreed to be publicly listed.

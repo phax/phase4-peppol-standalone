@@ -75,18 +75,19 @@ public class PeppolSenderController
     if (StringHelper.isEmpty (xtoken))
     {
       LOGGER.error ("The specific token header is missing");
-      throw new HttpForbiddenException ();
+      throw new HttpForbiddenException ("AS4 Sender: token is missing");
     }
     if (!xtoken.equals (APConfig.getPhase4ApiRequiredToken ()))
     {
       LOGGER.error ("The specified token value does not match the configured required token");
-      throw new HttpForbiddenException ();
+      throw new HttpForbiddenException ("AS4 Sender: token is invalid");
     }
 
+    // Make Network decisions
     final EPeppolNetwork eStage = APConfig.getPeppolStage ();
     final ISMLInfo aSML = eStage.getSMLInfo ();
-    final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP ()
-                                                          : PeppolTrustedCA.peppolTestAP ();
+    final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP () : PeppolTrustedCA
+                                                                                                                   .peppolTestAP ();
     LOGGER.info ("Trying to send Peppol " +
                  eStage.name () +
                  " message from '" +
@@ -140,8 +141,8 @@ public class PeppolSenderController
 
     final EPeppolNetwork eStage = APConfig.getPeppolStage ();
     final ISMLInfo aSMLInfo = eStage.getSMLInfo ();
-    final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP ()
-                                                          : PeppolTrustedCA.peppolTestAP ();
+    final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP () : PeppolTrustedCA
+                                                                                                                   .peppolTestAP ();
     LOGGER.info ("Trying to send Peppol " +
                  eStage.name () +
                  " message from '" +
@@ -175,18 +176,19 @@ public class PeppolSenderController
     if (StringHelper.isEmpty (xtoken))
     {
       LOGGER.error ("The specific token header is missing");
-      throw new HttpForbiddenException ();
+      throw new HttpForbiddenException ("AS4 Sender: token is missing");
     }
     if (!xtoken.equals (APConfig.getPhase4ApiRequiredToken ()))
     {
       LOGGER.error ("The specified token value does not match the configured required token");
-      throw new HttpForbiddenException ();
+      throw new HttpForbiddenException ("AS4 Sender: token is invalid");
     }
 
+    // Make Network decisions
     final EPeppolNetwork eStage = APConfig.getPeppolStage ();
     final ISMLInfo aSMLInfo = eStage.getSMLInfo ();
-    final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP ()
-                                                          : PeppolTrustedCA.peppolTestAP ();
+    final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP () : PeppolTrustedCA
+                                                                                                                   .peppolTestAP ();
     final Phase4PeppolSendingReport aSendingReport = new Phase4PeppolSendingReport (aSMLInfo);
 
     final PeppolSBDHData aData;

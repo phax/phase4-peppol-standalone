@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.CheckForSigned;
 import com.helger.annotation.concurrent.Immutable;
+import com.helger.base.string.StringHelper;
 import com.helger.config.fallback.IConfigWithFallback;
 import com.helger.httpclient.HttpClientSettings;
 import com.helger.httpclient.HttpClientSettingsConfig;
@@ -116,6 +117,40 @@ public final class APConfig
   public static boolean isReceivingEnabled ()
   {
     return getConfig ().getAsBoolean ("peppol.receiving.enabled", true);
+  }
+
+  /**
+   * Returns the PostgreSQL schema name configured for the Peppol stored-reports database
+   * ({@code peppol.report.jdbc.schema}), with a trailing dot appended so it can be used
+   * directly as a table name prefix in native SQL queries.
+   *
+   * @return Schema-qualified prefix string, e.g. {@code "phase4_peppol_reports."}, or an
+   *         empty string if the property is not set.
+   */
+  @NonNull
+  public static String getPeppolReportsTablePrefix ()
+  {
+    final String sSchema = getConfig ().getAsString ("peppol.report.jdbc.schema");
+    if (StringHelper.isEmpty (sSchema))
+      return "";
+    return sSchema + ".";
+  }
+
+  /**
+   * Returns the PostgreSQL schema name configured for the Peppol reporting-items database
+   * ({@code peppol.reporting.jdbc.schema}), with a trailing dot appended so it can be used
+   * directly as a table name prefix in native SQL queries.
+   *
+   * @return Schema-qualified prefix string, e.g. {@code "phase4_peppol_reporting."}, or an
+   *         empty string if the property is not set.
+   */
+  @NonNull
+  public static String getPeppolReportingTablePrefix ()
+  {
+    final String sSchema = getConfig ().getAsString ("peppol.reporting.jdbc.schema");
+    if (StringHelper.isEmpty (sSchema))
+      return "";
+    return sSchema + ".";
   }
 
   private static final AtomicBoolean PROXY_INITED = new AtomicBoolean (false);

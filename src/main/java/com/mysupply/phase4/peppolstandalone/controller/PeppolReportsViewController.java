@@ -17,6 +17,7 @@ package com.mysupply.phase4.peppolstandalone.controller;
 
 import com.helger.base.string.StringHelper;
 import com.mysupply.phase4.peppolstandalone.APConfig;
+import com.mysupply.phase4.persistence.DocumentConstants;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.slf4j.Logger;
@@ -60,9 +61,6 @@ public class PeppolReportsViewController {
 
     private static final String REPORT_TYPE_TSR = "tsr10";
     private static final String REPORT_TYPE_EUSR = "eusr11";
-
-    private static final String PEPPOL_REPORTS_TABLE_PREFIX = "phase4_peppol_reports.";
-    private static final String PEPPOL_REPORTING_TABLE_PREFIX = "phase4_peppol_reporting.";
 
     private static final DateTimeFormatter HTML_DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -249,7 +247,7 @@ public class PeppolReportsViewController {
         String sql = "SELECT EXTRACT(YEAR FROM exchangedt)::int AS year, " +
                      "EXTRACT(MONTH FROM exchangedt)::int AS month, " +
                      "COUNT(*) AS item_count " +
-                     "FROM " + PEPPOL_REPORTING_TABLE_PREFIX + "peppol_reporting_item " +
+                     "FROM " + APConfig.getPeppolReportingTablePrefix() + DocumentConstants.PEPPOL_REPORTING_ITEM_TABLE_NAME + " " +
                      "GROUP BY EXTRACT(YEAR FROM exchangedt), EXTRACT(MONTH FROM exchangedt) " +
                      "ORDER BY year DESC, month DESC";
 
@@ -270,7 +268,7 @@ public class PeppolReportsViewController {
         // DISTINCT ON keeps only the latest repcreatedt for each (reptype, repyear, repmonth).
         String sql = "SELECT DISTINCT ON (reptype, repyear, repmonth) " +
                      "reptype, repyear, repmonth, repcreatedt, repvalid " +
-                     "FROM " + PEPPOL_REPORTS_TABLE_PREFIX + "peppol_report " +
+                     "FROM " + APConfig.getPeppolReportsTablePrefix() + DocumentConstants.PEPPOL_REPORT_TABLE_NAME + " " +
                      "ORDER BY reptype, repyear, repmonth, repcreatedt DESC";
 
         List<Object[]> rows = entityManager.createNativeQuery(sql).getResultList();
@@ -300,7 +298,7 @@ public class PeppolReportsViewController {
         // DISTINCT ON keeps only the latest repcreatedt for each (reptype, repyear, repmonth).
         String sql = "SELECT DISTINCT ON (reptype, repyear, repmonth) " +
                      "reptype, repyear, repmonth, repcreatedt " +
-                     "FROM " + PEPPOL_REPORTS_TABLE_PREFIX + "peppol_sending_report " +
+                     "FROM " + APConfig.getPeppolReportsTablePrefix() + DocumentConstants.PEPPOL_SENDING_REPORT_TABLE_NAME + " " +
                      "ORDER BY reptype, repyear, repmonth, repcreatedt DESC";
 
         List<Object[]> rows = entityManager.createNativeQuery(sql).getResultList();
@@ -326,7 +324,7 @@ public class PeppolReportsViewController {
 
     @SuppressWarnings("unchecked")
     private String queryReportXml(final String reportType, final int year, final int month) {
-        String sql = "SELECT report FROM " + PEPPOL_REPORTS_TABLE_PREFIX + "peppol_report " +
+        String sql = "SELECT report FROM " + APConfig.getPeppolReportsTablePrefix() + DocumentConstants.PEPPOL_REPORT_TABLE_NAME + " " +
                      "WHERE reptype = :reptype AND repyear = :year AND repmonth = :month " +
                      "ORDER BY repcreatedt DESC LIMIT 1";
 
@@ -919,6 +917,12 @@ public class PeppolReportsViewController {
         public void setEusrSentDate(final LocalDateTime date) { this.eusrSentDate = date; }
     }
 }
+
+
+
+
+
+
 
 
 

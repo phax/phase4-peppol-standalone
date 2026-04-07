@@ -164,16 +164,15 @@ public class PeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingSBDHand
                 try {
                     LOGGER.info("Creating Peppol Reporting Item and storing it");
 
-                    // TODO determine correct values
-//                    final String sC3ID = aPeppolSBD.getReceiverAsIdentifier().getURIEncoded();
-                    final String sC4CountryCode = this.countryCodeMapper.mapCountryCode(aPeppolSBD.getReceiverValue());// "DK"; // incorrect, we need to determine the country code like in VAX
                     final String sC3ID = APConfig.getMyPeppolSeatID ();
+                    final String sC4CountryCode = this.countryCodeMapper.mapCountryCode(aPeppolSBD.getReceiverValue());
+                    final String sEndUserID = aPeppolSBD.getReceiverAsIdentifier().getURIEncoded();
                     final PeppolReportingItem aReportingItem = Phase4PeppolServletMessageProcessorSPI.createPeppolReportingItemForReceivedMessage(aUserMessage,
                             aPeppolSBD,
                             aIncomingState,
                             sC3ID,
                             sC4CountryCode,
-                            sC3ID);
+                            sEndUserID);
 
                     PeppolReportingBackend.withBackendDo(APConfig.getConfig(),
                             aBackend -> aBackend.storeReportingItem(aReportingItem));

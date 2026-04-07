@@ -2,6 +2,7 @@ package com.mysupply.phase4.peppolstandalone.reporting;
 
 import com.helger.base.wrapper.Wrapper;
 import com.helger.peppol.reporting.jaxb.eusr.v110.EndUserStatisticsReportType;
+import com.helger.peppol.reporting.jaxb.eusr.v110.SubsetKeyType;
 import com.helger.peppol.reportingsupport.EPeppolReportType;
 import com.helger.peppol.reportingsupport.IPeppolReportSenderCallback;
 import com.helger.peppol.reportingsupport.IPeppolReportStorage;
@@ -34,6 +35,8 @@ import java.time.YearMonth;
 )
 public class EndUserStatisticsReportApp implements CommandLineRunner {
     private static final Logger LOGGER = Phase4LoggerFactory.getLogger(EndUserStatisticsReportApp.class);
+
+    private static final String COUNTRY_CODE_META_SCHEME_ID = "CC";
 
     public static void main(final String[] args) {
         SpringApplication app = new SpringApplication(EndUserStatisticsReportApp.class);
@@ -90,6 +93,11 @@ public class EndUserStatisticsReportApp implements CommandLineRunner {
     private void cleanUpEndUserStatisticsReport(final EndUserStatisticsReportType report) {
         report.getSubset().removeIf(subsetType ->
                 subsetType.getKey().stream().anyMatch(keyType ->
-                        CountryCodeMapper.DEFAULT_COUNTRY_CODE.equals(keyType.getValue())));
+                        this.isDefaultCountryCode(keyType)));
+    }
+
+    private boolean isDefaultCountryCode(final SubsetKeyType subset) {
+        boolean isDefaultCountryCode = subset.getMetaSchemeID().equals(COUNTRY_CODE_META_SCHEME_ID) && subset.getValue().equals(CountryCodeMapper.DEFAULT_COUNTRY_CODE);
+        return isDefaultCountryCode;
     }
 }

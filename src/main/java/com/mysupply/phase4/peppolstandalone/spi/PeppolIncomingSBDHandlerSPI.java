@@ -19,6 +19,7 @@ package com.mysupply.phase4.peppolstandalone.spi;
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.style.IsSPIImplementation;
 import com.helger.http.header.HttpHeaderMap;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phase4.messaging.EAS4MessageMode;
 import com.helger.security.certificate.CertificateHelper;
 import com.mysupply.phase4.ICountryCodeMapper;
@@ -164,15 +165,15 @@ public class PeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingSBDHand
                     LOGGER.info("Creating Peppol Reporting Item and storing it");
 
                     // TODO determine correct values
-                    final String sC3ID = aPeppolSBD.getReceiverAsIdentifier().getURIEncoded();
-                    final String sC4CountryCode = this.countryCodeMapper.mapCountryCode(aPeppolSBD.getReceiverScheme(), aPeppolSBD.getReceiverValue()) ;// "DK"; // incorrect, we need to determine the country code like in VAX
-                    final String sEndUserID = APConfig.getMyPeppolSeatID ();
+//                    final String sC3ID = aPeppolSBD.getReceiverAsIdentifier().getURIEncoded();
+                    final String sC4CountryCode = this.countryCodeMapper.mapCountryCode(aPeppolSBD.getReceiverValue());// "DK"; // incorrect, we need to determine the country code like in VAX
+                    final String sC3ID = APConfig.getMyPeppolSeatID ();
                     final PeppolReportingItem aReportingItem = Phase4PeppolServletMessageProcessorSPI.createPeppolReportingItemForReceivedMessage(aUserMessage,
                             aPeppolSBD,
                             aIncomingState,
                             sC3ID,
                             sC4CountryCode,
-                            sEndUserID);
+                            sC3ID);
 
                     PeppolReportingBackend.withBackendDo(APConfig.getConfig(),
                             aBackend -> aBackend.storeReportingItem(aReportingItem));

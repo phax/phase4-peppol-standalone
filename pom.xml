@@ -168,12 +168,12 @@
     <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-core</artifactId>
-      <version>11.8.0</version>
+      <version>12.3.0</version>
     </dependency>
     <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-database-postgresql</artifactId>
-      <version>11.8.0</version>
+      <version>12.3.0</version>
     </dependency>
 
     <dependency>
@@ -185,7 +185,7 @@
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>42.7.5</version>
+        <version>42.7.10</version>
       </dependency>
 
     <dependency>

@@ -211,8 +211,7 @@ public final class PeppolSender
                                                                                         aMessageMetadata,
                                                                                         aState) -> {
                                                                     aSendingReport.setAS4ReceivedSignalMsg (aSignalMsg);
-                                                                  })
-                                                                  .disableValidation ();
+                                                                  });
       final Wrapper <Phase4Exception> aCaughtEx = new Wrapper <> ();
       eResult = aBuilder.sendMessageAndCheckForReceipt (aCaughtEx::set);
       LOGGER.info ("Peppol client send result: " + eResult);
@@ -386,8 +385,7 @@ public final class PeppolSender
                                                                                         aMessageMetadata,
                                                                                         aState) -> {
                                                                     aSendingReport.setAS4ReceivedSignalMsg (aSignalMsg);
-                                                                  })
-                                                                  .disableValidation ();
+                                                                  });
       final Wrapper <Phase4Exception> aCaughtEx = new Wrapper <> ();
       eResult = aBuilder.sendMessageAndCheckForReceipt (aCaughtEx::set);
       LOGGER.info ("Peppol client send result: " + eResult);

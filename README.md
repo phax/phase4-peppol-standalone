@@ -2,10 +2,20 @@
 
 This an example standalone implementation of [phase4](https://github.com/phax/phase4) for the Peppol Network.
 
-This is a demo application and NOT ready for production use (of course phase4 itself is ready for production use).
-Use it as a template to add your own code.
+**== == == == == == == == ==**
 
-**Note:** because it is demo code, no releases are created - you have to modify it anyway.
+## phoss-ap
+
+Please see [phoss-ap](https://github.com/phax/phoss-ap) for a complete standalone Peppol Access Point (AP) based on [phase4](https://github.com/phax/phase4) and Spring Boot 4.x
+
+**== == == == == == == == ==**
+
+This is a template application and NOT ready for production use, because you need to take decisions and add some code.
+Of course phase4 itself is ready for production use - see a list of [known phase4 users](https://github.com/phax/phase4/wiki/Known-Users) that have agreed to be publicly listed.
+
+**Note:** because it is a template application, no releases are created - you have to modify it anyway.
+
+Contact me via email for *commercial support* (see `pom.xml` for the address).
 
 This project is part of my Peppol solution stack. See https://github.com/phax/peppol for other components and libraries in that area.
 
@@ -23,7 +33,7 @@ It also contains a lot of boilerplate code to show how certain things can be ach
 
 Sending is triggered via an HTTP POST request.
 
-Since 2025-01-31 all the sending APIs mentioned below also require the HTTP Header `X-Token` to be present and have a specific value.
+All the sending APIs mentioned below also require the HTTP Header `X-Token` to be present and have a specific value.
 What value that is, depends on the configuration property `phase4.api.requiredtoken`.
 The pre-configured value is `NjIh9tIx3Rgzme19mGIy` and should be changed in your own setup.
 

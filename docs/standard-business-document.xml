@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<StandardBusinessDocument xmlns="http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader">
+    <StandardBusinessDocumentHeader>
+        <HeaderVersion>1.0</HeaderVersion>
+        <Sender>
+            <Identifier Authority="iso6523-actorid-upis">0184:DK25894375</Identifier>
+        </Sender>
+        <Receiver>
+            <Identifier Authority="iso6523-actorid-upis">9902:DK99010004</Identifier>
+        </Receiver>
+        <DocumentIdentification>
+            <Standard>urn:oasis:names:specification:ubl:schema:xsd:Invoice-2</Standard>
+            <TypeVersion>2.0</TypeVersion>
+            <InstanceIdentifier>6421ce06-5079-414a-b309-70640867ec5f</InstanceIdentifier>
+            <Type>Invoice</Type>
+            <CreationDateAndTime>2024-12-03T09:27:09Z</CreationDateAndTime>
+        </DocumentIdentification>
+        <BusinessScope>
+            <Scope>
+                <Type>DOCUMENTID</Type>
+                <InstanceIdentifier>urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##OIOUBL-2.01::2.0</InstanceIdentifier>
+                <Identifier>busdox-docid-qns</Identifier>
+            </Scope>
+            <Scope>
+                <Type>PROCESSID</Type>
+                <InstanceIdentifier>urn:www.nesubl.eu:profiles:profile5:ver2.0</InstanceIdentifier>
+                <Identifier>nes-procid-ubl</Identifier>
+            </Scope>
+            <Scope>
+                <Type>COUNTRY_C1</Type>
+                <InstanceIdentifier>DK</InstanceIdentifier>
+            </Scope>
+        </BusinessScope>
+    </StandardBusinessDocumentHeader>
+    <Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:ccts="urn:oasis:names:specification:ubl:schema:xsd:CoreComponentParameters-2" xmlns:sdt="urn:oasis:names:specification:ubl:schema:xsd:SpecializedDatatypes-2" xmlns:udt="urn:un:unece:uncefact:data:specification:UnqualifiedDataTypesSchemaModule:2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2 UBL-Invoice-2.0.xsd">
+        <cbc:UBLVersionID>2.0</cbc:UBLVersionID>
+        <cbc:CustomizationID>OIOUBL-2.01</cbc:CustomizationID>
+        <cbc:ProfileID schemeAgencyID="320" schemeID="urn:oioubl:id:profileid-1.2">urn:www.nesubl.eu:profiles:profile5:ver2.0</cbc:ProfileID>
+        <cbc:ID>mySupply Dokumentflow-test PEPPOL</cbc:ID>
+        <cbc:CopyIndicator>false</cbc:CopyIndicator>
+        <cbc:UUID>9756b4d0-8815-1029-857a-e388fe63f399</cbc:UUID>
+        <cbc:IssueDate>2020-08-03</cbc:IssueDate>
+        <cbc:InvoiceTypeCode listAgencyID="320" listID="urn:oioubl:codelist:invoicetypecode-1.1">380</cbc:InvoiceTypeCode>
+        <cbc:DocumentCurrencyCode>DKK</cbc:DocumentCurrencyCode>
+        <cbc:AccountingCost>.</cbc:AccountingCost>
+        <cac:OrderReference>
+            <cbc:ID>.</cbc:ID>
+            <cbc:UUID>9756b468-8815-1029-857a-e388fe63f399</cbc:UUID>
+            <cbc:IssueDate>2020-08-03</cbc:IssueDate>
+        </cac:OrderReference>
+        <cac:AccountingSupplierParty>
+            <cac:Party>
+                <cbc:EndpointID schemeID="DK:CVR">DK25894375</cbc:EndpointID>
+                <cac:PartyIdentification>
+                    <cbc:ID schemeID="DK:CVR">DK25894375</cbc:ID>
+                </cac:PartyIdentification>
+                <cac:PartyName>
+                    <cbc:Name>mySupply Dokumentflow-test PEPPOL</cbc:Name>
+                </cac:PartyName>
+                <cac:PostalAddress>
+                    <cbc:AddressFormatCode listAgencyID="320" listID="urn:oioubl:codelist:addressformatcode-1.1">StructuredDK</cbc:AddressFormatCode>
+                    <cbc:StreetName>.</cbc:StreetName>
+                    <cbc:BuildingNumber>.</cbc:BuildingNumber>
+                    <cbc:CityName>.</cbc:CityName>
+                    <cbc:PostalZone>.</cbc:PostalZone>
+                    <cac:Country>
+                        <cbc:IdentificationCode>DK</cbc:IdentificationCode>
+                    </cac:Country>
+                </cac:PostalAddress>
+                <cac:PartyTaxScheme>
+                    <cbc:CompanyID schemeID="DK:SE">DK25894375</cbc:CompanyID>
+                    <cac:TaxScheme>
+                        <cbc:ID schemeAgencyID="320" schemeID="urn:oioubl:id:taxschemeid-1.1">63</cbc:ID>
+                        <cbc:Name>Moms</cbc:Name>
+                    </cac:TaxScheme>
+                </cac:PartyTaxScheme>
+                <cac:PartyLegalEntity>
+                    <cbc:RegistrationName>mySupply Dokumentflow-test PEPPOL</cbc:RegistrationName>
+                    <cbc:CompanyID schemeID="DK:CVR">DK25894375</cbc:CompanyID>
+                </cac:PartyLegalEntity>
+                <cac:Contact>
+                    <cbc:ID>.</cbc:ID>
+                    <cbc:Name>.</cbc:Name>
+                    <cbc:Telephone>.</cbc:Telephone>
+                    <cbc:ElectronicMail>.</cbc:ElectronicMail>
+                </cac:Contact>
+            </cac:Party>
+        </cac:AccountingSupplierParty>
+        <cac:AccountingCustomerParty>
+            <cac:Party>
+                <cbc:EndpointID schemeAgencyID="9" schemeID="DK:CVR">DK99010004</cbc:EndpointID>
+                <cac:PartyIdentification>
+                    <cbc:ID schemeAgencyID="9" schemeID="GLN">5798009883896</cbc:ID>
+                </cac:PartyIdentification>
+                <cac:PartyName>
+                    <cbc:Name>mySupply Dokumentflow-test PEPPOL</cbc:Name>
+                </cac:PartyName>
+                <cac:PostalAddress>
+                    <cbc:AddressFormatCode listAgencyID="320" listID="urn:oioubl:codelist:addressformatcode-1.1">StructuredDK</cbc:AddressFormatCode>
+                    <cbc:StreetName>.</cbc:StreetName>
+                    <cbc:BuildingNumber>.</cbc:BuildingNumber>
+                    <cbc:CityName>.</cbc:CityName>
+                    <cbc:PostalZone>.</cbc:PostalZone>
+                    <cac:Country>
+                        <cbc:IdentificationCode>DK</cbc:IdentificationCode>
+                    </cac:Country>
+                </cac:PostalAddress>
+                <cac:Contact>
+                    <cbc:ID>.</cbc:ID>
+                    <cbc:Name>.</cbc:Name>
+                    <cbc:Telephone>.</cbc:Telephone>
+                    <cbc:ElectronicMail>.</cbc:ElectronicMail>
+                </cac:Contact>
+            </cac:Party>
+        </cac:AccountingCustomerParty>
+        <cac:Delivery>
+            <cbc:ActualDeliveryDate>2020-08-03</cbc:ActualDeliveryDate>
+        </cac:Delivery>
+        <cac:PaymentMeans>
+            <cbc:ID>1</cbc:ID>
+            <cbc:PaymentMeansCode>42</cbc:PaymentMeansCode>
+            <cbc:PaymentDueDate>2020-08-03</cbc:PaymentDueDate>
+            <cbc:PaymentChannelCode listAgencyID="320" listID="urn:oioubl:codelist:paymentchannelcode-1.1">DK:BANK</cbc:PaymentChannelCode>
+            <cac:PayeeFinancialAccount>
+                <cbc:ID>1234567890</cbc:ID>
+                <cbc:PaymentNote>A00095678</cbc:PaymentNote>
+                <cac:FinancialInstitutionBranch>
+                    <cbc:ID>1234</cbc:ID>
+                </cac:FinancialInstitutionBranch>
+            </cac:PayeeFinancialAccount>
+        </cac:PaymentMeans>
+        <cac:PaymentTerms>
+            <cbc:ID>1</cbc:ID>
+            <cbc:PaymentMeansID>1</cbc:PaymentMeansID>
+            <cbc:Amount currencyID="DKK">5.00</cbc:Amount>
+        </cac:PaymentTerms>
+        <cac:TaxTotal>
+            <cbc:TaxAmount currencyID="DKK">1.00</cbc:TaxAmount>
+            <cac:TaxSubtotal>
+                <cbc:TaxableAmount currencyID="DKK">4.00</cbc:TaxableAmount>
+                <cbc:TaxAmount currencyID="DKK">1.00</cbc:TaxAmount>
+                <cac:TaxCategory>
+                    <cbc:ID schemeAgencyID="320" schemeID="urn:oioubl:id:taxcategoryid-1.1">StandardRated</cbc:ID>
+                    <cbc:Percent>25</cbc:Percent>
+                    <cac:TaxScheme>
+                        <cbc:ID schemeAgencyID="320" schemeID="urn:oioubl:id:taxschemeid-1.1">63</cbc:ID>
+                        <cbc:Name>Moms</cbc:Name>
+                    </cac:TaxScheme>
+                </cac:TaxCategory>
+            </cac:TaxSubtotal>
+        </cac:TaxTotal>
+        <cac:LegalMonetaryTotal>
+            <cbc:LineExtensionAmount currencyID="DKK">4.00</cbc:LineExtensionAmount>
+            <cbc:TaxExclusiveAmount currencyID="DKK">1.00</cbc:TaxExclusiveAmount>
+            <cbc:TaxInclusiveAmount currencyID="DKK">5.00</cbc:TaxInclusiveAmount>
+            <cbc:PayableAmount currencyID="DKK">5.00</cbc:PayableAmount>
+        </cac:LegalMonetaryTotal>
+        <cac:InvoiceLine>
+            <cbc:ID>1</cbc:ID>
+            <cbc:InvoicedQuantity unitCode="EA">1.00</cbc:InvoicedQuantity>
+            <cbc:LineExtensionAmount currencyID="DKK">4.00</cbc:LineExtensionAmount>
+            <cac:OrderLineReference>
+                <cbc:LineID>1</cbc:LineID>
+            </cac:OrderLineReference>
+            <cac:TaxTotal>
+                <cbc:TaxAmount currencyID="DKK">1.00</cbc:TaxAmount>
+                <cac:TaxSubtotal>
+                    <cbc:TaxableAmount currencyID="DKK">4.00</cbc:TaxableAmount>
+                    <cbc:TaxAmount currencyID="DKK">1.00</cbc:TaxAmount>
+                    <cac:TaxCategory>
+                        <cbc:ID schemeAgencyID="320" schemeID="urn:oioubl:id:taxcategoryid-1.1">StandardRated</cbc:ID>
+                        <cbc:Percent>25</cbc:Percent>
+                        <cac:TaxScheme>
+                            <cbc:ID schemeAgencyID="320" schemeID="urn:oioubl:id:taxschemeid-1.1">63</cbc:ID>
+                            <cbc:Name>Moms</cbc:Name>
+                        </cac:TaxScheme>
+                    </cac:TaxCategory>
+                </cac:TaxSubtotal>
+            </cac:TaxTotal>
+            <cac:Item>
+                <cbc:Description>.</cbc:Description>
+                <cbc:Name>.</cbc:Name>
+                <cac:SellersItemIdentification>
+                    <cbc:ID schemeAgencyID="9" schemeID="GTIN">.</cbc:ID>
+                </cac:SellersItemIdentification>
+            </cac:Item>
+            <cac:Price>
+                <cbc:PriceAmount currencyID="DKK">4.00</cbc:PriceAmount>
+                <cbc:BaseQuantity unitCode="EA">1.00</cbc:BaseQuantity>
+                <cbc:OrderableUnitFactorRate>1.00</cbc:OrderableUnitFactorRate>
+            </cac:Price>
+        </cac:InvoiceLine>
+    </Invoice>
+</StandardBusinessDocument>

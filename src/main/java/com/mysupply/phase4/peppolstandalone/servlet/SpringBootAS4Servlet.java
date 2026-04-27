@@ -142,7 +142,6 @@ public class SpringBootAS4Servlet extends Phase4PeppolAS4Servlet
         }
       }
 
-      @Override
       public void customizeAfterHandling (@NonNull final IRequestWebScopeWithoutResponse aRequestScope,
                                           @NonNull final AS4UnifiedResponse aUnifiedResponse,
                                           @NonNull final AS4RequestHandler aRequestHandler)

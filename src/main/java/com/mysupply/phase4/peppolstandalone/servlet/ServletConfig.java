@@ -69,9 +69,11 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.PreDestroy;
 import jakarta.servlet.ServletContext;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.scheduling.annotation.Scheduled;
 
 @Configuration
+@ConditionalOnWebApplication
 public class ServletConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServletConfig.class);
 

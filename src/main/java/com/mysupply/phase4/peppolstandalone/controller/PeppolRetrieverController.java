@@ -365,6 +365,7 @@ public class PeppolRetrieverController {
             html.append("</style></head><body>");
             html.append("<h1>Document Database Status</h1>");
             html.append("<a class=\"refresh-btn\" href=\"viewDocuments?token=").append(token).append("\">🔄 Refresh / Clear Filters</a>");
+            html.append(" <a class=\"refresh-btn\" style=\"background-color:#1565c0;\" href=\"viewReports?token=").append(token).append("\">📊 Peppol Reports</a>");
 
             // Search form
             html.append("<div class=\"search-form\">");

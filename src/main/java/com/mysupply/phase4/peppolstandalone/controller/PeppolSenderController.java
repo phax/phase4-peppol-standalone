@@ -105,7 +105,7 @@ public class PeppolSenderController {
         }
 
         final EPeppolNetwork eStage = APConfig.getPeppolStage();
-        final ESML eSML = eStage.isProduction() ? ESML.DIGIT_PRODUCTION : ESML.DIGIT_TEST;
+        final ESML eSML = eStage.isProduction() ? ESML.PEPPOL_PRODUCTION : ESML.PEPPOL_TEST;
         //final Phase4PeppolSendingReport aSendingReport = new Phase4PeppolSendingReport(eSML);
 
         final PeppolSBDHData aData;
@@ -156,7 +156,7 @@ public class PeppolSenderController {
         }
 
         final EPeppolNetwork eStage = APConfig.getPeppolStage();
-        final ESML eSML = eStage.isProduction() ? ESML.DIGIT_PRODUCTION : ESML.DIGIT_TEST;
+        final ESML eSML = eStage.isProduction() ? ESML.PEPPOL_PRODUCTION : ESML.PEPPOL_TEST;
         final TrustedCAChecker aApCaChecker = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP () : PeppolTrustedCA.peppolTestAP();
 
         final Phase4PeppolSendingReportExtension aSendingReport = new Phase4PeppolSendingReportExtension(eSML);
@@ -216,7 +216,7 @@ public class PeppolSenderController {
         }
 
         final EPeppolNetwork eStage = APConfig.getPeppolStage();
-        final ESML eSML = eStage.isProduction() ? ESML.DIGIT_PRODUCTION : ESML.DIGIT_TEST;
+        final ESML eSML = eStage.isProduction() ? ESML.PEPPOL_PRODUCTION : ESML.PEPPOL_TEST;
         final LookupReport lookupReport = new LookupReport();
 
         final PeppolSBDHData aData;

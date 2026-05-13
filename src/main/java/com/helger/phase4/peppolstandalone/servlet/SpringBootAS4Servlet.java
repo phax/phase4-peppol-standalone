@@ -95,7 +95,7 @@ public class SpringBootAS4Servlet extends Phase4PeppolAS4Servlet
                                                                                                                 .getDecodedOrNull ())
                                                                   .sbdhIdentifierFactoryPeppol ()
                                                                   .performSBDHValueChecks (Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks ())
-                                                                  .checkSigningCertificateRevocation (Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation ())
+                                                                  .checkAPSigningCertificateRevocation (Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation ())
                                                                   .build ();
           }
           else
@@ -109,7 +109,7 @@ public class SpringBootAS4Servlet extends Phase4PeppolAS4Servlet
                                                                                                                 .getDecodedOrNull ())
                                                                   .sbdhIdentifierFactoryPeppol ()
                                                                   .performSBDHValueChecks (Phase4PeppolDefaultReceiverConfiguration.isPerformSBDHValueChecks ())
-                                                                  .checkSigningCertificateRevocation (Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation ())
+                                                                  .checkAPSigningCertificateRevocation (Phase4PeppolDefaultReceiverConfiguration.isCheckSigningCertificateRevocation ())
                                                                   .build ();
           }
 

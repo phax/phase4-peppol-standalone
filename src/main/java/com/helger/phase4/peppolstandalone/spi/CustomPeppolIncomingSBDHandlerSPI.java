@@ -34,6 +34,7 @@ import com.helger.peppol.sbdh.PeppolSBDHData;
 import com.helger.peppol.sbdh.payload.PeppolSBDHPayloadBinaryMarshaller;
 import com.helger.peppol.sbdh.spec12.BinaryContentType;
 import com.helger.peppol.sbdh.spec12.ObjectFactory;
+import com.helger.peppolid.peppol.enduser.PeppolEndUserHelper;
 import com.helger.phase4.ebms3header.Ebms3UserMessage;
 import com.helger.phase4.error.AS4ErrorList;
 import com.helger.phase4.incoming.IAS4IncomingMessageMetadata;
@@ -92,11 +93,11 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
       // TODO example code on how to identify Factur-X payloads
       final Element aXMLPayload = aPeppolSBD.getBusinessMessageNoClone ();
       if (ObjectFactory._BinaryContent_QNAME.getLocalPart ().equals (aXMLPayload.getLocalName ()) &&
-        ObjectFactory._BinaryContent_QNAME.getNamespaceURI ().equals (aXMLPayload.getNamespaceURI ()))
+          ObjectFactory._BinaryContent_QNAME.getNamespaceURI ().equals (aXMLPayload.getNamespaceURI ()))
       {
         if ("urn:peppol:doctype:pdf+xml".equals (aPeppolSBD.getStandard ()) &&
-          "0".equals (aPeppolSBD.getTypeVersion ()) &&
-          "factur-x".equals (aPeppolSBD.getType ()))
+            "0".equals (aPeppolSBD.getTypeVersion ()) &&
+            "factur-x".equals (aPeppolSBD.getType ()))
         {
           // Handle as Factur-X
           final BinaryContentType aBinaryContent = new PeppolSBDHPayloadBinaryMarshaller ().read (aXMLPayload);
@@ -110,7 +111,7 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
     // Error Message to the sender
 
     // Last action in this method
-    new Thread ( () -> {
+    new Thread (() -> {
       // TODO If you have a way to determine the real end user of the message
       // here, this might be a good opportunity to store the data for Peppol
       // Reporting (do this asynchronously as the last activity)
@@ -126,7 +127,7 @@ public class CustomPeppolIncomingSBDHandlerSPI implements IPhase4PeppolIncomingS
           // TODO determine correct values for the next three fields
           final String sC3ID = sMyPeppolSeatID;
           final String sC4CountryCode = "AT";
-          final String sEndUserID = aPeppolSBD.getReceiverAsIdentifier ().getURIEncoded ();
+          final String sEndUserID = PeppolEndUserHelper.getEffectiveEndUserID (aPeppolSBD.getReceiverAsIdentifier ());
 
           // Create the reporting item
           final PeppolReportingItem aReportingItem = Phase4PeppolServletMessageProcessorSPI.createPeppolReportingItemForReceivedMessage (aUserMessage,

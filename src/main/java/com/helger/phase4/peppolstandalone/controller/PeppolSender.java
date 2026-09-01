@@ -33,6 +33,7 @@ import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.peppolid.peppol.doctype.EPredefinedDocumentTypeIdentifier;
+import com.helger.peppolid.peppol.enduser.PeppolEndUserHelper;
 import com.helger.peppolid.peppol.process.EPredefinedProcessIdentifier;
 import com.helger.phase4.client.IAS4ClientBuildMessageCallback;
 import com.helger.phase4.logging.Phase4LoggerFactory;
@@ -183,9 +184,9 @@ public final class PeppolSender
                                                                   })
                                                                   .endpointURLConsumer (aSendingReport::setC3EndpointURL)
                                                                   .technicalContactConsumer (aSendingReport::setC3TechnicalContact)
-                                                                  .certificateConsumer ( (aAPCertificate,
-                                                                                          aCheckDT,
-                                                                                          eCertCheckResult) -> {
+                                                                  .certificateConsumer ((aAPCertificate,
+                                                                                         aCheckDT,
+                                                                                         eCertCheckResult) -> {
                                                                     // Determined by SMP lookup
                                                                     aSendingReport.setC3Cert (aAPCertificate);
                                                                     aSendingReport.setC3CertCheckDT (aCheckDT);
@@ -207,9 +208,9 @@ public final class PeppolSender
                                                                     }
                                                                   })
                                                                   .rawResponseConsumer (aSendingReport::setRawHttpResponse)
-                                                                  .signalMsgConsumer ( (aSignalMsg,
-                                                                                        aMessageMetadata,
-                                                                                        aState) -> {
+                                                                  .signalMsgConsumer ((aSignalMsg,
+                                                                                       aMessageMetadata,
+                                                                                       aState) -> {
                                                                     aSendingReport.setAS4ReceivedSignalMsg (aSignalMsg);
                                                                   });
       final Wrapper <Phase4Exception> aCaughtEx = new Wrapper <> ();
@@ -220,7 +221,7 @@ public final class PeppolSender
       {
         // TODO determine the enduser ID of the outbound message
         // In many simple cases, this might be the sender's participant ID
-        final String sEndUserID = aSenderID.getURIEncoded ();
+        final String sEndUserID = PeppolEndUserHelper.getEffectiveEndUserID (aSenderID);
 
         // TODO Enable Peppol Reporting when ready
         if (false)
@@ -357,9 +358,9 @@ public final class PeppolSender
                                                                   })
                                                                   .endpointURLConsumer (aSendingReport::setC3EndpointURL)
                                                                   .technicalContactConsumer (aSendingReport::setC3TechnicalContact)
-                                                                  .certificateConsumer ( (aAPCertificate,
-                                                                                          aCheckDT,
-                                                                                          eCertCheckResult) -> {
+                                                                  .certificateConsumer ((aAPCertificate,
+                                                                                         aCheckDT,
+                                                                                         eCertCheckResult) -> {
                                                                     // Determined by SMP lookup
                                                                     aSendingReport.setC3Cert (aAPCertificate);
                                                                     aSendingReport.setC3CertCheckDT (aCheckDT);
@@ -381,9 +382,9 @@ public final class PeppolSender
                                                                     }
                                                                   })
                                                                   .rawResponseConsumer (aSendingReport::setRawHttpResponse)
-                                                                  .signalMsgConsumer ( (aSignalMsg,
-                                                                                        aMessageMetadata,
-                                                                                        aState) -> {
+                                                                  .signalMsgConsumer ((aSignalMsg,
+                                                                                       aMessageMetadata,
+                                                                                       aState) -> {
                                                                     aSendingReport.setAS4ReceivedSignalMsg (aSignalMsg);
                                                                   });
       final Wrapper <Phase4Exception> aCaughtEx = new Wrapper <> ();
@@ -394,7 +395,7 @@ public final class PeppolSender
       {
         // TODO determine the enduser ID of the outbound message
         // In many simple cases, this might be the sender's participant ID
-        final String sEndUserID = aSenderID.getURIEncoded ();
+        final String sEndUserID = PeppolEndUserHelper.getEffectiveEndUserID (aSenderID);
 
         // TODO Enable Peppol Reporting when ready
         if (false)
@@ -476,9 +477,9 @@ public final class PeppolSender
                                                                       .smpClient (aSMPClient)
                                                                       .endpointURLConsumer (aSendingReport::setC3EndpointURL)
                                                                       .technicalContactConsumer (aSendingReport::setC3TechnicalContact)
-                                                                      .certificateConsumer ( (aAPCertificate,
-                                                                                              aCheckDT,
-                                                                                              eCertCheckResult) -> {
+                                                                      .certificateConsumer ((aAPCertificate,
+                                                                                             aCheckDT,
+                                                                                             eCertCheckResult) -> {
                                                                         // Determined by SMP lookup
                                                                         aSendingReport.setC3Cert (aAPCertificate);
                                                                         aSendingReport.setC3CertCheckDT (aCheckDT);
@@ -500,9 +501,9 @@ public final class PeppolSender
                                                                         }
                                                                       })
                                                                       .rawResponseConsumer (aSendingReport::setRawHttpResponse)
-                                                                      .signalMsgConsumer ( (aSignalMsg,
-                                                                                            aMessageMetadata,
-                                                                                            aState) -> {
+                                                                      .signalMsgConsumer ((aSignalMsg,
+                                                                                           aMessageMetadata,
+                                                                                           aState) -> {
                                                                         aSendingReport.setAS4ReceivedSignalMsg (aSignalMsg);
                                                                       });
       final Wrapper <Phase4Exception> aCaughtEx = new Wrapper <> ();
@@ -513,7 +514,7 @@ public final class PeppolSender
       {
         // TODO determine the enduser ID of the outbound message
         // In many simple cases, this might be the sender's participant ID
-        final String sEndUserID = aData.getSenderAsIdentifier ().getURIEncoded ();
+        final String sEndUserID = PeppolEndUserHelper.getEffectiveEndUserID (aData.getSenderAsIdentifier ());
 
         // TODO Enable Peppol Reporting when ready
         if (false)

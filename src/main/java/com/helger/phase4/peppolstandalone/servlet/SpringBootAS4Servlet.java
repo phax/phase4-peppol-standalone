@@ -122,7 +122,7 @@ public class SpringBootAS4Servlet extends Phase4PeppolAS4Servlet
         {
           // Install a global consumer that is called every time an inbound message triggers an AS4
           // Error Message
-          aRequestHandler.setErrorConsumer ( (aMessageMetdata, aIncomingState, aEbmsErrors, aAS4ErrorMsg) -> {
+          aRequestHandler.setErrorConsumer ((aMessageMetdata, aIncomingState, aEbmsErrors, aAS4ErrorMsg) -> {
             LOGGER.error ("!!! An AS4 error was created for incoming request " +
                           aMessageMetdata.getIncomingUniqueID ());
             LOGGER.error ("   Found " + aEbmsErrors.size () + " errors");

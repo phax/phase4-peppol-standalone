@@ -86,8 +86,8 @@ public class PeppolSenderController
     // Make Network decisions
     final EPeppolNetwork eStage = APConfig.getPeppolStage ();
     final ISMLInfo aSML = eStage.getSMLInfo ();
-    final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP () : PeppolTrustedCA
-                                                                                                                   .peppolTestAP ();
+    final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP ()
+                                                          : PeppolTrustedCA.peppolTestAP ();
     LOGGER.info ("Trying to send Peppol " +
                  eStage.name () +
                  " message from '" +
@@ -141,8 +141,8 @@ public class PeppolSenderController
 
     final EPeppolNetwork eStage = APConfig.getPeppolStage ();
     final ISMLInfo aSMLInfo = eStage.getSMLInfo ();
-    final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP () : PeppolTrustedCA
-                                                                                                                   .peppolTestAP ();
+    final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP ()
+                                                          : PeppolTrustedCA.peppolTestAP ();
     LOGGER.info ("Trying to send Peppol " +
                  eStage.name () +
                  " message from '" +
@@ -187,8 +187,8 @@ public class PeppolSenderController
     // Make Network decisions
     final EPeppolNetwork eStage = APConfig.getPeppolStage ();
     final ISMLInfo aSMLInfo = eStage.getSMLInfo ();
-    final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP () : PeppolTrustedCA
-                                                                                                                   .peppolTestAP ();
+    final TrustedCAChecker aAPCA = eStage.isProduction () ? PeppolTrustedCA.peppolProductionAP ()
+                                                          : PeppolTrustedCA.peppolTestAP ();
     final Phase4PeppolSendingReport aSendingReport = new Phase4PeppolSendingReport (aSMLInfo);
 
     final PeppolSBDHData aData;
